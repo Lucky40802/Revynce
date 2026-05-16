@@ -1767,30 +1767,90 @@ window.markAllRead=function(){
   document.getElementById('notif-dot').style.display='none';
 };
 
-// ── CHATBOT ──
-const chatResponses=[
-  "Great question! Let me break that down step by step for you.",
-  "This is a core exam topic. The key is understanding the relationship between cause and effect here.",
-  "Here's how I'd approach that — start with the definition, then work through the application.",
-  "That's a common sticking point. The trick is to remember the acronym PMAT (or whichever applies to your subject).",
-  "Let me explain this with an analogy that makes it click. Think of it like…",
-  "That's actually a tricky one — but if you understand the underlying principle, it becomes clear.",
-  "Great revision topic! For exams, they often ask about this in the context of real-world applications.",
+// ── CHATBOT — powered by Groq via secure Cloud Function proxy ──
+//
+// ▼▼▼  PASTE YOUR DEPLOYED FUNCTION URL BELOW  ▼▼▼
+// After running: firebase deploy --only functions
+// Copy the URL printed in the terminal, e.g.:
+//   https://chat-abc12345-uc.a.run.app
+// and replace the placeholder below.
+//
+const PROXY_URL = 'YOUR_CLOUD_FUNCTION_URL_HERE'; // <-- replace this
+
+let chatHistory = [
+  {
+    role: 'system',
+    content: `You are Revynce AI, an expert study tutor for high school and university students.
+You help with all subjects — maths, science, history, literature, languages, and more.
+Explain concepts clearly, set practice problems, give essay feedback, and create study strategies.
+Keep responses concise but thorough. Use bullet points and numbered lists where helpful.
+When giving worked examples, show step-by-step solutions. Always be encouraging and positive.`
+  }
 ];
-window.sendMsg=function(){
-  const input=document.getElementById('chatInput');
-  const text=input.value.trim();
-  if(!text)return;
-  input.value=''; document.getElementById('sendBtn').disabled=true;
-  appendChat(text,'user'); showTyping();
-  setTimeout(()=>{
+
+window.sendMsg = async function() {
+  const input   = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const text    = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  sendBtn.disabled = true;
+
+  appendChat(text, 'user');
+  chatHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  // Show a helpful message if URL hasn't been configured yet
+  if (!PROXY_URL || PROXY_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
     removeTyping();
-    appendChat(chatResponses[Math.floor(Math.random()*chatResponses.length)],'ai');
-    document.getElementById('sendBtn').disabled=false; input.focus();
-  },800+Math.random()*800);
+    appendChatError('⚙ AI Tutor not yet connected. Deploy the Cloud Function and set PROXY_URL in the HTML. See functions/index.js for instructions.');
+    sendBtn.disabled = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:       'llama3-70b-8192',
+        messages:    chatHistory,
+        max_tokens:  1024,
+        temperature: 0.7
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Server error ' + res.status);
+    }
+
+    const data  = await res.json();
+    const reply = data.choices?.[0]?.message?.content;
+    if (!reply) throw new Error('Empty response from AI');
+
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Keep context window manageable (system prompt + last 20 turns)
+    if (chatHistory.length > 21) {
+      chatHistory = [chatHistory[0], ...chatHistory.slice(-20)];
+    }
+
+    removeTyping();
+    appendChat(reply, 'ai');
+
+  } catch(e) {
+    removeTyping();
+    appendChatError('⚠ Could not reach AI: ' + e.message);
+  }
+
+  sendBtn.disabled = false;
+  input.focus();
 };
-window.useSuggestion=function(chip){
-  document.getElementById('chatInput').value=chip.textContent;
+
+window.useSuggestion = function(chip) {
+  document.getElementById('chatInput').value = chip.textContent;
   sendMsg();
 };
 function appendChat(text,type){
@@ -1801,6 +1861,13 @@ function appendChat(text,type){
   const bubble=document.createElement('div'); bubble.className='msg-bubble'; bubble.textContent=text;
   wrap.appendChild(ava); wrap.appendChild(bubble); box.appendChild(wrap);
   box.scrollTop=box.scrollHeight;
+}
+function appendChatError(msg){
+  const box=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.style.cssText='color:var(--rose);font-size:.8rem;padding:9px 14px;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);border-radius:10px;margin:0 0 4px';
+  div.textContent=msg;
+  box.appendChild(div); box.scrollTop=box.scrollHeight;
 }
 function showTyping(){
   const box=document.getElementById('chatMessages');

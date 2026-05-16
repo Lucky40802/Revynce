@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revynce</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #050505;
+    color: white;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 2px solid cyan;
+}
+
+.neon {
+    color: cyan;
+    text-shadow: 0 0 5px cyan, 0 0 10px cyan, 0 0 20px cyan;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 15px;
+    background: #111;
+}
+
+nav a {
+    color: cyan;
+    text-decoration: none;
+}
+
+.hero {
+    text-align: center;
+    padding: 70px 20px;
+}
+
+.btn {
+    background: transparent;
+    color: cyan;
+    border: 2px solid cyan;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px cyan;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 20px;
+    padding: 40px;
+}
+
+.card {
+    background: #111;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid cyan;
+    box-shadow: 0 0 10px rgba(0,255,255,0.3);
+}
+
+.upload-section, .chatbot-section, .leaderboard-section, .voice-section, .login-section {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.drop-zone {
+    border: 2px dashed cyan;
+    padding: 40px;
+    margin: 20px auto;
+    width: 60%;
+    cursor: pointer;
+}
+
+.chatbox {
+    width: 60%;
+    margin: auto;
+    background: #111;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.chat-input {
+    width: 80%;
+    padding: 10px;
+}
+
+.leaderboard {
+    width: 60%;
+    margin: auto;
+}
+
+.leaderboard li {
+    list-style: none;
+    background: #111;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.voice-room {
+    background: #111;
+    width: 60%;
+    margin: auto;
+    padding: 30px;
+    border-radius: 12px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 2px solid cyan;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1 class="neon">Revynce</h1>
+    <p>AI Powered Student Learning Platform</p>
+</header>
+
+<nav>
+    <a href="#features">Features</a>
+    <a href="#upload">AI Upload</a>
+    <a href="#chatbot">AI Tutor</a>
+    <a href="#leaderboard">Leaderboard</a>
+    <a href="#voice">Voice Study</a>
+</nav>
+
+<section class="hero">
+    <h1 class="neon">Future of Studying</h1>
+    <p>Turn textbooks into notes, quizzes, flashcards, and more.</p>
+    <button class="btn">Get Started</button>
+</section>
+
+<section id="features" class="features">
+    <div class="card"><h2 class="neon">AI Notes</h2></div>
+    <div class="card"><h2 class="neon">AI Quizzes</h2></div>
+    <div class="card"><h2 class="neon">Flashcards</h2></div>
+    <div class="card"><h2 class="neon">Pomodoro Timer</h2></div>
+    <div class="card"><h2 class="neon">Teacher Dashboard</h2></div>
+    <div class="card"><h2 class="neon">Auto Marking</h2></div>
+</section>
+
+<section id="upload" class="upload-section">
+    <h1 class="neon">Drag & Drop Upload</h1>
+    <div class="drop-zone" id="dropZone">
+        Drop syllabus/textbook here
+    </div>
+    <button class="btn">Generate AI Content</button>
+</section>
+
+<section id="chatbot" class="chatbot-section">
+    <h1 class="neon">AI Study Chatbot</h1>
+    <div class="chatbox">
+        <div class="chat-messages" id="chatMessages">
+            <p>AI Tutor: Ask me anything about your studies.</p>
+        </div>
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question...">
+        <button class="btn" onclick="sendMessage()">Send</button>
+    </div>
+</section>
+
+<section id="leaderboard" class="leaderboard-section">
+    <h1 class="neon">Leaderboard</h1>
+    <ul class="leaderboard">
+        <li>1. Alex - 500 XP</li>
+        <li>2. Sarah - 450 XP</li>
+        <li>3. John - 400 XP</li>
+    </ul>
+</section>
+
+<section id="voice" class="voice-section">
+    <h1 class="neon">Voice Study Rooms</h1>
+    <div class="voice-room">
+        <p>Join live study sessions with friends</p>
+        <button class="btn"><i class="fa-solid fa-microphone"></i> Join Room</button>
+    </div>
+</section>
+
+<section class="login-section">
+    <h1 class="neon">Login / Dashboard</h1>
+    <p>Student & Teacher account login system placeholder</p>
+</section>
+
+<footer>
+    <p>© 2026 Revynce</p>
+</footer>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.background = '#222';
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.style.background = '#111';
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.innerHTML = 'File Uploaded Successfully!';
+});
+
+function sendMessage() {
+    let input = document.getElementById('chatInput');
+    let messages = document.getElementById('chatMessages');
+
+    if(input.value.trim() !== '') {
+        messages.innerHTML += `<p>You: ${input.value}</p>`;
+        messages.innerHTML += `<p>AI Tutor: I'm processing your question...</p>`;
+        input.value = '';
+    }
+}
+// ---------------- FIREBASE SETUP ----------------
+// Replace with your actual Firebase config from urlFirebase Consolehttps://console.firebase.google.com
+const firebaseConfig = {
+  apiKey: "AIzaSyBgjPbnop4gn5ATFMiNthMN6HAbhloXGG8",
+  authDomain: "revynce-740d1.firebaseapp.com",
+  databaseURL: "https://revynce-740d1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "revynce-740d1",
+  storageBucket: "revynce-740d1.firebasestorage.app",
+  messagingSenderId: "624890666308",
+  appId: "1:624890666308:web:fc91a7549010bea4d80b11",
+  measurementId: "G-WYNFB4GQ8K"
+};
+
+// Firebase SDK imports (CDN)
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---------------- USER AUTH ----------------
+window.signupUser = async function () {
+    const email = prompt("Enter email:");
+    const password = prompt("Enter password:");
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Account created successfully!");
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+window.loginUser = async function () {
+    const email = prompt("Enter email:");
+    const password = prompt("Enter password:");
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// ---------------- SAVE STUDY FILE DATA ----------------
+window.saveStudyMaterial = async function () {
+    const fileName = prompt("Enter uploaded file name:");
+
+    try {
+        await addDoc(collection(db, "studyMaterials"), {
+            fileName: fileName,
+            uploadedAt: new Date(),
+            generatedNotes: true
+        });
+
+        alert("Study material saved to database!");
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// ---------------- VIEW LEADERBOARD DATA ----------------
+window.loadLeaderboard = async function () {
+    const querySnapshot = await getDocs(collection(db, "leaderboard"));
+
+    querySnapshot.forEach((doc) => {
+        console.log(doc.data());
+    });
+}
+</script>
+
+<section style="text-align:center; padding:50px;">
+    <h1 class="neon">Firebase Database Integration</h1>
+    <p>Signup/Login + Save Study Materials + Leaderboard Database</p>
+    <br>
+    <button class="btn" onclick="signupUser()">Sign Up</button>
+    <button class="btn" onclick="loginUser()">Login</button>
+    <button class="btn" onclick="saveStudyMaterial()">Save File</button>
+</section>
+
+</body>
+</html>

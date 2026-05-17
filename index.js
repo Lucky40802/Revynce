@@ -1,65 +1,55 @@
 /**
- * Revynce — OpenAI Proxy
+ * Revynce — Groq AI Proxy
  * Firebase Cloud Function (2nd gen)
  *
- * HOW TO UPDATE & REDEPLOY:
- * 1. Store your NEW OpenAI key as a secret:
- *       firebase functions:secrets:set OPENAI_API_KEY
- *    Paste your new key when prompted.
- *
- * 2. Replace functions/index.js with this file.
- *
- * 3. Deploy:
- *       firebase deploy --only functions
+ * HOW TO REDEPLOY:
+ * 1. firebase functions:secrets:set GROQ_API_KEY
+ *    (paste your Groq key when prompted)
+ * 2. firebase deploy --only functions
  */
 
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 
-// References the secret stored in Google Secret Manager
-const openAiKey = defineSecret("OPENAI_API_KEY");
+const groqKey = defineSecret("GROQ_API_KEY");
 
 exports.chat = onRequest(
   {
-    secrets: [openAiKey],        // key injected at runtime only — never in browser
+    secrets: [groqKey],
     cors: true,
     region: "us-central1",
     timeoutSeconds: 30,
-    minInstances: 0,             // scales to zero when idle (free tier friendly)
+    minInstances: 0,
   },
   async (req, res) => {
 
-    // ── CORS — locked to your GitHub Pages domain ──
     const allowedOrigins = [
       "https://lucky40802.github.io",
       "http://localhost",
       "http://127.0.0.1",
-      "null",                    // file:// during local dev
+      "null",
     ];
 
     const origin = req.headers.origin || "";
     if (allowedOrigins.includes(origin)) {
       res.set("Access-Control-Allow-Origin", origin);
     } else {
-      res.set("Access-Control-Allow-Origin", "*"); // remove this line once tested
+      res.set("Access-Control-Allow-Origin", "*");
     }
 
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type");
 
-    // Handle CORS preflight
     if (req.method === "OPTIONS") {
       res.status(204).send("");
       return;
     }
 
-    // Only allow POST
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
     }
 
-    // Validate request body
     const { messages, model, max_tokens, temperature } = req.body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -67,18 +57,17 @@ exports.chat = onRequest(
       return;
     }
 
-    // ── Forward to OpenAI ──
     try {
-      const openAiResponse = await fetch(
-        "https://api.openai.com/v1/chat/completions",
+      const groqResponse = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
         {
           method: "POST",
           headers: {
             "Content-Type":  "application/json",
-            "Authorization": `Bearer ${openAiKey.value()}`, // key never sent to browser
+            "Authorization": `Bearer ${groqKey.value()}`,
           },
           body: JSON.stringify({
-            model:       model       || "gpt-3.5-turbo",
+            model:       model       || "llama3-70b-8192",
             messages:    messages,
             max_tokens:  max_tokens  || 1024,
             temperature: temperature || 0.7,
@@ -86,16 +75,16 @@ exports.chat = onRequest(
         }
       );
 
-      if (!openAiResponse.ok) {
-        const errBody = await openAiResponse.json();
-        console.error("OpenAI API error:", errBody);
-        res.status(openAiResponse.status).json({
-          error: errBody.error?.message || "OpenAI API error",
+      if (!groqResponse.ok) {
+        const errBody = await groqResponse.json();
+        console.error("Groq API error:", errBody);
+        res.status(groqResponse.status).json({
+          error: errBody.error?.message || "Groq API error",
         });
         return;
       }
 
-      const data = await openAiResponse.json();
+      const data = await groqResponse.json();
       res.status(200).json(data);
 
     } catch (err) {

@@ -78,7 +78,7 @@ exports.chat = onRequest(
             "Authorization": `Bearer ${openAiKey.value()}`, // key never sent to browser
           },
           body: JSON.stringify({
-            model:       model       || "gpt-4o-mini", // cheap + fast + smart
+            model:       model       || "gpt-3.5-turbo",
             messages:    messages,
             max_tokens:  max_tokens  || 1024,
             temperature: temperature || 0.7,

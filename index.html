@@ -1814,7 +1814,7 @@ window.sendMsg = async function() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:       'gpt-3.5-turbo',
+        model:       'llama3-70b-8192',
         messages:    chatHistory,
         max_tokens:  1024,
         temperature: 0.7

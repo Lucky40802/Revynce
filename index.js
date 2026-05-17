@@ -1,56 +1,47 @@
 /**
- * Revynce — Groq AI Proxy
+ * Revynce — OpenAI Proxy
  * Firebase Cloud Function (2nd gen)
  *
- * HOW TO DEPLOY:
- * 1. cd into the folder that contains this `functions/` directory
- * 2. npm install -g firebase-tools   (if not already installed)
- * 3. firebase login
- * 4. firebase init functions         (choose your revynce-740d1 project, JavaScript, no ESLint)
- * 5. Copy this file into functions/index.js
- * 6. cd functions && npm install     (installs firebase-functions, firebase-admin)
- * 7. Store your secret key:
- *       firebase functions:secrets:set GROQ_API_KEY
- *    Paste your key when prompted: gsk_JNTSTg...
- * 8. Deploy:
+ * HOW TO UPDATE & REDEPLOY:
+ * 1. Store your NEW OpenAI key as a secret:
+ *       firebase functions:secrets:set OPENAI_API_KEY
+ *    Paste your new key when prompted.
+ *
+ * 2. Replace functions/index.js with this file.
+ *
+ * 3. Deploy:
  *       firebase deploy --only functions
- * 9. Copy the printed Function URL — looks like:
- *       https://chat-XXXXXXXX-uc.a.run.app
- *    Paste it into revynce.html as PROXY_URL (see comment there).
  */
 
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 
-// This references the secret stored in Google Secret Manager via Firebase
-const groqKey = defineSecret("GROQ_API_KEY");
+// References the secret stored in Google Secret Manager
+const openAiKey = defineSecret("OPENAI_API_KEY");
 
 exports.chat = onRequest(
   {
-    secrets: [groqKey],          // injects secret as env var at runtime only
-    cors: true,                  // auto-handles OPTIONS preflight
-    region: "us-central1",       // change if you prefer a closer region
+    secrets: [openAiKey],        // key injected at runtime only — never in browser
+    cors: true,
+    region: "us-central1",
     timeoutSeconds: 30,
     minInstances: 0,             // scales to zero when idle (free tier friendly)
   },
   async (req, res) => {
 
-    // ── CORS headers — restrict to your domain in production ──
+    // ── CORS — locked to your GitHub Pages domain ──
     const allowedOrigins = [
-      "https://revynce-740d1.web.app",
-      "https://revynce-740d1.firebaseapp.com",
-      "http://localhost",          // for local testing
+      "https://lucky40802.github.io",
+      "http://localhost",
       "http://127.0.0.1",
-      "null",                      // file:// in browser during dev
+      "null",                    // file:// during local dev
     ];
 
     const origin = req.headers.origin || "";
     if (allowedOrigins.includes(origin)) {
       res.set("Access-Control-Allow-Origin", origin);
     } else {
-      // Uncomment the line below to lock down to allowed origins only.
-      // For now we allow all so you can test before deploying to your domain.
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "*"); // remove this line once tested
     }
 
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -76,18 +67,18 @@ exports.chat = onRequest(
       return;
     }
 
-    // ── Forward to Groq ──
+    // ── Forward to OpenAI ──
     try {
-      const groqResponse = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
+      const openAiResponse = await fetch(
+        "https://api.openai.com/v1/chat/completions",
         {
           method: "POST",
           headers: {
             "Content-Type":  "application/json",
-            "Authorization": `Bearer ${groqKey.value()}`,  // key never sent to browser
+            "Authorization": `Bearer ${openAiKey.value()}`, // key never sent to browser
           },
           body: JSON.stringify({
-            model:       model       || "llama3-70b-8192",
+            model:       model       || "gpt-4o-mini", // cheap + fast + smart
             messages:    messages,
             max_tokens:  max_tokens  || 1024,
             temperature: temperature || 0.7,
@@ -95,16 +86,16 @@ exports.chat = onRequest(
         }
       );
 
-      if (!groqResponse.ok) {
-        const errBody = await groqResponse.json();
-        console.error("Groq API error:", errBody);
-        res.status(groqResponse.status).json({
-          error: errBody.error?.message || "Groq API error",
+      if (!openAiResponse.ok) {
+        const errBody = await openAiResponse.json();
+        console.error("OpenAI API error:", errBody);
+        res.status(openAiResponse.status).json({
+          error: errBody.error?.message || "OpenAI API error",
         });
         return;
       }
 
-      const data = await groqResponse.json();
+      const data = await openAiResponse.json();
       res.status(200).json(data);
 
     } catch (err) {

@@ -408,25 +408,62 @@ body::before {
 .suggestion-chip:hover { border-color:var(--cyan); color:var(--cyan); }
 
 /* ═══════════════════════════════════════
-   FLASHCARDS
+   FLASHCARD SETS (Quizlet-style)
 ═══════════════════════════════════════ */
-.fc-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
-.fc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
-.flashcard {
-  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
-  padding:28px 22px; cursor:pointer; min-height:160px; display:flex; align-items:center;
-  justify-content:center; text-align:center; position:relative; transition:all .25s;
-  perspective:1000px;
+/* Deck browser */
+.deck-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+.deck-card {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:22px; cursor:pointer; transition:all .22s; position:relative; overflow:hidden;
 }
-.flashcard:hover { border-color:var(--cyan); transform:translateY(-2px); }
-.flashcard.flipped { border-color:var(--cyan); background:var(--cyan-dim); }
-.flashcard.flipped .fc-front { display:none; }
-.flashcard:not(.flipped) .fc-back { display:none; }
-.fc-front { font-weight:600; font-size:.9rem; line-height:1.5; }
-.fc-back { color:var(--cyan); font-size:.85rem; line-height:1.7; }
-.fc-tag { position:absolute; top:10px; left:12px; font-size:.65rem; font-weight:700; color:var(--text-muted); background:var(--bg-card2); padding:2px 8px; border-radius:100px; }
-.fc-hint { position:absolute; bottom:10px; right:12px; font-size:.63rem; color:var(--text-muted); }
-.fc-difficulty { position:absolute; top:10px; right:12px; font-size:.65rem; }
+.deck-card:hover { border-color:var(--cyan); transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,.18); }
+.deck-card::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:var(--cyan); opacity:0; transition:opacity .2s; }
+.deck-card:hover::before { opacity:1; }
+.deck-icon { width:48px;height:48px; background:var(--cyan-dim); border-radius:13px; display:flex;align-items:center;justify-content:center; font-size:1.3rem; color:var(--cyan); margin-bottom:14px; }
+.deck-name { font-family:var(--font-d); font-weight:700; font-size:1rem; margin-bottom:3px; }
+.deck-count { font-size:.78rem; color:var(--text-muted); margin-bottom:18px; }
+.deck-footer { display:flex;align-items:center;justify-content:space-between; padding-top:14px; border-top:1px solid var(--border); }
+.deck-date { font-size:.7rem; color:var(--text-muted); }
+.deck-study-btn { background:var(--cyan); color:#05070f; border:none; padding:7px 16px; border-radius:8px; font-family:var(--font-b); font-size:.78rem; font-weight:700; cursor:pointer; display:flex;align-items:center;gap:6px; }
+.deck-study-btn:hover { opacity:.85; }
+.fc-empty { text-align:center; padding:60px 20px; color:var(--text-muted); grid-column:1/-1; }
+.fc-empty i { font-size:2.5rem; color:var(--border); display:block; margin-bottom:14px; }
+.fc-empty p { font-size:.875rem; margin-bottom:18px; }
+/* Study mode */
+.fc-decks-view.hidden { display:none; }
+.fc-study-view { display:none; }
+.fc-study-view.active { display:block; }
+.fc-study-topbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px; }
+.fc-study-meta { display:flex;align-items:center;gap:10px; }
+.fc-study-actions { display:flex;gap:8px; }
+.fc-progress-wrap { margin-bottom:26px; }
+.fc-progress-label { display:flex;justify-content:space-between;font-size:.76rem;color:var(--text-muted);margin-bottom:7px; }
+.fc-progress-bar { height:5px; background:rgba(255,255,255,.07); border-radius:3px; overflow:hidden; }
+.fc-progress-fill { height:100%; background:var(--cyan); border-radius:3px; transition:width .4s ease; }
+/* 3D flip card */
+.fc-scene { perspective:1200px; width:100%; max-width:680px; height:320px; margin:0 auto 26px; cursor:pointer; }
+.fc-inner { width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .5s cubic-bezier(.4,0,.2,1); }
+.fc-inner.flipped { transform:rotateY(180deg); }
+.fc-face { position:absolute;inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-lg); display:flex;flex-direction:column;align-items:center;justify-content:center; padding:40px; text-align:center; }
+.fc-face-front { background:var(--bg-card); border:1px solid var(--border); }
+.fc-face-front:hover { border-color:var(--cyan); }
+.fc-face-back { background:var(--cyan-dim); border:1px solid var(--border-active); transform:rotateY(180deg); }
+.fc-face-label { font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);margin-bottom:16px; }
+.fc-face-back .fc-face-label { color:var(--cyan); }
+.fc-face-text { font-family:var(--font-d); font-size:clamp(1rem,3vw,1.45rem); font-weight:700; line-height:1.45; }
+.fc-face-back .fc-face-text { color:var(--cyan); }
+.fc-flip-hint { position:absolute;bottom:18px;font-size:.68rem;color:var(--text-muted);opacity:.55; }
+/* Nav controls */
+.fc-nav { display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px; }
+.fc-nav-btn { width:50px;height:50px;border-radius:13px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s; }
+.fc-nav-btn:hover:not(:disabled) { border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim); }
+.fc-nav-btn:disabled { opacity:.28;cursor:default; }
+.fc-flip-btn { flex:1;max-width:200px;height:50px;border-radius:13px;background:var(--cyan);color:#05070f;border:none;font-family:var(--font-d);font-weight:700;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px; }
+.fc-flip-btn:hover { opacity:.88; }
+.fc-shortcuts { text-align:center;font-size:.72rem;color:var(--text-muted);display:flex;justify-content:center;gap:16px;flex-wrap:wrap; }
+.fc-shortcut-key { display:inline-flex;align-items:center;gap:5px; }
+.fc-shortcut-key kbd { background:var(--bg-card2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:.68rem;font-family:monospace; }
+@media(max-width:600px) { .fc-scene{height:240px} .fc-face{padding:24px} }
 
 /* ═══════════════════════════════════════
    QUIZZES
@@ -1156,21 +1193,80 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 
     <!-- ── FLASHCARDS ── -->
     <div class="app-panel" id="panel-flashcards">
-      <h2 class="section-head">Flashcards</h2>
-      <p class="section-sub">Click any card to flip and reveal the answer.</p>
-      <div class="fc-toolbar">
-        <span class="badge">Biology</span><span class="badge badge-violet">Physics</span><span class="badge badge-amber">Maths</span>
-        <button class="btn-ghost" style="padding:7px 14px;font-size:.8rem;margin-left:auto" onclick="showPanel('upload',null)"><i class="fi fi-br-plus"></i> Generate New Deck</button>
+
+      <!-- ── Deck Browser ── -->
+      <div class="fc-decks-view" id="fc-decks-view">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 class="section-head" style="margin-bottom:4px">My Flashcard Sets</h2>
+            <p style="color:var(--text-muted);font-size:.875rem">Study your decks Quizlet-style — flip, navigate, shuffle.</p>
+          </div>
+          <button class="btn-primary" onclick="showPanel('upload',null)"><i class="fi fi-br-magic-wand"></i> New Set with AI</button>
+        </div>
+        <div class="deck-grid" id="deck-grid">
+          <!-- Populated by renderDecks() -->
+        </div>
       </div>
-      <div class="fc-grid" id="fc-grid">
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Biology</div><div class="fc-front">What is photosynthesis?</div><div class="fc-back">The process by which plants convert sunlight, water and CO₂ into glucose and oxygen using chlorophyll.</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Biology</div><div class="fc-front">Define osmosis.</div><div class="fc-back">Movement of water molecules from high to low water potential through a semi-permeable membrane.</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Physics</div><div class="fc-front">Newton's Second Law?</div><div class="fc-back">F = ma. Force equals mass times acceleration. The net force on an object equals its mass multiplied by its acceleration.</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Maths</div><div class="fc-front">Quadratic formula?</div><div class="fc-back">x = (−b ± √(b²−4ac)) / 2a — used to solve any quadratic equation ax² + bx + c = 0.</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">History</div><div class="fc-front">Cause of World War I?</div><div class="fc-back">Assassination of Franz Ferdinand + MAIN: Militarism, Alliances, Imperialism, Nationalism.</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Biology</div><div class="fc-front">What is mitosis?</div><div class="fc-back">Cell division producing two identical daughter cells. Stages: PMAT (Prophase, Metaphase, Anaphase, Telophase).</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Chemistry</div><div class="fc-front">What is an ionic bond?</div><div class="fc-back">A bond formed by the electrostatic attraction between oppositely charged ions, usually between metals and non-metals.</div><div class="fc-hint">tap to flip</div></div>
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="fc-tag">Maths</div><div class="fc-front">What is the derivative of sin(x)?</div><div class="fc-back">cos(x) — Remember: d/dx[sin(x)] = cos(x), d/dx[cos(x)] = −sin(x).</div><div class="fc-hint">tap to flip</div></div>
+
+      <!-- ── Study Mode ── -->
+      <div class="fc-study-view" id="fc-study-view">
+        <div class="fc-study-topbar">
+          <button class="btn-ghost" style="padding:8px 14px;font-size:.82rem" onclick="closeStudyMode()">
+            <i class="fi fi-rr-angle-left"></i> All Sets
+          </button>
+          <div class="fc-study-meta">
+            <span class="badge" id="fc-study-subject">Subject</span>
+            <span style="font-size:.82rem;color:var(--text-muted)" id="fc-counter">0 / 0</span>
+          </div>
+          <div class="fc-study-actions">
+            <button class="btn-ghost" style="padding:8px 13px;font-size:.82rem" title="Shuffle (S)" onclick="shuffleStudyDeck()"><i class="fi fi-br-shuffle"></i></button>
+            <button class="btn-ghost" style="padding:8px 13px;font-size:.82rem" title="Restart (R)" onclick="restartStudyDeck()"><i class="fi fi-br-rotate-left"></i></button>
+          </div>
+        </div>
+
+        <div class="fc-progress-wrap">
+          <div class="fc-progress-label">
+            <span id="fc-prog-label">Card 1</span>
+            <span id="fc-prog-pct">0%</span>
+          </div>
+          <div class="fc-progress-bar"><div class="fc-progress-fill" id="fc-prog-fill" style="width:0%"></div></div>
+        </div>
+
+        <!-- 3D Flip Card -->
+        <div class="fc-scene" id="fc-scene" onclick="flipStudyCard()">
+          <div class="fc-inner" id="fc-inner">
+            <div class="fc-face fc-face-front">
+              <div class="fc-face-label">Question</div>
+              <div class="fc-face-text" id="fc-front-text">Loading…</div>
+              <span class="fc-flip-hint">Click or press Space to flip</span>
+            </div>
+            <div class="fc-face fc-face-back">
+              <div class="fc-face-label">Answer</div>
+              <div class="fc-face-text" id="fc-back-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="fc-nav">
+          <button class="fc-nav-btn" id="fc-prev-btn" onclick="prevStudyCard()" title="Previous (←)">
+            <i class="fi fi-rr-angle-left"></i>
+          </button>
+          <button class="fc-flip-btn" onclick="flipStudyCard()">
+            <i class="fi fi-br-refresh"></i> Flip
+          </button>
+          <button class="fc-nav-btn" id="fc-next-btn" onclick="nextStudyCard()" title="Next (→)">
+            <i class="fi fi-rr-angle-right"></i>
+          </button>
+        </div>
+
+        <div class="fc-shortcuts">
+          <span class="fc-shortcut-key"><kbd>Space</kbd> Flip</span>
+          <span class="fc-shortcut-key"><kbd>←</kbd> Prev</span>
+          <span class="fc-shortcut-key"><kbd>→</kbd> Next</span>
+          <span class="fc-shortcut-key"><kbd>R</kbd> Restart</span>
+          <span class="fc-shortcut-key"><kbd>S</kbd> Shuffle</span>
+        </div>
       </div>
     </div>
 
@@ -1963,47 +2059,60 @@ window._createClass = async function(name, subject, yearLevel) {
   } catch(e) { console.error('_createClass:', e); return null; }
 };
 
-// ── Flashcards ──
+// ── Flashcards (deck-based) ──
 async function loadFlashcards() {
   if (!window._uid) return;
   try {
     const snap = await get(child(ref(db), `flashcardDecks/${window._uid}`));
-    if (!snap.exists()) return;
-    const grid = document.getElementById('fc-grid');
-    grid.innerHTML = '';
-    for (const [, deck] of Object.entries(snap.val())) {
-      (deck.cards||[]).forEach(card => {
-        const el = document.createElement('div');
-        el.className = 'flashcard';
-        el.onclick = function(){ this.classList.toggle('flipped'); };
-        el.innerHTML = `<div class="fc-tag">${deck.subject||'Study'}</div><div class="fc-front">${card.front}</div><div class="fc-back">${card.back}</div><div class="fc-hint">tap to flip</div>`;
-        grid.appendChild(el);
-      });
+    if (snap.exists()) {
+      window._fcDecks = snap.val();
+    } else {
+      _restoreSampleDecks();
     }
-    if (!grid.children.length) _restoreSampleCards();
+    window.renderDecks?.();
   } catch(e) { console.error('loadFlashcards:', e); }
 }
 window._loadFlashcards = loadFlashcards;
 
-function _restoreSampleCards() {
-  const samples = [
-    {tag:'Biology',front:'What is photosynthesis?',back:'The process by which plants convert sunlight, water and CO₂ into glucose and oxygen using chlorophyll.'},
-    {tag:'Biology',front:'Define osmosis.',back:'Movement of water molecules from high to low water potential through a semi-permeable membrane.'},
-    {tag:'Physics',front:"Newton's Second Law?",back:'F = ma. Force equals mass times acceleration.'},
-    {tag:'Maths',front:'Quadratic formula?',back:'x = (−b ± √(b²−4ac)) / 2a'},
-    {tag:'History',front:'Cause of World War I?',back:'Assassination of Franz Ferdinand + MAIN: Militarism, Alliances, Imperialism, Nationalism.'},
-    {tag:'Biology',front:'What is mitosis?',back:'Cell division producing two identical daughter cells. Stages: PMAT.'},
-    {tag:'Chemistry',front:'What is an ionic bond?',back:'A bond formed by the electrostatic attraction between oppositely charged ions.'},
-    {tag:'Maths',front:'Derivative of sin(x)?',back:'cos(x)'},
-  ];
-  const grid = document.getElementById('fc-grid');
-  samples.forEach(c => {
-    const el = document.createElement('div');
-    el.className = 'flashcard';
-    el.onclick = function(){ this.classList.toggle('flipped'); };
-    el.innerHTML = `<div class="fc-tag">${c.tag}</div><div class="fc-front">${c.front}</div><div class="fc-back">${c.back}</div><div class="fc-hint">tap to flip</div>`;
-    grid.appendChild(el);
-  });
+function _restoreSampleDecks() {
+  window._fcDecks = {
+    'sample-bio': {
+      subject: 'Biology',
+      createdAt: new Date().toISOString(),
+      cards: [
+        { front:'What is photosynthesis?', back:'The process by which plants convert sunlight, water and CO₂ into glucose and oxygen using chlorophyll.' },
+        { front:'Define osmosis.', back:'Movement of water molecules from high to low water potential through a semi-permeable membrane.' },
+        { front:'What is mitosis?', back:'Cell division producing two identical daughter cells. Stages: PMAT (Prophase, Metaphase, Anaphase, Telophase).' },
+        { front:'What is an enzyme?', back:'A biological catalyst (protein) that speeds up chemical reactions without being consumed.' },
+        { front:'Define homeostasis.', back:'The maintenance of a stable internal environment despite external changes.' },
+        { front:'What is ATP?', back:'Adenosine triphosphate — the primary energy currency of the cell, produced in mitochondria.' },
+        { front:'Define natural selection.', back:'Organisms with favourable traits survive and reproduce more, passing those traits to offspring.' },
+        { front:'What is meiosis?', back:'Cell division producing four genetically unique haploid cells, used in sexual reproduction.' },
+      ]
+    },
+    'sample-maths': {
+      subject: 'Mathematics',
+      createdAt: new Date().toISOString(),
+      cards: [
+        { front:'Quadratic formula?', back:'x = (−b ± √(b²−4ac)) / 2a — solves ax² + bx + c = 0.' },
+        { front:"Newton's Second Law?", back:'F = ma — Force equals mass times acceleration.' },
+        { front:'Derivative of sin(x)?', back:'cos(x)  —  d/dx[cos(x)] = −sin(x).' },
+        { front:'Product rule?', back:'If y = uv, then dy/dx = u·(dv/dx) + v·(du/dx).' },
+        { front:'Equation of a circle?', back:'(x−h)² + (y−k)² = r², centred at (h,k) with radius r.' },
+      ]
+    },
+    'sample-chem': {
+      subject: 'Chemistry',
+      createdAt: new Date().toISOString(),
+      cards: [
+        { front:'What is an ionic bond?', back:'Electrostatic attraction between oppositely charged ions, usually metal + non-metal.' },
+        { front:'Avogadro\'s number?', back:'6.022 × 10²³ — the number of particles in one mole of a substance.' },
+        { front:'What is pH?', back:'A scale (0–14) measuring acidity. pH < 7 acidic, pH 7 neutral, pH > 7 alkaline.' },
+        { front:'Endothermic vs exothermic?', back:'Endothermic: absorbs heat (feels cold). Exothermic: releases heat (feels warm).' },
+        { front:'OIL RIG?', back:'Oxidation Is Loss of electrons. Reduction Is Gain of electrons.' },
+      ]
+    },
+  };
 }
 
 // ── Quiz score saver ──
@@ -2123,7 +2232,8 @@ window.appGenerate = async function() {
           createdAt: new Date().toISOString(),
           cards: generated.flashcards
         });
-        loadFlashcards();
+        await loadFlashcards();
+        window.renderDecks?.();
       }
       loadDashboardStats();
       await window._addXP(50);
@@ -2284,6 +2394,7 @@ window.showPanel = function(name, navEl) {
   document.getElementById('topbar-title').textContent = titles[name] || name;
   if (name === 'quizzes') initQuiz();
   if (name === 'schedule') renderSchedule();
+  if (name === 'flashcards') renderDecks();
   if (name === 'notifications') markAllRead();
   window.scrollTo(0, 0);
 };
@@ -2542,6 +2653,136 @@ window.resetPomo = function() {
   updatePomoUI(); document.getElementById('pomo-start').innerHTML='<i class="fi fi-br-play"></i> Start';
 };
 window.skipPomo = function() { clearInterval(pomoInterval); pomoRunning=false; pomoSeconds=0; tickPomo(); };
+
+// ═══════════════════════════════════════
+//  FLASHCARD SETS — Quizlet-style
+// ═══════════════════════════════════════
+const _deckIcons = {
+  Biology:'fi-br-flask', Mathematics:'fi-br-calculator', Maths:'fi-br-calculator',
+  Chemistry:'fi-br-atom', Physics:'fi-br-science', History:'fi-br-book-open-cover',
+  English:'fi-br-book', default:'fi-br-layers'
+};
+
+window.renderDecks = function() {
+  const grid = document.getElementById('deck-grid');
+  if (!grid) return;
+  const decks = window._fcDecks || {};
+  const keys  = Object.keys(decks);
+
+  if (!keys.length) {
+    grid.innerHTML = `
+      <div class="fc-empty">
+        <i class="fi fi-br-layers"></i>
+        <p>No flashcard sets yet. Generate one from your uploaded material.</p>
+        <button class="btn-primary" onclick="showPanel('upload',null)">
+          <i class="fi fi-br-magic-wand"></i> Generate a Set with AI
+        </button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = keys.map(id => {
+    const d = decks[id];
+    const count = d.cards?.length || 0;
+    const icon  = _deckIcons[d.subject] || _deckIcons.default;
+    const date  = d.createdAt
+      ? new Date(d.createdAt).toLocaleDateString('en-AU', { day:'numeric', month:'short' })
+      : '';
+    return `
+      <div class="deck-card" onclick="openDeck('${id}')">
+        <div class="deck-icon"><i class="fi ${icon}"></i></div>
+        <div class="deck-name">${d.subject || 'Untitled Set'}</div>
+        <div class="deck-count">${count} card${count !== 1 ? 's' : ''}</div>
+        <div class="deck-footer">
+          <span class="deck-date">${date}</span>
+          <button class="deck-study-btn" onclick="event.stopPropagation();openDeck('${id}')">
+            <i class="fi fi-rr-play"></i> Study
+          </button>
+        </div>
+      </div>`;
+  }).join('') + `
+    <div class="deck-card" style="border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:170px" onclick="showPanel('upload',null)">
+      <i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i>
+      <span style="font-size:.84rem;color:var(--text-muted);font-weight:600">New Set</span>
+    </div>`;
+};
+
+// Study mode state
+let _studyCards = [], _studyIdx = 0, _studyFlipped = false;
+
+window.openDeck = function(deckId) {
+  const deck = (window._fcDecks || {})[deckId];
+  if (!deck?.cards?.length) return;
+  _studyCards   = [...deck.cards];
+  _studyIdx     = 0;
+  _studyFlipped = false;
+  document.getElementById('fc-study-subject').textContent = deck.subject || 'Study';
+  document.getElementById('fc-decks-view').classList.add('hidden');
+  document.getElementById('fc-study-view').classList.add('active');
+  _renderStudyCard();
+};
+
+window.closeStudyMode = function() {
+  document.getElementById('fc-study-view').classList.remove('active');
+  document.getElementById('fc-decks-view').classList.remove('hidden');
+  document.getElementById('fc-inner').classList.remove('flipped');
+};
+
+function _renderStudyCard() {
+  const card  = _studyCards[_studyIdx];
+  const total = _studyCards.length;
+  if (!card) return;
+  _studyFlipped = false;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  document.getElementById('fc-front-text').textContent = card.front;
+  document.getElementById('fc-back-text').textContent  = card.back;
+  const n   = _studyIdx + 1;
+  const pct = Math.round((n / total) * 100);
+  document.getElementById('fc-counter').textContent    = `${n} / ${total}`;
+  document.getElementById('fc-prog-label').textContent = `Card ${n} of ${total}`;
+  document.getElementById('fc-prog-pct').textContent   = pct + '%';
+  document.getElementById('fc-prog-fill').style.width  = pct + '%';
+  document.getElementById('fc-prev-btn').disabled = _studyIdx === 0;
+  document.getElementById('fc-next-btn').disabled = _studyIdx === total - 1;
+}
+
+window.flipStudyCard = function() {
+  _studyFlipped = !_studyFlipped;
+  document.getElementById('fc-inner').classList.toggle('flipped', _studyFlipped);
+};
+
+window.nextStudyCard = function() {
+  if (_studyIdx < _studyCards.length - 1) { _studyIdx++; _renderStudyCard(); }
+};
+
+window.prevStudyCard = function() {
+  if (_studyIdx > 0) { _studyIdx--; _renderStudyCard(); }
+};
+
+window.shuffleStudyDeck = function() {
+  for (let i = _studyCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [_studyCards[i], _studyCards[j]] = [_studyCards[j], _studyCards[i]];
+  }
+  _studyIdx = 0; _renderStudyCard();
+  showToast('Deck shuffled!', 'info');
+};
+
+window.restartStudyDeck = function() {
+  _studyIdx = 0; _renderStudyCard();
+  showToast('Restarted from card 1', 'info');
+};
+
+// Keyboard shortcuts (only active in study mode)
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('fc-study-view')?.classList.contains('active')) return;
+  if (['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if (e.key === ' ' || e.key === 'Enter')            { e.preventDefault(); flipStudyCard(); }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextStudyCard(); }
+  else if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); prevStudyCard(); }
+  else if (e.key === 'r' || e.key === 'R') restartStudyDeck();
+  else if (e.key === 's' || e.key === 'S') shuffleStudyDeck();
+});
 
 // ── Leaderboard filter ──
 window.setLbFilter = function(btn, filter) {

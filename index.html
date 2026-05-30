@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-accent="cyan">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Revynce — AI Student Platform</title>
+<!-- Apply saved theme before paint to prevent flash -->
+<script>(function(){var t=localStorage.getItem('revynce-theme'),a=localStorage.getItem('revynce-accent');if(t)document.documentElement.setAttribute('data-theme',t);if(a)document.documentElement.setAttribute('data-accent',a);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <!-- Flaticon Uicons -->
@@ -688,6 +690,100 @@ body::before {
   .lb-podium { gap:6px; }
   .app-panel { padding:20px 18px; }
 }
+
+/* ═══════════════════════════════════════
+   THEME TRANSITIONS
+═══════════════════════════════════════ */
+body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
+.auth-card, .chatbox, .modal, .flashcard, .quiz-card,
+.lb-item, .notif-item, .class-card, .feat-card, .stat-card,
+.voice-card, .badge-card, .pomo-display, .pomo-settings,
+.agenda-item, .welcome-banner, input, button {
+  transition: background-color .3s ease, border-color .3s ease, color .25s ease, box-shadow .3s ease;
+}
+
+/* ── Light Mode ── */
+[data-theme="light"] {
+  --bg: #f0f4ff;
+  --bg-2: #e6ecfb;
+  --bg-card: #ffffff;
+  --bg-card2: #f5f7fe;
+  --text: #1a1f35;
+  --text-muted: #6b7a99;
+  --border: rgba(0,0,0,0.09);
+  --border-active: rgba(0,240,212,0.45);
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+[data-theme="light"] body::before { opacity: 0; }
+[data-theme="light"] .orb-1 { background: radial-gradient(circle,rgba(0,240,212,0.15),transparent 70%); }
+[data-theme="light"] .orb-2 { background: radial-gradient(circle,rgba(124,58,237,0.12),transparent 70%); }
+[data-theme="light"] .btn-primary { color: #05070f; }
+[data-theme="light"] .logo { text-shadow: 0 0 20px var(--cyan-glow); }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+
+/* ═══════════════════════════════════════
+   PANEL TRANSITION
+═══════════════════════════════════════ */
+.app-panel.active { animation: panelIn .22s ease; }
+@keyframes panelIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* ═══════════════════════════════════════
+   TOAST NOTIFICATIONS
+═══════════════════════════════════════ */
+.toast-container { position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none; }
+.toast {
+  background:var(--bg-card2); border:1px solid var(--border); border-radius:14px;
+  padding:13px 18px; display:flex; align-items:center; gap:12px;
+  min-width:250px; max-width:340px; pointer-events:all;
+  box-shadow:0 8px 32px rgba(0,0,0,0.22);
+  animation: toastIn .3s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.toast.out { animation: toastOut .25s ease forwards; }
+.toast-icon { width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem; }
+.toast-success .toast-icon { background:var(--green-dim);color:var(--green); }
+.toast-error   .toast-icon { background:rgba(244,63,94,.1);color:var(--rose); }
+.toast-info    .toast-icon { background:var(--cyan-dim);color:var(--cyan); }
+.toast-xp      .toast-icon { background:rgba(245,158,11,.1);color:var(--amber); }
+.toast-title { font-weight:700;font-size:.84rem; }
+.toast-sub { font-size:.74rem;color:var(--text-muted);margin-top:2px; }
+@keyframes toastIn  { from{opacity:0;transform:translateX(60px) scale(.92)} to{opacity:1;transform:none} }
+@keyframes toastOut { to{opacity:0;transform:translateX(60px) scale(.92)} }
+
+/* ═══════════════════════════════════════
+   THEME & ACCENT PICKERS
+═══════════════════════════════════════ */
+.theme-toggle-wrap { display:flex;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px; }
+.theme-btn { padding:7px 16px;border-radius:8px;border:none;background:none;color:var(--text-muted);font-family:var(--font-b);font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px; }
+.theme-btn.active { background:var(--cyan);color:#05070f; }
+.theme-btn:not(.active):hover { background:var(--cyan-dim);color:var(--cyan); }
+
+.accent-picker { display:flex;gap:9px;align-items:center;flex-wrap:wrap; }
+.accent-dot { width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:transform .18s,border-color .18s,box-shadow .18s; }
+.accent-dot:hover { transform:scale(1.2); }
+.accent-dot.active { border-color:var(--text);box-shadow:0 0 0 3px rgba(255,255,255,.2); transform:scale(1.15); }
+
+/* ═══════════════════════════════════════
+   SETTINGS PANEL
+═══════════════════════════════════════ */
+.settings-tabs { display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap; }
+.settings-tab { padding:8px 16px;border:1px solid var(--border);border-radius:9px;background:none;color:var(--text-muted);font-family:var(--font-b);font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px; }
+.settings-tab.active { background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan); }
+.settings-tab:not(.active):hover { border-color:var(--cyan);color:var(--cyan); }
+.settings-tab-pane { display:none; }
+.settings-tab-pane.active { display:block; }
+.settings-section { margin-bottom:26px; }
+.settings-section-title { font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border); }
+
+/* ═══════════════════════════════════════
+   RIPPLE EFFECT
+═══════════════════════════════════════ */
+.btn-primary, .btn-ghost, .pomo-btn, .join-room-btn { position:relative;overflow:hidden; }
+.ripple { position:absolute;border-radius:50%;background:rgba(255,255,255,.22);animation:rippleAnim .55s ease-out forwards;pointer-events:none;transform:translate(-50%,-50%); }
+@keyframes rippleAnim { from{width:0;height:0;opacity:.6} to{width:220px;height:220px;opacity:0} }
+
+/* ── XP pop animation ── */
+.xp-pop { animation: xpPop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes xpPop { 0%{transform:scale(1)} 55%{transform:scale(1.35)} 100%{transform:scale(1)} }
 </style>
 </head>
 <body>
@@ -1454,11 +1550,12 @@ body::before {
       </ul>
     </div>
 
-    <!-- ── PROFILE ── -->
+    <!-- ── PROFILE & SETTINGS ── -->
     <div class="app-panel" id="panel-profile">
       <h2 class="section-head">Profile &amp; Settings</h2>
-      <p class="section-sub">Manage your account, preferences, and notifications.</p>
+      <p class="section-sub">Manage your account, appearance, notifications, and study preferences.</p>
       <div class="profile-layout">
+        <!-- Left column -->
         <div>
           <div class="profile-sidebar-card" style="margin-bottom:16px">
             <div class="profile-big-ava" id="profile-ava">?</div>
@@ -1467,48 +1564,159 @@ body::before {
             <span class="badge" id="profile-role-badge">Student</span>
             <div class="profile-stats" style="margin-top:16px">
               <div><div class="profile-stat-n" id="profile-xp">0</div><div class="profile-stat-l">XP</div></div>
-              <div><div class="profile-stat-n">7</div><div class="profile-stat-l">Streak</div></div>
-              <div><div class="profile-stat-n">3</div><div class="profile-stat-l">Badges</div></div>
+              <div><div class="profile-stat-n" id="profile-streak">0</div><div class="profile-stat-l">Streak</div></div>
+              <div><div class="profile-stat-n" id="profile-badges">3</div><div class="profile-stat-l">Badges</div></div>
             </div>
           </div>
           <div class="card card-pad">
-            <div class="card-title">Account</div>
-            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px"><i class="fi fi-br-pencil" style="color:var(--cyan)"></i> Edit Profile</button>
-            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px"><i class="fi fi-br-lock" style="color:var(--cyan)"></i> Change Password</button>
+            <div class="card-title" style="margin-bottom:14px">Account</div>
+            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px" onclick="showToast('Edit profile coming soon','info')"><i class="fi fi-br-pencil" style="color:var(--cyan)"></i> Edit Profile</button>
+            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px" onclick="showToast('Change password coming soon','info')"><i class="fi fi-br-lock" style="color:var(--cyan)"></i> Change Password</button>
             <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;display:flex;align-items:center;gap:8px;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="doLogout()"><i class="fi fi-br-sign-out-alt"></i> Log Out</button>
           </div>
         </div>
+
+        <!-- Right column: tabbed settings -->
         <div class="card card-pad">
-          <div class="card-title" style="margin-bottom:20px">Preferences</div>
-          <div class="setting-row">
-            <div><div class="setting-label">Email Notifications</div><div class="setting-desc">Receive alerts for grades, reminders, and at-risk flags</div></div>
-            <button class="toggle-switch on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'23px':'3px'"><div class="toggle-knob" style="left:23px"></div></button>
+          <div class="settings-tabs">
+            <button class="settings-tab active" id="stab-btn-appearance" onclick="switchSettingsTab(this,'appearance')">
+              <i class="fi fi-br-palette"></i> Appearance
+            </button>
+            <button class="settings-tab" id="stab-btn-notifications" onclick="switchSettingsTab(this,'notifications')">
+              <i class="fi fi-br-bell"></i> Notifications
+            </button>
+            <button class="settings-tab" id="stab-btn-study" onclick="switchSettingsTab(this,'study')">
+              <i class="fi fi-br-graduation-cap"></i> Study
+            </button>
           </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Push Notifications</div><div class="setting-desc">Study reminders and leaderboard updates</div></div>
-            <button class="toggle-switch on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'23px':'3px'"><div class="toggle-knob" style="left:23px"></div></button>
+
+          <!-- ── Appearance ── -->
+          <div class="settings-tab-pane active" id="stab-appearance">
+            <div class="settings-section">
+              <div class="settings-section-title">Color Mode</div>
+              <div class="setting-row">
+                <div>
+                  <div class="setting-label">Theme</div>
+                  <div class="setting-desc">Choose between dark and light interface</div>
+                </div>
+                <div class="theme-toggle-wrap">
+                  <button class="theme-btn active" id="theme-btn-dark" onclick="applyTheme('dark')">
+                    <i class="fi fi-br-moon"></i> Dark
+                  </button>
+                  <button class="theme-btn" id="theme-btn-light" onclick="applyTheme('light')">
+                    <i class="fi fi-sr-sun"></i> Light
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="settings-section-title">Accent Color</div>
+              <div class="setting-row" style="flex-wrap:wrap;gap:14px">
+                <div>
+                  <div class="setting-label">Highlight Color</div>
+                  <div class="setting-desc">Applied to buttons, borders, and active states</div>
+                </div>
+                <div class="accent-picker" id="accent-picker">
+                  <button class="accent-dot active" style="background:#00f0d4" data-accent="cyan"   title="Cyan"   onclick="applyAccent('cyan',this)"></button>
+                  <button class="accent-dot"        style="background:#7c3aed" data-accent="violet" title="Violet" onclick="applyAccent('violet',this)"></button>
+                  <button class="accent-dot"        style="background:#f59e0b" data-accent="amber"  title="Amber"  onclick="applyAccent('amber',this)"></button>
+                  <button class="accent-dot"        style="background:#f43f5e" data-accent="rose"   title="Rose"   onclick="applyAccent('rose',this)"></button>
+                  <button class="accent-dot"        style="background:#22c55e" data-accent="green"  title="Green"  onclick="applyAccent('green',this)"></button>
+                  <button class="accent-dot"        style="background:#3b82f6" data-accent="blue"   title="Blue"   onclick="applyAccent('blue',this)"></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="settings-section-title">Typography</div>
+              <div class="setting-row">
+                <div>
+                  <div class="setting-label">Font Size</div>
+                  <div class="setting-desc">Adjust the base text size across the app</div>
+                </div>
+                <div class="theme-toggle-wrap">
+                  <button class="theme-btn" id="font-sm" onclick="applyFontSize('sm')">S</button>
+                  <button class="theme-btn active" id="font-md" onclick="applyFontSize('md')">M</button>
+                  <button class="theme-btn" id="font-lg" onclick="applyFontSize('lg')">L</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <div class="setting-label">Reduce Motion</div>
+                  <div class="setting-desc">Minimise animations and transitions</div>
+                </div>
+                <button class="toggle-switch" id="toggle-motion" onclick="toggleMotion(this)"><div class="toggle-knob"></div></button>
+              </div>
+            </div>
+
+            <button class="btn-primary" style="padding:10px 22px" onclick="saveAppearanceSettings()">
+              <i class="fi fi-br-disk"></i> Save Appearance
+            </button>
           </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Homework Reminders</div><div class="setting-desc">24h and 1h reminders before due dates</div></div>
-            <button class="toggle-switch on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'23px':'3px'"><div class="toggle-knob" style="left:23px"></div></button>
+
+          <!-- ── Notifications ── -->
+          <div class="settings-tab-pane" id="stab-notifications">
+            <div class="settings-section">
+              <div class="settings-section-title">Alert Preferences</div>
+              <div class="setting-row">
+                <div><div class="setting-label">Email Notifications</div><div class="setting-desc">Grades, reminders, and at-risk alerts via email</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Push Notifications</div><div class="setting-desc">Study reminders and leaderboard updates</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Homework Reminders</div><div class="setting-desc">24h and 1h reminders before due dates</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Leaderboard Updates</div><div class="setting-desc">Notify when your rank changes</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">XP &amp; Badge Alerts</div><div class="setting-desc">Celebrate when you earn XP or unlock a badge</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+            </div>
+            <button class="btn-primary" style="padding:10px 22px" onclick="showToast('Notification settings saved!','success')">
+              <i class="fi fi-br-disk"></i> Save
+            </button>
           </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Leaderboard Visibility</div><div class="setting-desc">Show your name on class leaderboards</div></div>
-            <button class="toggle-switch on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'23px':'3px'"><div class="toggle-knob" style="left:23px"></div></button>
+
+          <!-- ── Study ── -->
+          <div class="settings-tab-pane" id="stab-study">
+            <div class="settings-section">
+              <div class="settings-section-title">Learning Preferences</div>
+              <div class="setting-row">
+                <div><div class="setting-label">AI Tutor Memory</div><div class="setting-desc">Remember conversation history for better help</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Leaderboard Visibility</div><div class="setting-desc">Show your name on class leaderboards</div></div>
+                <button class="toggle-switch on" onclick="toggleSetting(this)"><div class="toggle-knob" style="left:23px"></div></button>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Parent Account Linked</div><div class="setting-desc">Allow a parent to view your progress and grades</div></div>
+                <button class="toggle-switch" onclick="toggleSetting(this)"><div class="toggle-knob"></div></button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Study Planning</div>
+              <div class="form-group">
+                <label class="form-label">Exam Date</label>
+                <input type="date" class="form-input" id="pref-exam-date" style="max-width:200px">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Daily Study Goal (hours)</label>
+                <input type="number" class="form-input" id="pref-study-hours" value="3" min="1" max="12" style="max-width:100px">
+              </div>
+            </div>
+            <button class="btn-primary" style="padding:10px 22px" onclick="showToast('Study preferences saved!','success')">
+              <i class="fi fi-br-disk"></i> Save
+            </button>
           </div>
-          <div class="setting-row">
-            <div><div class="setting-label">AI Tutor Memory</div><div class="setting-desc">Remember conversation history for better help</div></div>
-            <button class="toggle-switch on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'23px':'3px'"><div class="toggle-knob" style="left:23px"></div></button>
-          </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Parent Account Linked</div><div class="setting-desc">Allow parent to view your progress and grades</div></div>
-            <button class="toggle-switch" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'23px':'3px'"><div class="toggle-knob"></div></button>
-          </div>
-          <div class="form-group" style="margin-top:18px">
-            <label class="form-label">Exam Date (for study planning)</label>
-            <input type="date" class="form-input" style="max-width:200px">
-          </div>
-          <button class="btn-primary" style="padding:10px 22px"><i class="fi fi-br-disk"></i> Save Changes</button>
         </div>
       </div>
     </div>
@@ -2266,6 +2474,164 @@ window.setLbFilter = function(btn, filter) {
   btn.closest('.lb-filter').querySelectorAll('.lb-filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 };
+
+// ═══════════════════════════════════════
+//  TOAST SYSTEM
+// ═══════════════════════════════════════
+const _toastContainer = document.createElement('div');
+_toastContainer.className = 'toast-container';
+document.body.appendChild(_toastContainer);
+
+const _toastIcons = {
+  success: '<i class="fi fi-br-check"></i>',
+  error:   '<i class="fi fi-br-cross-circle"></i>',
+  info:    '<i class="fi fi-br-info"></i>',
+  xp:      '<i class="fi fi-br-star"></i>',
+};
+window.showToast = function(title, type = 'info', sub = '') {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${_toastIcons[type] || _toastIcons.info}</div>
+    <div><div class="toast-title">${title}</div>${sub ? `<div class="toast-sub">${sub}</div>` : ''}</div>`;
+  _toastContainer.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+  }, 3000);
+};
+
+// ═══════════════════════════════════════
+//  THEME & ACCENT SYSTEM
+// ═══════════════════════════════════════
+const _accentMap = {
+  cyan:   { main:'#00f0d4', dim:'rgba(0,240,212,0.1)',   glow:'rgba(0,240,212,0.3)',   active:'rgba(0,240,212,0.3)' },
+  violet: { main:'#7c3aed', dim:'rgba(124,58,237,0.12)', glow:'rgba(124,58,237,0.3)', active:'rgba(124,58,237,0.3)' },
+  amber:  { main:'#f59e0b', dim:'rgba(245,158,11,0.12)', glow:'rgba(245,158,11,0.3)', active:'rgba(245,158,11,0.3)' },
+  rose:   { main:'#f43f5e', dim:'rgba(244,63,94,0.12)',  glow:'rgba(244,63,94,0.3)',  active:'rgba(244,63,94,0.3)'  },
+  green:  { main:'#22c55e', dim:'rgba(34,197,94,0.12)',  glow:'rgba(34,197,94,0.3)',  active:'rgba(34,197,94,0.3)'  },
+  blue:   { main:'#3b82f6', dim:'rgba(59,130,246,0.12)', glow:'rgba(59,130,246,0.3)', active:'rgba(59,130,246,0.3)' },
+};
+
+window.applyTheme = function(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('revynce-theme', theme);
+  document.getElementById('theme-btn-dark')?.classList.toggle('active', theme === 'dark');
+  document.getElementById('theme-btn-light')?.classList.toggle('active', theme === 'light');
+  showToast(theme === 'light' ? 'Switched to Light Mode' : 'Switched to Dark Mode', 'info',
+            theme === 'light' ? '☀️ Bright and clean' : '🌙 Easy on the eyes');
+};
+
+window.applyAccent = function(name, btn) {
+  const c = _accentMap[name]; if (!c) return;
+  const s = document.documentElement.style;
+  s.setProperty('--cyan', c.main);
+  s.setProperty('--cyan-dim', c.dim);
+  s.setProperty('--cyan-glow', c.glow);
+  s.setProperty('--border-active', c.active);
+  s.setProperty('--shadow-glow', `0 0 32px ${c.glow}`);
+  document.documentElement.setAttribute('data-accent', name);
+  localStorage.setItem('revynce-accent', name);
+  document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  showToast(`Accent: ${name.charAt(0).toUpperCase() + name.slice(1)}`, 'info');
+};
+
+window.applyFontSize = function(size) {
+  const map = { sm: '13px', md: '15px', lg: '17px' };
+  document.body.style.fontSize = map[size] || '15px';
+  localStorage.setItem('revynce-fontsize', size);
+  ['sm','md','lg'].forEach(s => document.getElementById('font-'+s)?.classList.toggle('active', s === size));
+};
+
+window.toggleMotion = function(btn) {
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  btn.querySelector('.toggle-knob').style.left = on ? '23px' : '3px';
+  // Apply prefers-reduced-motion style override
+  let style = document.getElementById('motion-style');
+  if (!style) { style = document.createElement('style'); style.id = 'motion-style'; document.head.appendChild(style); }
+  style.textContent = on ? '*, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }' : '';
+  localStorage.setItem('revynce-reduce-motion', on ? '1' : '');
+};
+
+window.saveAppearanceSettings = function() {
+  showToast('Appearance saved!', 'success', 'Your preferences have been stored.');
+};
+
+// Settings tabs
+window.switchSettingsTab = function(btn, tab) {
+  document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.settings-tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('stab-' + tab)?.classList.add('active');
+};
+
+// Generic toggle switch helper
+window.toggleSetting = function(btn) {
+  btn.classList.toggle('on');
+  btn.querySelector('.toggle-knob').style.left = btn.classList.contains('on') ? '23px' : '3px';
+};
+
+// ═══════════════════════════════════════
+//  RIPPLE EFFECT
+// ═══════════════════════════════════════
+document.addEventListener('click', e => {
+  const target = e.target.closest('.btn-primary,.btn-ghost,.pomo-btn,.join-room-btn');
+  if (!target) return;
+  const rect = target.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.left = (e.clientX - rect.left) + 'px';
+  ripple.style.top  = (e.clientY - rect.top)  + 'px';
+  target.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+});
+
+// ═══════════════════════════════════════
+//  LOAD SAVED SETTINGS ON STARTUP
+// ═══════════════════════════════════════
+(function loadSavedSettings() {
+  const theme  = localStorage.getItem('revynce-theme');
+  const accent = localStorage.getItem('revynce-accent');
+  const fs     = localStorage.getItem('revynce-fontsize');
+  const motion = localStorage.getItem('revynce-reduce-motion');
+
+  // Sync theme buttons
+  if (theme) {
+    document.getElementById('theme-btn-dark')?.classList.toggle('active', theme === 'dark');
+    document.getElementById('theme-btn-light')?.classList.toggle('active', theme === 'light');
+  }
+  // Sync accent dots
+  if (accent) {
+    const saved = _accentMap[accent];
+    if (saved) {
+      const s = document.documentElement.style;
+      s.setProperty('--cyan', saved.main);
+      s.setProperty('--cyan-dim', saved.dim);
+      s.setProperty('--cyan-glow', saved.glow);
+      s.setProperty('--border-active', saved.active);
+      s.setProperty('--shadow-glow', `0 0 32px ${saved.glow}`);
+      const dot = document.querySelector(`.accent-dot[data-accent="${accent}"]`);
+      document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
+      if (dot) dot.classList.add('active');
+    }
+  }
+  // Sync font size
+  if (fs) {
+    const map = { sm:'13px', md:'15px', lg:'17px' };
+    document.body.style.fontSize = map[fs] || '15px';
+    ['sm','md','lg'].forEach(s => document.getElementById('font-'+s)?.classList.toggle('active', s === fs));
+  }
+  // Sync reduce motion
+  if (motion) {
+    const btn = document.getElementById('toggle-motion');
+    if (btn) { btn.classList.add('on'); btn.querySelector('.toggle-knob').style.left = '23px'; }
+    let style = document.createElement('style'); style.id = 'motion-style';
+    style.textContent = '*, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }';
+    document.head.appendChild(style);
+  }
+})();
 
 // ── Scroll observer ──
 const obs = new IntersectionObserver(entries => {

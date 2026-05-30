@@ -910,11 +910,31 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <input type="email" class="form-input" id="auth-email" placeholder="you@school.edu">
         </div>
         <div class="form-group">
-          <label class="form-label">Password</label>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <label class="form-label" style="margin:0">Password</label>
+            <button id="forgot-pw-link" onclick="showForgotPassword()" style="display:none;background:none;border:none;color:var(--cyan);font-size:.75rem;font-family:var(--font-b);cursor:pointer;padding:0">Forgot password?</button>
+          </div>
           <input type="password" class="form-input" id="auth-password" placeholder="Min. 8 characters" onkeydown="if(event.key==='Enter')doAuth()">
         </div>
         <button class="auth-submit" id="auth-btn" onclick="doAuth()">Create Account</button>
         <p id="auth-msg"></p>
+
+        <!-- ── Forgot Password Panel ── -->
+        <div id="forgot-pw-panel" style="display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)">
+          <p style="font-size:.82rem;font-weight:600;margin-bottom:10px">Reset your password</p>
+          <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:14px">Enter your registered email address and we'll send you a reset link.</p>
+          <div class="form-group">
+            <label class="form-label">Registered Email</label>
+            <input type="email" class="form-input" id="forgot-email" placeholder="you@school.edu">
+          </div>
+          <button class="auth-submit" id="forgot-btn" onclick="doForgotPassword()" style="background:var(--bg-card2);color:var(--cyan);border:1px solid var(--border-active)">
+            <i class="fi fi-br-paper-plane"></i> Send Reset Link
+          </button>
+          <p id="forgot-msg" style="margin-top:10px;font-size:.8rem;text-align:center;min-height:18px"></p>
+          <button onclick="hideForgotPassword()" style="display:block;margin:10px auto 0;background:none;border:none;color:var(--text-muted);font-size:.78rem;cursor:pointer;font-family:var(--font-b)">
+            ← Back to log in
+          </button>
+        </div>
       </div>
     </div>
     <span class="auth-back" onclick="showPage('landing')"><i class="fi fi-rr-angle-left"></i> Back to home</span>
@@ -1748,7 +1768,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 import { getStorage, ref as sRef, uploadBytes } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
@@ -2148,6 +2168,11 @@ window.switchAuthTab = function(tab) {
   document.getElementById('signup-extras').style.display = isSu?'':'none';
   document.getElementById('auth-btn').textContent = isSu?'Create Account':'Log In';
   document.getElementById('auth-msg').textContent='';
+  // Show forgot-password link only on login tab
+  const fpLink = document.getElementById('forgot-pw-link');
+  if (fpLink) fpLink.style.display = isSu ? 'none' : 'inline';
+  // Hide forgot panel when switching tabs
+  if (window.hideForgotPassword) hideForgotPassword();
   window._authTab=tab;
 };
 window._authTab='signup';
@@ -2179,6 +2204,33 @@ window.doAuth = async function() {
   }
 };
 window.doLogout = async function(){ await signOut(auth); showPage('landing'); };
+
+// ── Forgot Password ──
+window.doForgotPassword = async function() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const msgEl = document.getElementById('forgot-msg');
+  const btn   = document.getElementById('forgot-btn');
+  if (!email) { msgEl.textContent = 'Please enter your email address.'; msgEl.className = 'msg-err'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fi fi-br-clock-three"></i> Sending…';
+  msgEl.textContent = ''; msgEl.className = '';
+  try {
+    await sendPasswordResetEmail(auth, email);
+    msgEl.textContent = '✓ Reset link sent! Check your inbox (and spam folder).';
+    msgEl.className = 'msg-ok';
+    btn.innerHTML = '<i class="fi fi-br-check"></i> Email Sent';
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found': 'No account found with that email.',
+      'auth/invalid-email':  'Invalid email address.',
+      'auth/too-many-requests': 'Too many attempts. Please wait a moment.'
+    };
+    msgEl.textContent = msgs[e.code] || e.message;
+    msgEl.className = 'msg-err';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fi fi-br-paper-plane"></i> Send Reset Link';
+  }
+};
 </script>
 
 <script>
@@ -2186,6 +2238,28 @@ window.doLogout = async function(){ await signOut(auth); showPage('landing'); };
 // Uses llama-3.3-70b-versatile — Groq's fastest versatile model
 const PROXY_URL = 'https://us-central1-revynce-740d1.cloudfunctions.net/chat';
 window._PROXY_URL = PROXY_URL;
+
+// ── Forgot Password UI helpers ──
+window.showForgotPassword = function() {
+  document.getElementById('forgot-pw-panel').style.display = 'block';
+  document.getElementById('forgot-pw-link').style.display  = 'none';
+  document.getElementById('auth-email').parentElement.style.display = 'none';
+  document.getElementById('auth-password').closest('.form-group').style.display = 'none';
+  document.getElementById('auth-btn').style.display = 'none';
+  const fe = document.getElementById('forgot-email');
+  fe.value = document.getElementById('auth-email').value;
+  fe.focus();
+};
+window.hideForgotPassword = function() {
+  document.getElementById('forgot-pw-panel').style.display = 'none';
+  document.getElementById('forgot-pw-link').style.display  = 'inline';
+  document.getElementById('auth-email').parentElement.style.display = '';
+  document.getElementById('auth-password').closest('.form-group').style.display = '';
+  document.getElementById('auth-btn').style.display = '';
+  document.getElementById('forgot-msg').textContent = '';
+  document.getElementById('forgot-btn').disabled = false;
+  document.getElementById('forgot-btn').innerHTML = '<i class="fi fi-br-paper-plane"></i> Send Reset Link';
+};
 
 // ═══════════════════════════════════════
 //  PAGE / PANEL SYSTEM

@@ -56,7 +56,7 @@ exports.chat = onRequest(
           "Authorization": `Bearer ${groqKey.value()}`,
         },
         body: JSON.stringify({
-          model: model || "llama-3.3-70b-versatile",   // ← updated default
+          model: model || "llama-3.3-70b-versatile",
           messages,
           max_tokens: max_tokens || 1024,
           temperature: temperature || 0.7,

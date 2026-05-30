@@ -887,24 +887,23 @@ body::before {
           <p id="dash-sub">Here's your study overview for today.</p>
         </div>
         <div class="streak-chip">
-          <div><div class="streak-num">🔥 7</div><div class="streak-label">Day Streak</div></div>
+          <div><div class="streak-num" id="d-streak">🔥 0</div><div class="streak-label">Day Streak</div></div>
         </div>
       </div>
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-card-num" id="d-xp">0</div><div class="stat-card-label">Total XP</div><div class="stat-card-delta">↑ +120 this week</div></div>
-        <div class="stat-card"><div class="stat-card-num">3</div><div class="stat-card-label">Uploads</div><div class="stat-card-delta">↑ +1 today</div></div>
-        <div class="stat-card"><div class="stat-card-num">12</div><div class="stat-card-label">Quizzes Done</div><div class="stat-card-delta">Avg score 78%</div></div>
-        <div class="stat-card"><div class="stat-card-num">48</div><div class="stat-card-label">Flashcards</div><div class="stat-card-delta">Due today: 12</div></div>
-        <div class="stat-card"><div class="stat-card-num">2</div><div class="stat-card-label">Active Classes</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="d-uploads">—</div><div class="stat-card-label">Uploads</div><div class="stat-card-delta">AI-generated files</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="d-quizzes">—</div><div class="stat-card-label">Quizzes Done</div><div class="stat-card-delta">Saved to your profile</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="d-flashcards">—</div><div class="stat-card-label">Flashcards</div><div class="stat-card-delta">Across all decks</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="d-class-count">—</div><div class="stat-card-label">Active Classes</div></div>
       </div>
       <div class="two-col">
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-clock-three" style="color:var(--cyan)"></i> &nbsp;Recent Activity</div>
-          <ul class="recent-list">
-            <li class="recent-li"><div class="recent-ic"><i class="fi fi-br-document-signed"></i></div><div><div class="recent-name">Biology Ch.4 Notes</div><div class="recent-time">Generated 2 hours ago</div></div><div class="recent-meta"><span class="badge">Notes</span></div></li>
-            <li class="recent-li"><div class="recent-ic"><i class="fi fi-br-quiz-alt"></i></div><div><div class="recent-name">Maths Practice Quiz</div><div class="recent-time">Scored 8/10 · Yesterday</div></div><div class="recent-meta"><span class="pill pill-green">80%</span></div></li>
-            <li class="recent-li"><div class="recent-ic"><i class="fi fi-br-layers"></i></div><div><div class="recent-name">History Flashcards</div><div class="recent-time">32 cards reviewed</div></div><div class="recent-meta"><span class="badge">Deck</span></div></li>
-            <li class="recent-li"><div class="recent-ic"><i class="fi fi-br-clock-three"></i></div><div><div class="recent-name">Pomodoro Session</div><div class="recent-time">4 sessions · 2 days ago</div></div><div class="recent-meta"><span class="topbar-xp">+40 XP</span></div></li>
+          <ul class="recent-list" id="recent-activity-list">
+            <li class="recent-li" style="color:var(--text-muted);font-size:.82rem;justify-content:center;padding:18px 0">
+              <i class="fi fi-br-clock-three" style="margin-right:8px"></i> No activity yet — upload a file or take a quiz!
+            </li>
           </ul>
         </div>
         <div>
@@ -1017,7 +1016,7 @@ body::before {
           <div class="ai-avatar"><i class="fi fi-br-robot"></i></div>
           <div><div class="ai-name">Revynce AI</div><div class="ai-status"><div class="status-dot"></div> Online &amp; ready</div></div>
           <div style="margin-left:auto;display:flex;gap:6px">
-            <span class="badge">GPT-4o</span>
+            <span class="badge">Llama 3 70B</span>
           </div>
         </div>
         <div class="chat-messages" id="chatMessages">
@@ -1119,7 +1118,7 @@ body::before {
             <div class="class-stat"><div class="class-stat-n">7</div><div class="class-stat-l">Resources</div></div>
           </div>
         </div>
-        <div class="class-card" style="border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px" onclick="document.getElementById('class-code-input').focus()">
+        <div class="class-card class-add-card" style="border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px" onclick="document.getElementById('class-code-input')?.focus()">
           <i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i>
           <span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>
         </div>
@@ -1140,14 +1139,8 @@ body::before {
         <button class="btn-primary"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Schedule</button>
       </div>
       <h3 style="font-family:var(--font-d);font-weight:700;font-size:.95rem;margin-bottom:14px">This Week</h3>
-      <div class="schedule-grid">
-        <div class="sched-day"><div class="sched-day-label">Mon</div><div class="sched-day-num">12</div><div class="sched-task">Biology</div><div class="sched-task violet">Maths</div></div>
-        <div class="sched-day today"><div class="sched-day-label">Tue</div><div class="sched-day-num">13</div><div class="sched-task">Physics</div><div class="sched-task amber">Chemistry</div></div>
-        <div class="sched-day"><div class="sched-day-label">Wed</div><div class="sched-day-num">14</div><div class="sched-task violet">Maths</div></div>
-        <div class="sched-day"><div class="sched-day-label">Thu</div><div class="sched-day-num">15</div><div class="sched-task">Biology</div><div class="sched-task">History</div></div>
-        <div class="sched-day"><div class="sched-day-label">Fri</div><div class="sched-day-num">16</div><div class="sched-task amber">Chemistry</div></div>
-        <div class="sched-day"><div class="sched-day-label">Sat</div><div class="sched-day-num">17</div><div class="sched-task violet">Maths</div></div>
-        <div class="sched-day"><div class="sched-day-label">Sun</div><div class="sched-day-num">18</div><div class="sched-task">Revision</div></div>
+      <div class="schedule-grid" id="schedule-week-grid">
+        <!-- Populated dynamically by renderSchedule() -->
       </div>
       <h3 style="font-family:var(--font-d);font-weight:700;font-size:.95rem;margin:22px 0 14px">Today's Agenda</h3>
       <ul class="agenda-list">
@@ -1530,13 +1523,13 @@ body::before {
       <div class="modal-title">Create New Class</div>
       <button class="modal-close" onclick="closeModal('create-class-modal')"><i class="fi fi-rr-cross"></i></button>
     </div>
-    <div class="form-group"><label class="form-label">Class Name</label><input type="text" class="form-input" placeholder="e.g. Biology Year 12"></div>
-    <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" placeholder="e.g. Biology"></div>
-    <div class="form-group"><label class="form-label">Year Level</label><input type="text" class="form-input" placeholder="e.g. Year 12"></div>
-    <div class="form-group"><label class="form-label">Class Code (auto-generated)</label><input type="text" class="form-input" value="BIO-2025" style="opacity:.6" readonly></div>
+    <div class="form-group"><label class="form-label">Class Name</label><input type="text" class="form-input" id="create-class-name" placeholder="e.g. Biology Year 12"></div>
+    <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="create-class-subject" placeholder="e.g. Biology"></div>
+    <div class="form-group"><label class="form-label">Year Level</label><input type="text" class="form-input" id="create-class-year" placeholder="e.g. Year 12"></div>
+    <div class="form-group"><label class="form-label">Class Code (auto-generated on creation)</label><input type="text" class="form-input" id="create-class-code-display" value="Will be generated…" style="opacity:.6;font-family:monospace;letter-spacing:.1em" readonly></div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('create-class-modal')">Cancel</button>
-      <button class="btn-primary" onclick="closeModal('create-class-modal')"><i class="fi fi-br-check"></i> Create Class</button>
+      <button class="btn-primary" id="create-class-btn" onclick="createClassSubmit()"><i class="fi fi-br-check"></i> Create Class</button>
     </div>
   </div>
 </div>
@@ -1572,13 +1565,18 @@ window._auth = auth; window._db = db; window._storage = storage;
 window._fbRef = ref; window._fbSet = set; window._fbGet = get; window._fbChild = child;
 window._sRef = sRef; window._uploadBytes = uploadBytes;
 
+// ── Auth state ──
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     try {
       const snap = await get(child(ref(db), `users/${user.uid}`));
-      const profile = snap.exists() ? snap.val() : { name: user.email, role: 'student', xp: 0 };
+      const profile = snap.exists() ? snap.val() : { name: user.email, role: 'student', xp: 0, streak: 0 };
       window._userProfile = profile; window._uid = user.uid;
-      populateApp(profile); showPage('app');
+      populateApp(profile);
+      showPage('app');
+      loadClasses();
+      loadDashboardStats();
+      loadFlashcards();
     } catch(e) { populateApp({ name: user.email, role:'student', xp:0 }); showPage('app'); }
   }
 });
@@ -1599,6 +1597,7 @@ function populateApp(profile) {
   document.getElementById('reward-xp-text').textContent = (profile.xp||0)+' / 500 XP';
   const fillPct = Math.min(100, ((profile.xp||0)/500)*100);
   document.getElementById('xp-bar-fill').style.width = fillPct+'%';
+  if (profile.streak) document.getElementById('d-streak').textContent = '🔥 ' + profile.streak;
   const role = profile.role||'student';
   if (role==='teacher') {
     ['teach-section','teach-nav','testbuilder-nav','marking-nav'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
@@ -1611,7 +1610,328 @@ function populateApp(profile) {
   }
 }
 
-// Auth
+// ── XP helper ──
+window._addXP = async function(amount) {
+  if (!window._uid || !amount) return;
+  const newXP = (window._userProfile?.xp || 0) + amount;
+  window._userProfile = {...(window._userProfile||{}), xp: newXP};
+  await set(ref(db, `users/${window._uid}/xp`), newXP);
+  document.getElementById('d-xp').textContent = newXP;
+  document.getElementById('topbar-xp').textContent = newXP + ' XP';
+  document.getElementById('profile-xp').textContent = newXP;
+  document.getElementById('lb-your-xp').textContent = newXP + ' XP';
+  document.getElementById('reward-xp-text').textContent = newXP + ' / 500 XP';
+  document.getElementById('xp-bar-fill').style.width = Math.min(100,(newXP/500)*100) + '%';
+};
+
+// ── Dashboard stats ──
+async function loadDashboardStats() {
+  if (!window._uid) return;
+  try {
+    const [uploadsSnap, quizSnap, fcSnap, classSnap] = await Promise.all([
+      get(child(ref(db), `uploads/${window._uid}`)),
+      get(child(ref(db), `quizScores/${window._uid}`)),
+      get(child(ref(db), `flashcardDecks/${window._uid}`)),
+      get(child(ref(db), `enrollments/${window._uid}`)),
+    ]);
+    document.getElementById('d-uploads').textContent = uploadsSnap.exists() ? Object.keys(uploadsSnap.val()).length : 0;
+    document.getElementById('d-quizzes').textContent = quizSnap.exists() ? Object.keys(quizSnap.val()).length : 0;
+    let fcCount = 0;
+    if (fcSnap.exists()) Object.values(fcSnap.val()).forEach(d => { fcCount += (d.cards?.length||0); });
+    document.getElementById('d-flashcards').textContent = fcCount;
+    document.getElementById('d-class-count').textContent = classSnap.exists() ? Object.keys(classSnap.val()).length : 0;
+    // Recent activity
+    if (uploadsSnap.exists()) {
+      const uploads = Object.values(uploadsSnap.val())
+        .sort((a,b) => new Date(b.uploadedAt||0) - new Date(a.uploadedAt||0))
+        .slice(0, 4);
+      const list = document.getElementById('recent-activity-list');
+      if (list && uploads.length) {
+        list.innerHTML = uploads.map(u => `
+          <li class="recent-li">
+            <div class="recent-ic"><i class="fi fi-br-document-signed"></i></div>
+            <div><div class="recent-name">${u.fileName||'Uploaded file'}</div>
+            <div class="recent-time">${u.subject||'AI Upload'}</div></div>
+            <div class="recent-meta"><span class="badge">Notes</span></div>
+          </li>`).join('');
+      }
+    }
+  } catch(e) { console.error('loadDashboardStats:', e); }
+}
+window._loadDashboardStats = loadDashboardStats;
+
+// ── Classes ──
+async function loadClasses() {
+  if (!window._uid) return;
+  try {
+    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    if (!snap.exists()) return;
+    const enrollments = snap.val();
+    const grid = document.getElementById('classes-grid');
+    const colorSets = [
+      {bg:'rgba(0,240,212,0.1)',color:'var(--cyan)',icon:'fi-br-flask'},
+      {bg:'rgba(124,58,237,0.1)',color:'#a78bfa',icon:'fi-br-calculator'},
+      {bg:'rgba(245,158,11,0.1)',color:'var(--amber)',icon:'fi-br-book-open-cover'},
+      {bg:'rgba(244,63,94,0.1)',color:'var(--rose)',icon:'fi-br-atom'},
+      {bg:'rgba(34,197,94,0.1)',color:'var(--green)',icon:'fi-br-science'},
+    ];
+    grid.innerHTML = '';
+    let i = 0;
+    for (const [code, cls] of Object.entries(enrollments)) {
+      const c = colorSets[i % colorSets.length]; i++;
+      const div = document.createElement('div');
+      div.className = 'class-card';
+      div.innerHTML = `
+        <div class="class-header">
+          <div class="class-icon" style="background:${c.bg};color:${c.color}"><i class="fi ${c.icon}"></i></div>
+          <span class="class-code-chip">${code}</span>
+        </div>
+        <div class="class-name">${cls.name||code}</div>
+        <div class="class-teacher">${cls.teacherName||'Your Teacher'}${cls.subject?' · '+cls.subject:''}</div>
+        <div class="class-stats">
+          <div class="class-stat"><div class="class-stat-n">${cls.yearLevel||'—'}</div><div class="class-stat-l">Year Level</div></div>
+          <div class="class-stat"><div class="class-stat-n">${cls.role==='teacher'?'Teacher':'Student'}</div><div class="class-stat-l">Role</div></div>
+        </div>`;
+      grid.appendChild(div);
+    }
+    const addEl = document.createElement('div');
+    addEl.className = 'class-card class-add-card';
+    addEl.style.cssText = 'border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px';
+    addEl.onclick = () => document.getElementById('class-code-input')?.focus();
+    addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>';
+    grid.appendChild(addEl);
+  } catch(e) { console.error('loadClasses:', e); }
+}
+window._loadClasses = loadClasses;
+
+window._joinClass = async function(code) {
+  if (!window._uid || !code) return 'error';
+  try {
+    const classSnap = await get(child(ref(db), `classes/${code}`));
+    if (!classSnap.exists()) return 'not-found';
+    const cls = classSnap.val();
+    const alreadySnap = await get(child(ref(db), `enrollments/${window._uid}/${code}`));
+    if (alreadySnap.exists()) return 'already-enrolled';
+    await set(ref(db, `enrollments/${window._uid}/${code}`), { ...cls, joinedAt: new Date().toISOString() });
+    await set(ref(db, `classMembers/${code}/${window._uid}`), { name: window._userProfile?.name||'Student', joinedAt: new Date().toISOString() });
+    loadClasses();
+    loadDashboardStats();
+    return 'ok';
+  } catch(e) { console.error('_joinClass:', e); return 'error'; }
+};
+
+window._createClass = async function(name, subject, yearLevel) {
+  if (!window._uid) return null;
+  try {
+    const prefix = (subject||name).slice(0,3).toUpperCase().replace(/[^A-Z]/g,'') || 'CLS';
+    const suffix = Math.random().toString(36).slice(2,6).toUpperCase();
+    const code = `${prefix}-${suffix}`;
+    const classData = { name, subject, yearLevel, code, teacherUid: window._uid, teacherName: window._userProfile?.name||'Teacher', createdAt: new Date().toISOString() };
+    await set(ref(db, `classes/${code}`), classData);
+    await set(ref(db, `enrollments/${window._uid}/${code}`), { ...classData, role: 'teacher' });
+    loadClasses();
+    loadDashboardStats();
+    return code;
+  } catch(e) { console.error('_createClass:', e); return null; }
+};
+
+// ── Flashcards ──
+async function loadFlashcards() {
+  if (!window._uid) return;
+  try {
+    const snap = await get(child(ref(db), `flashcardDecks/${window._uid}`));
+    if (!snap.exists()) return;
+    const grid = document.getElementById('fc-grid');
+    grid.innerHTML = '';
+    for (const [, deck] of Object.entries(snap.val())) {
+      (deck.cards||[]).forEach(card => {
+        const el = document.createElement('div');
+        el.className = 'flashcard';
+        el.onclick = function(){ this.classList.toggle('flipped'); };
+        el.innerHTML = `<div class="fc-tag">${deck.subject||'Study'}</div><div class="fc-front">${card.front}</div><div class="fc-back">${card.back}</div><div class="fc-hint">tap to flip</div>`;
+        grid.appendChild(el);
+      });
+    }
+    if (!grid.children.length) _restoreSampleCards();
+  } catch(e) { console.error('loadFlashcards:', e); }
+}
+window._loadFlashcards = loadFlashcards;
+
+function _restoreSampleCards() {
+  const samples = [
+    {tag:'Biology',front:'What is photosynthesis?',back:'The process by which plants convert sunlight, water and CO₂ into glucose and oxygen using chlorophyll.'},
+    {tag:'Biology',front:'Define osmosis.',back:'Movement of water molecules from high to low water potential through a semi-permeable membrane.'},
+    {tag:'Physics',front:"Newton's Second Law?",back:'F = ma. Force equals mass times acceleration.'},
+    {tag:'Maths',front:'Quadratic formula?',back:'x = (−b ± √(b²−4ac)) / 2a'},
+    {tag:'History',front:'Cause of World War I?',back:'Assassination of Franz Ferdinand + MAIN: Militarism, Alliances, Imperialism, Nationalism.'},
+    {tag:'Biology',front:'What is mitosis?',back:'Cell division producing two identical daughter cells. Stages: PMAT.'},
+    {tag:'Chemistry',front:'What is an ionic bond?',back:'A bond formed by the electrostatic attraction between oppositely charged ions.'},
+    {tag:'Maths',front:'Derivative of sin(x)?',back:'cos(x)'},
+  ];
+  const grid = document.getElementById('fc-grid');
+  samples.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'flashcard';
+    el.onclick = function(){ this.classList.toggle('flipped'); };
+    el.innerHTML = `<div class="fc-tag">${c.tag}</div><div class="fc-front">${c.front}</div><div class="fc-back">${c.back}</div><div class="fc-hint">tap to flip</div>`;
+    grid.appendChild(el);
+  });
+}
+
+// ── Quiz score saver ──
+window._saveQuizScore = async function(score, total, subject) {
+  if (!window._uid) return;
+  try {
+    const key = Date.now().toString();
+    await set(ref(db, `quizScores/${window._uid}/${key}`), { score, total, subject: subject||'General', date: new Date().toISOString() });
+    await window._addXP(score * 10);
+    loadDashboardStats();
+  } catch(e) { console.error('_saveQuizScore:', e); }
+};
+
+// ── AI generation helpers ──
+async function readFileAsText(file) {
+  if (!file) return null;
+  if (!file.type.startsWith('text/') && !file.name.match(/\.(txt|md|csv)$/i)) return null;
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result.slice(0, 8000));
+    reader.onerror = () => resolve(null);
+    reader.readAsText(file);
+  });
+}
+
+async function generateContentWithAI(fileText, fileName, subject, instructions, mode, proxyUrl) {
+  const context = fileText
+    ? `Study material:\n"""\n${fileText}\n"""\n\n`
+    : `File: "${fileName}"${subject ? '\nSubject: ' + subject : ''}\n\n`;
+  const instr = instructions ? `Instructions: ${instructions}\n\n` : '';
+  const systemPrompt = 'You are Revynce AI, an educational content generator. Respond with raw valid JSON only — no markdown fences, no explanation before or after the JSON object.';
+  const userPrompt = mode === 'teacher'
+    ? `${context}${instr}Generate a complete test paper as JSON: {"test":"<full formatted test paper in markdown with MCQ section, short answer, essay, and answer key>"}`
+    : `${context}${instr}Generate study materials as JSON with these exact keys:
+- "notes": comprehensive markdown study notes with ## headings, bullet points, and **bold** key terms
+- "quiz": array of exactly 6 objects with keys q (string), opts (array of 4 strings), ans (number 0-3), exp (string)
+- "flashcards": array of exactly 8 objects with keys front (string) and back (string)
+- "schedule": 4-day study schedule as formatted plain text
+Return only the raw JSON object.`;
+
+  const res = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
+      max_tokens: 4096,
+      temperature: 0.25
+    })
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error||'Proxy error '+res.status); }
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content;
+  if (!raw) throw new Error('Empty response from AI');
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('AI response was not valid JSON');
+  return JSON.parse(match[0]);
+}
+
+// ── AI Upload ──
+let appUploadedFile = null;
+let _currentUploadMode = 'student';
+const appDrop = document.getElementById('appDrop');
+const appFileInput = document.getElementById('appFile');
+appDrop.addEventListener('click', () => appFileInput.click());
+appFileInput.addEventListener('change', e => handleAppFile(e.target.files[0]));
+appDrop.addEventListener('dragover', e => { e.preventDefault(); appDrop.classList.add('drag-over'); });
+appDrop.addEventListener('dragleave', () => appDrop.classList.remove('drag-over'));
+appDrop.addEventListener('drop', e => { e.preventDefault(); appDrop.classList.remove('drag-over'); handleAppFile(e.dataTransfer.files[0]); });
+function handleAppFile(file) {
+  if (!file) return; appUploadedFile = file;
+  appDrop.innerHTML = `<i class="fi fi-br-file-check"></i><p><strong style="color:var(--cyan)">${file.name}</strong></p><p style="font-size:.75rem;margin-top:5px">${(file.size/1024).toFixed(1)} KB · Ready to generate</p>`;
+}
+
+let resultContent = { notes:'', quiz:'', flashcards:'', schedule:'', test:'' };
+let currentResultTab = 'notes';
+
+window.appGenerate = async function() {
+  const status = document.getElementById('app-status');
+  const btn = document.getElementById('appGenBtn');
+  if (!appUploadedFile) { status.textContent='⚠ Please upload a file first.'; status.style.color='var(--rose)'; return; }
+  const proxyUrl = window._PROXY_URL;
+  if (!proxyUrl || proxyUrl === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
+    status.textContent='⚙ AI proxy not configured. See PROXY_URL in the HTML.'; status.style.color='var(--rose)'; return;
+  }
+  status.style.color='var(--cyan)'; status.textContent='⏳ Reading file…'; btn.disabled=true;
+  try {
+    if (window._uid) {
+      const fileRef = window._sRef(window._storage, `uploads/${window._uid}/${Date.now()}_${appUploadedFile.name}`);
+      await window._uploadBytes(fileRef, appUploadedFile);
+    }
+    status.textContent = '🤖 Generating AI content with Llama 3 70B — ~15 seconds…';
+    const fileText = await readFileAsText(appUploadedFile);
+    const subject = document.getElementById('upload-subject').value.trim();
+    const instructions = document.getElementById('upload-instructions').value.trim();
+    const generated = await generateContentWithAI(fileText, appUploadedFile.name, subject, instructions, _currentUploadMode, proxyUrl);
+    // Build result content strings
+    resultContent.notes = generated.notes || 'Notes could not be generated.';
+    resultContent.schedule = generated.schedule || 'Schedule could not be generated.';
+    if (generated.test) resultContent.test = generated.test;
+    if (generated.quiz?.length) {
+      window._generatedQuizData = generated.quiz;
+      resultContent.quiz = generated.quiz.map((q,i) =>
+        `Q${i+1}: ${q.q}\n${(q.opts||[]).map((o,j)=>String.fromCharCode(65+j)+'. '+o).join('\n')}\nAnswer: ${String.fromCharCode(65+(q.ans||0))}. ${q.exp||''}`
+      ).join('\n\n');
+    } else { resultContent.quiz = 'Quiz could not be generated.'; }
+    if (generated.flashcards?.length) {
+      resultContent.flashcards = generated.flashcards.map((c,i) => `Card ${i+1}\nQ: ${c.front}\nA: ${c.back}`).join('\n\n');
+    } else { resultContent.flashcards = 'Flashcards could not be generated.'; }
+    // Save to Firebase
+    if (window._uid) {
+      const key = Date.now().toString();
+      await set(ref(db, `uploads/${window._uid}/${key}`), { fileName: appUploadedFile.name, subject, uploadedAt: new Date().toISOString() });
+      if (generated.flashcards?.length) {
+        await set(ref(db, `flashcardDecks/${window._uid}/${key}`), {
+          subject: subject || appUploadedFile.name.replace(/\.[^.]+$/, ''),
+          createdAt: new Date().toISOString(),
+          cards: generated.flashcards
+        });
+        loadFlashcards();
+      }
+      loadDashboardStats();
+      await window._addXP(50);
+    }
+    status.textContent = '✓ Done! Switch between Notes, Quiz, Flashcards, and Schedule below.';
+    document.getElementById('upload-result').classList.add('show');
+    document.getElementById('upload-placeholder').style.display = 'none';
+    document.getElementById('result-content').textContent = resultContent.notes;
+    if (window._userProfile?.role==='teacher') document.getElementById('test-tab').style.display = '';
+  } catch(e) { status.textContent = '✗ ' + e.message; status.style.color = 'var(--rose)'; }
+  btn.disabled = false;
+};
+
+window.setUploadMode = function(btn, mode) {
+  _currentUploadMode = mode;
+  document.querySelectorAll('.upload-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('test-tab').style.display = mode === 'teacher' ? '' : 'none';
+};
+
+window.switchResult = function(btn, tab) {
+  currentResultTab = tab;
+  document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('result-content').textContent = resultContent[tab] || '';
+};
+
+// Test drop zone
+const testDrop = document.getElementById('testDrop');
+const testFile = document.getElementById('testFile');
+if (testDrop) {
+  testDrop.addEventListener('click', () => testFile.click());
+  testFile.addEventListener('change', e => { const f=e.target.files[0]; if(f) testDrop.innerHTML=`<i class="fi fi-br-file-check"></i><p><strong style="color:var(--cyan)">${f.name}</strong> ready</p>`; });
+}
+
+// ── Auth ──
 let currentRole = 'student';
 window.switchAuthTab = function(tab) {
   const isSu = tab==='signup';
@@ -1640,7 +1960,7 @@ window.doAuth = async function() {
   try {
     if(window._authTab==='signup'){
       const cred=await createUserWithEmailAndPassword(auth,email,password);
-      await set(ref(db,`users/${cred.user.uid}`),{name:name||email,email,role:currentRole,xp:0,createdAt:new Date().toISOString()});
+      await set(ref(db,`users/${cred.user.uid}`),{name:name||email,email,role:currentRole,xp:0,streak:0,createdAt:new Date().toISOString()});
     } else {
       await signInWithEmailAndPassword(auth,email,password);
     }
@@ -1651,287 +1971,250 @@ window.doAuth = async function() {
   }
 };
 window.doLogout = async function(){ await signOut(auth); showPage('landing'); };
-
-// Upload
-let appUploadedFile=null;
-const appDrop=document.getElementById('appDrop');
-const appFileInput=document.getElementById('appFile');
-appDrop.addEventListener('click',()=>appFileInput.click());
-appFileInput.addEventListener('change',e=>handleAppFile(e.target.files[0]));
-appDrop.addEventListener('dragover',e=>{e.preventDefault();appDrop.classList.add('drag-over')});
-appDrop.addEventListener('dragleave',()=>appDrop.classList.remove('drag-over'));
-appDrop.addEventListener('drop',e=>{e.preventDefault();appDrop.classList.remove('drag-over');handleAppFile(e.dataTransfer.files[0])});
-function handleAppFile(file){
-  if(!file)return; appUploadedFile=file;
-  appDrop.innerHTML=`<i class="fi fi-br-file-check"></i><p><strong style="color:var(--cyan)">${file.name}</strong></p><p style="font-size:.75rem;margin-top:5px">${(file.size/1024).toFixed(1)} KB · Ready to generate</p>`;
-}
-const resultContent = {
-  notes:`📄 AI-Generated Study Notes\n\n▸ Topic 1: Introduction & Key Definitions\nCore concept explained with real-world application. Remember the three-step process.\n\n▸ Topic 2: Primary Mechanisms\nCritical for exam questions. Focus on cause-and-effect relationships between variables.\n\n▸ Topic 3: Advanced Applications\nSynthesis of concepts 1 & 2. Common exam trap: students confuse X with Y.\n\n▸ Summary\nReview alongside flashcards for spaced repetition. Suggested study time: 45 min.`,
-  quiz:`❓ AI-Generated Practice Questions\n\n1. What is the primary function of [concept]?\n   Model Answer: The primary function is... [detailed answer with marks breakdown]\n\n2. Explain the relationship between A and B, with reference to [topic].\n   Model Answer: A affects B through... [3 key points, 1 mark each]\n\n3. Calculate the value of Z given conditions X=5, Y=3.\n   Worked Solution: Step 1... Step 2... Final answer = 12.4`,
-  flashcards:`🗂 Generated Flashcard Deck (8 cards)\n\nCard 1 — Q: [Key term from your material]\nA: [Precise definition with example]\n\nCard 2 — Q: [Process or mechanism]\nA: [Step-by-step explanation]\n\nCard 3 — Q: [Formula or equation]\nA: [Formula with worked example]\n\n... and 5 more cards added to your Flashcards panel.`,
-  schedule:`📅 Personalised Study Schedule\n\nBased on your uploaded material:\n\nDay 1 — Introduction & Definitions (45 min)\n→ Read notes → Review flashcards (Cards 1-3)\n\nDay 2 — Core Mechanisms (60 min)\n→ Watch video resource → Practice questions 1-3\n\nDay 3 — Application & Problem Solving (60 min)\n→ Timed practice quiz → Review weak areas\n\nDay 4 — Revision & Consolidation (45 min)\n→ Full flashcard review → Mock exam conditions`,
-  test:`📝 AI-Generated Test Paper\n\nSubject: [Detected from upload]\nDuration: 1 hour | Total Marks: 50\n\nSection A — Multiple Choice (20 marks)\n1. [MCQ question from your material] ......... /2\n2. [MCQ question] ......... /2\n...\n\nSection B — Short Answer (20 marks)\n1. Explain [concept] in no more than 3 sentences. [4 marks]\n2. Describe the process of [mechanism]. [6 marks]\n\nSection C — Extended Response (10 marks)\nDiscuss the significance of [key theme] with reference to [context]. [10 marks]`
-};
-let currentResultTab='notes';
-window.appGenerate = async function() {
-  const status=document.getElementById('app-status');
-  const btn=document.getElementById('appGenBtn');
-  if(!appUploadedFile){status.textContent='⚠ Please upload a file first.';status.style.color='var(--rose)';return;}
-  status.style.color='var(--cyan)'; status.textContent='⏳ Uploading and generating…'; btn.disabled=true;
-  try {
-    if(window._uid){
-      const fileRef=window._sRef(window._storage,`uploads/${window._uid}/${Date.now()}_${appUploadedFile.name}`);
-      await window._uploadBytes(fileRef,appUploadedFile);
-      await window._fbSet(window._fbRef(window._db,`uploads/${window._uid}/${Date.now()}`),{fileName:appUploadedFile.name,uploadedAt:new Date().toISOString()});
-    }
-    status.textContent='✓ Done! Switch between Notes, Quiz, Flashcards, and Schedule below.';
-    document.getElementById('upload-result').classList.add('show');
-    document.getElementById('upload-placeholder').style.display='none';
-    document.getElementById('result-content').textContent=resultContent.notes;
-    if(window._userProfile?.role==='teacher') document.getElementById('test-tab').style.display='';
-  } catch(e){ status.textContent='✗ '+e.message; status.style.color='var(--rose)'; }
-  btn.disabled=false;
-};
-window.switchResult=function(btn,tab){
-  currentResultTab=tab;
-  document.querySelectorAll('.result-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('result-content').textContent=resultContent[tab];
-};
-
-// Test drop zone
-const testDrop=document.getElementById('testDrop');
-const testFile=document.getElementById('testFile');
-if(testDrop){ testDrop.addEventListener('click',()=>testFile.click()); testFile.addEventListener('change',e=>{const f=e.target.files[0];if(f)testDrop.innerHTML=`<i class="fi fi-br-file-check"></i><p><strong style="color:var(--cyan)">${f.name}</strong> ready</p>`;}); }
 </script>
 
 <script>
+// ── Groq proxy URL (via Firebase Cloud Function) ──
+// Uses llama-3.3-70b-versatile — Groq's fastest versatile model
+const PROXY_URL = 'https://us-central1-revynce-740d1.cloudfunctions.net/chat';
+window._PROXY_URL = PROXY_URL;
+
 // ═══════════════════════════════════════
 //  PAGE / PANEL SYSTEM
 // ═══════════════════════════════════════
-window.showPage=function(name){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+window.showPage = function(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
 };
-window.showAuth=function(tab,role){
+window.showAuth = function(tab, role) {
   showPage('auth');
-  if(window.switchAuthTab) switchAuthTab(tab);
-  else window._authTab=tab;
-  if(role){
-    const btn=document.getElementById('rp-'+role);
-    if(btn&&window.pickRole) pickRole(btn,role);
-  }
+  if (window.switchAuthTab) switchAuthTab(tab);
+  else window._authTab = tab;
+  if (role) { const btn = document.getElementById('rp-' + role); if (btn && window.pickRole) pickRole(btn, role); }
 };
-window.showPanel=function(name,navEl){
-  document.querySelectorAll('.app-panel').forEach(p=>p.classList.remove('active'));
-  const panel=document.getElementById('panel-'+name);
-  if(panel) panel.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  if(navEl) navEl.classList.add('active');
-  const titles={dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',flashcards:'Flashcards',quizzes:'Quizzes',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
-  document.getElementById('topbar-title').textContent=titles[name]||name;
-  if(name==='quizzes') initQuiz();
-  if(name==='notifications') markAllRead();
-  window.scrollTo(0,0);
+window.showPanel = function(name, navEl) {
+  document.querySelectorAll('.app-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + name);
+  if (panel) panel.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',flashcards:'Flashcards',quizzes:'Quizzes',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+  if (name === 'quizzes') initQuiz();
+  if (name === 'schedule') renderSchedule();
+  if (name === 'notifications') markAllRead();
+  window.scrollTo(0, 0);
 };
 
-// Account type selector (landing)
-window.selectAcctType=function(el,type){
-  document.querySelectorAll('.acct-card').forEach(c=>c.classList.remove('sel'));
+// Account type selector
+window.selectAcctType = function(el, type) {
+  document.querySelectorAll('.acct-card').forEach(c => c.classList.remove('sel'));
   el.classList.add('sel');
 };
 
-// Upload mode
-window.setUploadMode=function(btn,mode){
-  document.querySelectorAll('.upload-mode-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('test-tab').style.display=mode==='teacher'?'':'none';
-};
-
-// Classes
-window.joinClass=function(){
-  const code=document.getElementById('class-code-input').value.trim().toUpperCase();
-  if(!code){return;}
-  alert('Joining class with code: '+code+'...\n(Firebase integration will handle this)');
-  document.getElementById('class-code-input').value='';
-};
-window.openCreateClassModal=function(){ document.getElementById('create-class-modal').classList.add('open'); };
-window.closeModal=function(id){ document.getElementById(id).classList.remove('open'); };
-
-// Notifications
-window.markAllRead=function(){
-  document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
-  document.querySelectorAll('.notif-unread-dot').forEach(el=>el.style.display='none');
-  document.getElementById('notif-count').textContent='0';
-  document.getElementById('unread-count').textContent='0';
-  document.getElementById('notif-dot').style.display='none';
-};
-
-// ── CHATBOT — powered by OpenAI via secure Cloud Function proxy ──
-//
-// ▼▼▼  PASTE YOUR DEPLOYED FUNCTION URL BELOW  ▼▼▼
-// After running: firebase deploy --only functions
-// Copy the URL printed in the terminal, e.g.:
-//   https://chat-abc12345-uc.a.run.app
-// and replace the placeholder below.
-//
-const PROXY_URL = 'https://us-central1-revynce-740d1.cloudfunctions.net/chat';
-
-let chatHistory = [
-  {
-    role: 'system',
-    content: `You are Revynce AI, an expert study tutor for high school and university students.
-You help with all subjects — maths, science, history, literature, languages, and more.
-Explain concepts clearly, set practice problems, give essay feedback, and create study strategies.
-Keep responses concise but thorough. Use bullet points and numbered lists where helpful.
-When giving worked examples, show step-by-step solutions. Always be encouraging and positive.`
+// ── Classes ──
+window.joinClass = async function() {
+  const code = document.getElementById('class-code-input').value.trim().toUpperCase();
+  if (!code) return;
+  const btn = document.querySelector('.join-class-form .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
+  const result = window._joinClass ? await window._joinClass(code) : null;
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-plus"></i> Join'; }
+  const input = document.getElementById('class-code-input');
+  if (result === 'ok') {
+    input.value = '';
+    input.placeholder = '✓ Joined! Class added to your list.';
+    setTimeout(() => { input.placeholder = 'Enter class code e.g. BIO-2024'; }, 4000);
+  } else if (result === 'not-found') {
+    input.value = '';
+    input.placeholder = '⚠ Class code not found. Check and try again.';
+    setTimeout(() => { input.placeholder = 'Enter class code e.g. BIO-2024'; }, 4000);
+  } else if (result === 'already-enrolled') {
+    input.value = '';
+    input.placeholder = '✓ Already enrolled in this class.';
+    setTimeout(() => { input.placeholder = 'Enter class code e.g. BIO-2024'; }, 4000);
+  } else if (!window._joinClass) {
+    alert('Please log in to join a class.');
   }
-];
+};
+window.openCreateClassModal = function() { document.getElementById('create-class-modal').classList.add('open'); };
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+window.createClassSubmit = async function() {
+  const name = document.getElementById('create-class-name').value.trim();
+  const subject = document.getElementById('create-class-subject').value.trim();
+  const yearLevel = document.getElementById('create-class-year').value.trim();
+  if (!name) { alert('Please enter a class name.'); return; }
+  const btn = document.getElementById('create-class-btn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  const code = window._createClass ? await window._createClass(name, subject, yearLevel) : null;
+  btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-check"></i> Create Class';
+  if (code) {
+    const display = document.getElementById('create-class-code-display');
+    display.value = code; display.style.opacity = '1'; display.style.color = 'var(--cyan)';
+    setTimeout(() => closeModal('create-class-modal'), 2500);
+  } else { alert('Error creating class. Please try again.'); }
+};
+
+// ── Notifications ──
+window.markAllRead = function() {
+  document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+  document.querySelectorAll('.notif-unread-dot').forEach(el => el.style.display = 'none');
+  document.getElementById('notif-count').textContent = '0';
+  document.getElementById('unread-count').textContent = '0';
+  document.getElementById('notif-dot').style.display = 'none';
+};
+
+// ── Dynamic schedule ──
+function renderSchedule() {
+  const grid = document.getElementById('schedule-week-grid');
+  if (!grid) return;
+  const now = new Date();
+  const dow = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const subjects = [['Biology'],['Physics','Chemistry'],['Maths'],['Biology','History'],['Chemistry'],['Maths'],['Revision']];
+  const colors   = [[''],['','amber'],['violet'],['',''],['amber'],['violet'],['']];
+  grid.innerHTML = dayNames.map((d, i) => {
+    const date = new Date(monday); date.setDate(monday.getDate() + i);
+    const isToday = date.toDateString() === now.toDateString();
+    const tasks = subjects[i].map((s, j) => `<div class="sched-task ${colors[i][j]||''}">${s}</div>`).join('');
+    return `<div class="sched-day${isToday?' today':''}"><div class="sched-day-label">${d}</div><div class="sched-day-num">${date.getDate()}</div>${tasks}</div>`;
+  }).join('');
+}
+
+// ── Chatbot — Groq llama-3.3-70b-versatile via Cloud Function ──
+let chatHistory = [{
+  role: 'system',
+  content: `You are Revynce AI, an expert study tutor for high school and university students. Help with all subjects — maths, science, history, literature, languages, and more. Explain concepts clearly, set practice problems, give essay feedback, and create study strategies. Keep responses concise but thorough. Use bullet points and numbered lists where helpful. Show step-by-step solutions for worked examples. Always be encouraging and positive.`
+}];
 
 window.sendMsg = async function() {
-  const input   = document.getElementById('chatInput');
+  const input = document.getElementById('chatInput');
   const sendBtn = document.getElementById('sendBtn');
-  const text    = input.value.trim();
+  const text = input.value.trim();
   if (!text) return;
-
-  input.value = '';
-  sendBtn.disabled = true;
-
+  input.value = ''; sendBtn.disabled = true;
   appendChat(text, 'user');
   chatHistory.push({ role: 'user', content: text });
   showTyping();
-
-  // Show a helpful message if URL hasn't been configured yet
   if (!PROXY_URL || PROXY_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
     removeTyping();
-    appendChatError('⚙ AI Tutor not yet connected. Deploy the Cloud Function and set PROXY_URL in the HTML. See functions/index.js for instructions.');
-    sendBtn.disabled = false;
-    return;
+    appendChatError('⚙ AI Tutor not yet connected. Deploy the Cloud Function and set PROXY_URL. See functions/index.js for instructions.');
+    sendBtn.disabled = false; return;
   }
-
   try {
     const res = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:       'llama-3.3-70b-versatile',
-        messages:    chatHistory,
-        max_tokens:  1024,
-        temperature: 0.7
-      })
+      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: chatHistory, max_tokens: 1024, temperature: 0.7 })
     });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Server error ' + res.status);
-    }
-
-    const data  = await res.json();
+    if (!res.ok) { const err = await res.json().catch(()=>{}); throw new Error((err?.error) || 'Server error ' + res.status); }
+    const data = await res.json();
     const reply = data.choices?.[0]?.message?.content;
     if (!reply) throw new Error('Empty response from AI');
-
     chatHistory.push({ role: 'assistant', content: reply });
-
-    // Keep context window manageable (system prompt + last 20 turns)
-    if (chatHistory.length > 21) {
-      chatHistory = [chatHistory[0], ...chatHistory.slice(-20)];
-    }
-
+    if (chatHistory.length > 21) chatHistory = [chatHistory[0], ...chatHistory.slice(-20)];
     removeTyping();
     appendChat(reply, 'ai');
-
-  } catch(e) {
-    removeTyping();
-    appendChatError('⚠ Could not reach AI: ' + e.message);
-  }
-
-  sendBtn.disabled = false;
-  input.focus();
+  } catch(e) { removeTyping(); appendChatError('⚠ Could not reach AI: ' + e.message); }
+  sendBtn.disabled = false; input.focus();
 };
+window.useSuggestion = function(chip) { document.getElementById('chatInput').value = chip.textContent; sendMsg(); };
 
-window.useSuggestion = function(chip) {
-  document.getElementById('chatInput').value = chip.textContent;
-  sendMsg();
-};
-function appendChat(text,type){
-  const box=document.getElementById('chatMessages');
-  const wrap=document.createElement('div'); wrap.className='msg '+type;
-  const ava=document.createElement('div'); ava.className='msg-ava';
-  ava.innerHTML=type==='ai'?'<i class="fi fi-br-robot" style="font-size:.75rem"></i>':'ME';
-  const bubble=document.createElement('div'); bubble.className='msg-bubble'; bubble.textContent=text;
+function appendChat(text, type) {
+  const box = document.getElementById('chatMessages');
+  const wrap = document.createElement('div'); wrap.className = 'msg ' + type;
+  const ava = document.createElement('div'); ava.className = 'msg-ava';
+  ava.innerHTML = type === 'ai' ? '<i class="fi fi-br-robot" style="font-size:.75rem"></i>' : 'ME';
+  const bubble = document.createElement('div'); bubble.className = 'msg-bubble';
+  bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
   wrap.appendChild(ava); wrap.appendChild(bubble); box.appendChild(wrap);
-  box.scrollTop=box.scrollHeight;
+  box.scrollTop = box.scrollHeight;
 }
-function appendChatError(msg){
-  const box=document.getElementById('chatMessages');
-  const div=document.createElement('div');
-  div.style.cssText='color:var(--rose);font-size:.8rem;padding:9px 14px;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);border-radius:10px;margin:0 0 4px';
-  div.textContent=msg;
-  box.appendChild(div); box.scrollTop=box.scrollHeight;
+function appendChatError(msg) {
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.style.cssText = 'color:var(--rose);font-size:.8rem;padding:9px 14px;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);border-radius:10px;margin:0 0 4px';
+  div.textContent = msg; box.appendChild(div); box.scrollTop = box.scrollHeight;
 }
-function showTyping(){
-  const box=document.getElementById('chatMessages');
-  const wrap=document.createElement('div'); wrap.className='msg ai'; wrap.id='typing-ind';
-  wrap.innerHTML='<div class="msg-ava"><i class="fi fi-br-robot" style="font-size:.75rem"></i></div><div class="msg-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
-  box.appendChild(wrap); box.scrollTop=box.scrollHeight;
+function showTyping() {
+  const box = document.getElementById('chatMessages');
+  const wrap = document.createElement('div'); wrap.className = 'msg ai'; wrap.id = 'typing-ind';
+  wrap.innerHTML = '<div class="msg-ava"><i class="fi fi-br-robot" style="font-size:.75rem"></i></div><div class="msg-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  box.appendChild(wrap); box.scrollTop = box.scrollHeight;
 }
-function removeTyping(){ const el=document.getElementById('typing-ind'); if(el)el.remove(); }
+function removeTyping() { const el = document.getElementById('typing-ind'); if (el) el.remove(); }
 
-// ── QUIZ ──
-const questions=[
-  {q:"What is the powerhouse of the cell?",opts:["Nucleus","Mitochondria","Ribosome","Golgi Apparatus"],ans:1,exp:"Mitochondria produce ATP through cellular respiration — hence 'powerhouse of the cell.'"},
-  {q:"What is the formula for the area of a circle?",opts:["πr","2πr","πr²","πd"],ans:2,exp:"Area = πr² where r is the radius. Circumference = 2πr."},
+// ── Quiz — uses AI-generated questions when available ──
+const _sampleQuestions = [
+  {q:"What is the powerhouse of the cell?",opts:["Nucleus","Mitochondria","Ribosome","Golgi Apparatus"],ans:1,exp:"Mitochondria produce ATP through cellular respiration."},
+  {q:"What is the formula for the area of a circle?",opts:["πr","2πr","πr²","πd"],ans:2,exp:"Area = πr² where r is the radius."},
   {q:"Who wrote 'Romeo and Juliet'?",opts:["Charles Dickens","William Shakespeare","Jane Austen","Mark Twain"],ans:1,exp:"Romeo and Juliet was written by William Shakespeare around 1594–1596."},
-  {q:"What is Newton's First Law of Motion?",opts:["F=ma","Every action has an equal & opposite reaction","An object at rest stays at rest unless acted upon","Energy cannot be created or destroyed"],ans:2,exp:"Newton's First Law is the law of inertia — objects maintain their state unless a net force acts on them."},
-  {q:"What year did World War II end?",opts:["1943","1944","1945","1946"],ans:2,exp:"WWII ended in 1945 — VE Day (May 8) in Europe and VJ Day (September 2) in the Pacific."},
+  {q:"What is Newton's First Law?",opts:["F=ma","Every action has an equal reaction","An object at rest stays at rest unless acted upon","Energy cannot be created or destroyed"],ans:2,exp:"Newton's First Law is the law of inertia."},
+  {q:"What year did World War II end?",opts:["1943","1944","1945","1946"],ans:2,exp:"WWII ended in 1945 — VE Day (May 8) and VJ Day (September 2)."},
 ];
-let qIdx=0,answered=false,score=0;
-function initQuiz(){qIdx=0;answered=false;score=0;updateScoreHeader();renderQ();}
-function updateScoreHeader(){document.getElementById('quiz-score-header').textContent=`Score: ${score}/${qIdx}`;}
-function renderQ(){
-  const q=questions[qIdx];
-  document.getElementById('quiz-q').textContent=q.q;
-  document.getElementById('quiz-prog').textContent=`${qIdx+1} / ${questions.length}`;
-  document.getElementById('quiz-progress-fill').style.width=((qIdx/questions.length)*100)+'%';
-  document.getElementById('quiz-next').style.display='none';
-  const fb=document.getElementById('quiz-fb'); fb.className='quiz-fb'; fb.textContent='';
-  const opts=document.getElementById('quiz-opts'); opts.innerHTML=''; answered=false;
-  const letters=['A','B','C','D'];
-  q.opts.forEach((opt,i)=>{
-    const btn=document.createElement('button'); btn.className='quiz-opt';
-    btn.innerHTML=`<span class="opt-letter">${letters[i]}</span>${opt}`;
-    btn.onclick=()=>answerQ(i,btn,q);
+let _activeQuestions = null, qIdx = 0, answered = false, score = 0;
+
+function initQuiz() {
+  _activeQuestions = window._generatedQuizData || _sampleQuestions;
+  qIdx = 0; answered = false; score = 0; updateScoreHeader(); renderQ();
+}
+function updateScoreHeader() { document.getElementById('quiz-score-header').textContent = `Score: ${score}/${qIdx}`; }
+function renderQ() {
+  const q = _activeQuestions[qIdx];
+  document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-prog').textContent = `${qIdx+1} / ${_activeQuestions.length}`;
+  document.getElementById('quiz-progress-fill').style.width = ((qIdx/_activeQuestions.length)*100) + '%';
+  document.getElementById('quiz-next').style.display = 'none';
+  const fb = document.getElementById('quiz-fb'); fb.className = 'quiz-fb'; fb.textContent = '';
+  const opts = document.getElementById('quiz-opts'); opts.innerHTML = ''; answered = false;
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button'); btn.className = 'quiz-opt';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => answerQ(i, btn, q);
     opts.appendChild(btn);
   });
 }
-window.answerQ=function(i,btn,q){
-  if(answered)return; answered=true;
-  const allBtns=document.querySelectorAll('.quiz-opt');
-  allBtns.forEach(b=>b.disabled=true);
-  const fb=document.getElementById('quiz-fb');
-  if(i===q.ans){btn.classList.add('correct');fb.className='quiz-fb correct show';fb.textContent='✓ Correct! '+q.exp;score++;}
-  else{btn.classList.add('wrong');allBtns[q.ans].classList.add('correct');fb.className='quiz-fb wrong show';fb.textContent='✗ Not quite. '+q.exp;}
+window.answerQ = function(i, btn, q) {
+  if (answered) return; answered = true;
+  const allBtns = document.querySelectorAll('.quiz-opt');
+  allBtns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('quiz-fb');
+  const correct = i === q.ans;
+  if (correct) { btn.classList.add('correct'); fb.className = 'quiz-fb correct show'; fb.textContent = '✓ Correct! ' + q.exp; score++; }
+  else { btn.classList.add('wrong'); allBtns[q.ans].classList.add('correct'); fb.className = 'quiz-fb wrong show'; fb.textContent = '✗ Not quite. ' + q.exp; }
   qIdx++; updateScoreHeader();
-  document.getElementById('quiz-next').style.display=qIdx<questions.length?'':'none';
-  document.getElementById('quiz-progress-fill').style.width=((qIdx/questions.length)*100)+'%';
+  if (qIdx >= _activeQuestions.length) {
+    document.getElementById('quiz-progress-fill').style.width = '100%';
+    setTimeout(() => {
+      window._saveQuizScore?.(score, _activeQuestions.length, window._generatedQuizData ? 'AI Quiz' : 'General');
+      const fb2 = document.getElementById('quiz-fb');
+      fb2.className = 'quiz-fb correct show';
+      fb2.textContent = `Quiz complete! Final score: ${score}/${_activeQuestions.length} — +${score*10} XP earned!`;
+    }, 600);
+  } else {
+    document.getElementById('quiz-next').style.display = '';
+  }
 };
-window.nextQ=function(){if(qIdx<questions.length)renderQ();};
+window.nextQ = function() { if (qIdx < _activeQuestions.length) renderQ(); };
 
-// ── POMODORO ──
+// ── Pomodoro ──
 let pomoRunning=false,pomoInterval=null,pomoSeconds=25*60,pomoSession=1,pomoCycle='focus';
 let pomoSessionsDone=0,pomoXpEarned=0;
 let FOCUS_MIN=25,BREAK_MIN=5,LONG_MIN=15;
 let FOCUS=FOCUS_MIN*60,BREAK=BREAK_MIN*60,LONG=LONG_MIN*60;
 
-window.updatePomoSettings=function(){
+window.updatePomoSettings = function() {
   FOCUS_MIN=parseInt(document.getElementById('pomo-focus-min').value)||25;
   BREAK_MIN=parseInt(document.getElementById('pomo-break-min').value)||5;
   LONG_MIN=parseInt(document.getElementById('pomo-long-min').value)||15;
   FOCUS=FOCUS_MIN*60; BREAK=BREAK_MIN*60; LONG=LONG_MIN*60;
-  if(!pomoRunning){pomoSeconds=FOCUS; updatePomoUI();}
+  if (!pomoRunning) { pomoSeconds=FOCUS; updatePomoUI(); }
 };
-window.togglePomo=function(){
-  if(pomoRunning){
+window.togglePomo = function() {
+  if (pomoRunning) {
     clearInterval(pomoInterval); pomoRunning=false;
     document.getElementById('pomo-start').innerHTML='<i class="fi fi-br-play"></i> Resume';
   } else {
@@ -1940,19 +2223,20 @@ window.togglePomo=function(){
     pomoInterval=setInterval(tickPomo,1000);
   }
 };
-function tickPomo(){
+function tickPomo() {
   pomoSeconds--;
-  if(pomoSeconds<=0){
+  if (pomoSeconds<=0) {
     clearInterval(pomoInterval); pomoRunning=false;
-    if(pomoCycle==='focus'){
+    if (pomoCycle==='focus') {
       pomoSessionsDone++; pomoXpEarned+=20;
       document.getElementById('pomo-sessions-done').textContent=pomoSessionsDone;
       document.getElementById('pomo-xp-earned').textContent=pomoXpEarned+' XP';
       updatePomoDots();
-      if(pomoSession%4===0){pomoCycle='long';pomoSeconds=LONG;}
-      else{pomoCycle='break';pomoSeconds=BREAK;}
+      window._addXP?.(20);
+      if (pomoSession%4===0) { pomoCycle='long'; pomoSeconds=LONG; }
+      else { pomoCycle='break'; pomoSeconds=BREAK; }
     } else {
-      if(pomoCycle!=='long') pomoSession++;
+      if (pomoCycle!=='long') pomoSession++;
       pomoCycle='focus'; pomoSeconds=FOCUS;
     }
     updatePomoUI();
@@ -1961,38 +2245,33 @@ function tickPomo(){
   }
   updatePomoUI();
 }
-function updatePomoDots(){
-  for(let i=1;i<=4;i++){
-    const dot=document.getElementById('pd-'+i);
-    if(dot) dot.classList.toggle('done',pomoSessionsDone>=i);
-  }
+function updatePomoDots() {
+  for (let i=1;i<=4;i++) { const dot=document.getElementById('pd-'+i); if(dot) dot.classList.toggle('done',pomoSessionsDone>=i); }
 }
-function updatePomoUI(){
+function updatePomoUI() {
   const m=Math.floor(pomoSeconds/60).toString().padStart(2,'0');
   const s=(pomoSeconds%60).toString().padStart(2,'0');
   document.getElementById('pomo-time').textContent=`${m}:${s}`;
   document.getElementById('pomo-mode').textContent=pomoCycle==='focus'?'Focus Session':pomoCycle==='break'?'Short Break':'Long Break';
   document.getElementById('pomo-session').textContent=`Session ${pomoSession} of 4`;
 }
-window.resetPomo=function(){
+window.resetPomo = function() {
   clearInterval(pomoInterval); pomoRunning=false; pomoSeconds=FOCUS_MIN*60; pomoSession=1; pomoCycle='focus';
   updatePomoUI(); document.getElementById('pomo-start').innerHTML='<i class="fi fi-br-play"></i> Start';
 };
-window.skipPomo=function(){
-  clearInterval(pomoInterval); pomoRunning=false; pomoSeconds=0; tickPomo();
-};
+window.skipPomo = function() { clearInterval(pomoInterval); pomoRunning=false; pomoSeconds=0; tickPomo(); };
 
-// ── LEADERBOARD ──
-window.setLbFilter=function(btn,filter){
-  btn.closest('.lb-filter').querySelectorAll('.lb-filter-btn').forEach(b=>b.classList.remove('active'));
+// ── Leaderboard filter ──
+window.setLbFilter = function(btn, filter) {
+  btn.closest('.lb-filter').querySelectorAll('.lb-filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 };
 
-// ── SCROLL OBSERVER ──
-const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');}});
-},{threshold:.1});
-document.querySelectorAll('.fade-up,.scale-in').forEach(el=>obs.observe(el));
+// ── Scroll observer ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold:.1});
+document.querySelectorAll('.fade-up,.scale-in').forEach(el => obs.observe(el));
 </script>
 </body>
 </html>

@@ -1095,6 +1095,86 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 .deck-name-hint { font-size:.72rem;color:var(--cyan);margin-top:5px;min-height:14px;display:none; }
 .deck-name-hint.show { display:block; }
 
+/* ═══════════════════════════════════════
+   PRICING
+═══════════════════════════════════════ */
+.pricing-section { padding:96px 56px; position:relative; z-index:1; }
+.pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:1000px; margin:0 auto; }
+
+.pricing-card {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:32px 28px; display:flex; flex-direction:column; gap:0; position:relative; transition:all .25s;
+}
+.pricing-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(0,0,0,.22); }
+.pricing-card.popular {
+  border-color:var(--cyan); background:linear-gradient(160deg,var(--bg-card) 0%,rgba(0,240,212,.05) 100%);
+  box-shadow:0 0 0 1px var(--cyan), 0 8px 40px rgba(0,240,212,.12);
+}
+.pricing-popular-badge {
+  position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+  background:var(--cyan); color:#05070f; font-size:.65rem; font-weight:800;
+  padding:4px 16px; border-radius:100px; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap;
+}
+.pricing-plan { font-family:var(--font-d); font-size:.75rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.12em; color:var(--text-muted); margin-bottom:10px; }
+.pricing-card.popular .pricing-plan { color:var(--cyan); }
+.pricing-price { font-family:var(--font-d); font-size:3rem; font-weight:800; letter-spacing:-.04em; line-height:1; margin-bottom:4px; }
+.pricing-price sup { font-size:1.2rem; vertical-align:super; font-weight:700; }
+.pricing-cadence { font-size:.75rem; color:var(--text-muted); margin-bottom:6px; }
+.pricing-desc { font-size:.8rem; color:var(--text-muted); margin-bottom:24px; line-height:1.55; min-height:36px; }
+.pricing-divider { height:1px; background:var(--border); margin-bottom:22px; }
+.pricing-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:28px; flex:1; }
+.pricing-feat { display:flex; align-items:flex-start; gap:10px; font-size:.82rem; line-height:1.4; }
+.pricing-feat .pf-ic { width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:1px;
+  display:flex; align-items:center; justify-content:center; font-size:.6rem; }
+.pf-yes { background:var(--green-dim); color:var(--green); }
+.pf-no  { background:rgba(255,255,255,.05); color:var(--text-muted); }
+.pricing-feat.muted { color:var(--text-muted); }
+.pricing-cta { width:100%; padding:13px; border-radius:10px; font-family:var(--font-b); font-size:.9rem;
+  font-weight:700; cursor:pointer; transition:all .2s; border:none; }
+.pricing-cta.free  { background:var(--bg-card2); color:var(--text); border:1px solid var(--border); }
+.pricing-cta.free:hover  { border-color:var(--cyan); color:var(--cyan); }
+.pricing-cta.pro   { background:var(--cyan); color:#05070f; box-shadow:0 0 24px var(--cyan-glow); }
+.pricing-cta.pro:hover   { opacity:.88; transform:translateY(-1px); }
+.pricing-cta.teach { background:var(--violet); color:#fff; }
+.pricing-cta.teach:hover { opacity:.88; transform:translateY(-1px); }
+
+/* Pricing billing toggle */
+.pricing-toggle-wrap { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:44px; font-size:.82rem; }
+.pricing-toggle { width:48px; height:26px; border-radius:100px; background:var(--cyan); border:none; cursor:pointer; position:relative; transition:background .2s; }
+.pricing-toggle-knob { width:20px; height:20px; border-radius:50%; background:#05070f; position:absolute; top:3px; left:3px; transition:left .2s; }
+.pricing-toggle.annual .pricing-toggle-knob { left:25px; }
+.pricing-save-badge { background:var(--green-dim); color:var(--green); font-size:.65rem; font-weight:700; padding:2px 8px; border-radius:100px; border:1px solid rgba(34,197,94,.25); }
+
+/* In-app upgrade banner (sidebar) */
+.upgrade-banner {
+  margin:8px 8px 10px; border-radius:12px; padding:14px 14px 16px;
+  background:linear-gradient(135deg,rgba(0,240,212,.08) 0%,rgba(124,58,237,.1) 100%);
+  border:1px solid rgba(0,240,212,.2); position:relative; overflow:hidden;
+}
+.upgrade-banner::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px;
+  background:radial-gradient(circle,rgba(0,240,212,.18),transparent 70%); }
+.upgrade-banner-title { font-family:var(--font-d); font-weight:800; font-size:.82rem; margin-bottom:3px; color:var(--text); }
+.upgrade-banner-sub { font-size:.7rem; color:var(--text-muted); line-height:1.4; margin-bottom:10px; }
+.upgrade-banner-btn { width:100%; background:var(--cyan); color:#05070f; border:none; padding:8px;
+  border-radius:8px; font-family:var(--font-b); font-size:.78rem; font-weight:700; cursor:pointer; transition:all .2s; }
+.upgrade-banner-btn:hover { opacity:.88; transform:translateY(-1px); }
+
+/* In-app pricing modal */
+.pricing-modal-overlay {
+  position:fixed; inset:0; background:rgba(5,7,15,.9); backdrop-filter:blur(12px);
+  z-index:200; display:none; align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto;
+}
+.pricing-modal-overlay.open { display:flex; }
+.pricing-modal { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+  width:100%; max-width:960px; padding:40px 36px; position:relative; }
+.pricing-modal-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border);
+  color:var(--text-muted); width:34px; height:34px; border-radius:9px; cursor:pointer; font-size:1rem;
+  display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.pricing-modal-close:hover { border-color:var(--rose); color:var(--rose); }
+
+@media(max-width:860px) { .pricing-grid { grid-template-columns:1fr; } .pricing-section { padding:60px 20px; } }
+
 /* ── Google Sign-In ── */
 .auth-divider { display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-muted);font-size:.75rem;font-weight:600;letter-spacing:.04em; }
 .auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:var(--border); }
@@ -1294,6 +1374,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   <nav class="land-nav-bar">
     <span class="logo">Revynce</span>
     <div class="land-nav-links">
+      <button class="btn-ghost" onclick="document.getElementById('pricing-section').scrollIntoView({behavior:'smooth'})">Pricing</button>
       <button class="btn-ghost" onclick="showAuth('login')">Log In</button>
       <button class="btn-primary" onclick="showAuth('signup')"><i class="fi fi-br-rocket"></i> Get Started Free</button>
     </div>
@@ -1357,6 +1438,91 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <div class="stat-item"><div class="stat-n">4.9★</div><div class="stat-l">App Rating</div></div>
   </div>
 
+  <!-- ── PRICING ── -->
+  <section class="pricing-section" id="pricing-section">
+    <div style="text-align:center;margin-bottom:12px">
+      <div class="hero-eyebrow" style="margin-bottom:14px"><i class="fi fi-br-tag" style="font-size:.75rem"></i> Pricing</div>
+      <h2 class="section-head">Simple, honest pricing</h2>
+      <p class="section-sub" style="margin-bottom:28px">Start free forever. Upgrade when you need more.</p>
+    </div>
+    <!-- Billing toggle -->
+    <div class="pricing-toggle-wrap" id="pricing-toggle-wrap">
+      <span id="ptog-monthly" style="font-weight:600;color:var(--text)">Monthly</span>
+      <button class="pricing-toggle" id="pricing-tog" onclick="toggleBilling()"><div class="pricing-toggle-knob"></div></button>
+      <span id="ptog-annual" style="color:var(--text-muted)">Annual <span class="pricing-save-badge">Save 30%</span></span>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- FREE -->
+      <div class="pricing-card">
+        <div class="pricing-plan">Free</div>
+        <div class="pricing-price">$<span class="p-amount" data-m="0" data-y="0">0</span></div>
+        <div class="pricing-cadence">forever</div>
+        <div class="pricing-desc">Everything you need to get started and study smarter.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>5 AI uploads per month</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>AI Notes generation</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>12 Palm Cards per upload</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Practice Test generation</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Archive &amp; subject folders</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>AI Study Tutor chat</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>Unlimited uploads</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>PDF &amp; DOCX export</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>Priority AI processing</span></li>
+        </ul>
+        <button class="pricing-cta free" onclick="showAuth('signup')">Get Started Free</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="pricing-card popular">
+        <div class="pricing-popular-badge">⭐ Most Popular</div>
+        <div class="pricing-plan">Pro</div>
+        <div class="pricing-price">$<span class="p-amount" data-m="12" data-y="8">12</span></div>
+        <div class="pricing-cadence"><span class="p-cadence">per month</span></div>
+        <div class="pricing-desc">For students who are serious about getting top marks.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span><strong>Unlimited</strong> AI uploads</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Everything in Free</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>20 Palm Cards per upload</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>PDF &amp; DOCX export</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Priority AI processing</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Advanced study analytics</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Custom deck titles &amp; tags</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>XP leaderboard boost</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Early access to new features</span></li>
+        </ul>
+        <button class="pricing-cta pro" onclick="showAuth('signup')"><i class="fi fi-br-rocket"></i> &nbsp;Upgrade to Pro</button>
+      </div>
+
+      <!-- TEACHER / TEAM -->
+      <div class="pricing-card">
+        <div class="pricing-plan">Teacher</div>
+        <div class="pricing-price">$<span class="p-amount" data-m="19" data-y="13">19</span></div>
+        <div class="pricing-cadence"><span class="p-cadence">per month</span></div>
+        <div class="pricing-desc">Everything you need to run a class and track student progress.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Everything in Pro</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Unlimited classes &amp; students</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>AI Test Builder &amp; AI Marking</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Student risk alerts</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Class performance analytics</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Bulk material upload</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Custom class codes</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Priority support</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>School dashboard (coming soon)</span></li>
+        </ul>
+        <button class="pricing-cta teach" onclick="showAuth('signup','teacher')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Get Teacher Plan</button>
+      </div>
+
+    </div>
+    <p style="text-align:center;color:var(--text-muted);font-size:.75rem;margin-top:28px">
+      All plans include a <strong style="color:var(--text)">14-day free trial</strong>. No credit card required. Cancel anytime.
+    </p>
+  </section>
+
   <div class="cta-section">
     <h2>Ready to ace your exams?</h2>
     <p>Join 50,000+ students and 3,000+ teachers already using Revynce.</p>
@@ -1397,8 +1563,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <input type="text" class="form-input" id="auth-name" placeholder="Your full name">
           </div>
           <div class="form-group" id="org-code-group" style="display:none">
-            <label class="form-label">Organisation Code <span style="color:var(--text-muted);font-weight:400">(from your teacher)</span></label>
-            <input type="text" class="form-input" id="auth-org-code" placeholder="e.g. REV-XK29" style="text-transform:uppercase;letter-spacing:.1em">
+            <label class="form-label">Classroom Code <span style="color:var(--text-muted);font-weight:400">(given to you by your teacher)</span></label>
+            <input type="text" class="form-input" id="auth-org-code" placeholder="e.g. BIO-2024" style="text-transform:uppercase;letter-spacing:.1em">
           </div>
         </div>
         <div class="form-group">
@@ -1485,6 +1651,12 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       </div>
       <button class="nav-item" onclick="showPanel('notifications',this)" style="margin-bottom:4px"><i class="fi fi-br-bell"></i> Notifications <span class="nav-badge" id="notif-count">3</span></button>
       <button class="nav-item" onclick="showPanel('profile',this)" style="margin-bottom:4px"><i class="fi fi-br-user"></i> Profile &amp; Settings</button>
+      <!-- Upgrade banner (hidden for Pro/Teacher users) -->
+      <div class="upgrade-banner" id="upgrade-banner">
+        <div class="upgrade-banner-title">⚡ Upgrade to Pro</div>
+        <div class="upgrade-banner-sub">Unlimited uploads, 20 palm cards, PDF export &amp; priority AI.</div>
+        <button class="upgrade-banner-btn" onclick="openPricingModal()">Upgrade — from $12/mo</button>
+      </div>
       <button class="logout-btn" onclick="doLogout()"><i class="fi fi-br-sign-out-alt"></i> Log Out</button>
     </div>
   </aside>
@@ -2397,6 +2569,7 @@ function populateApp(profile) {
   ['sb-avatar','profile-ava'].forEach(id=>document.getElementById(id).textContent=init);
   document.getElementById('sb-name').textContent = profile.name||'User';
   document.getElementById('sb-role').textContent = profile.role||'student';
+  window._updateUpgradeBanner?.(profile.plan || profile.role);
   document.getElementById('dash-name').textContent = (profile.name||'').split(' ')[0]||'Student';
   document.getElementById('d-xp').textContent = profile.xp||0;
   document.getElementById('topbar-xp').textContent = (profile.xp||0)+' XP';
@@ -2809,7 +2982,22 @@ window.doAuth = async function() {
   try {
     if(window._authTab==='signup'){
       const cred=await createUserWithEmailAndPassword(auth,email,password);
-      await set(ref(db,`users/${cred.user.uid}`),{name:name||email,email,role:currentRole,xp:0,streak:0,createdAt:new Date().toISOString()});
+      const uid=cred.user.uid;
+      await set(ref(db,`users/${uid}`),{name:name||email,email,role:currentRole,xp:0,streak:0,createdAt:new Date().toISOString()});
+      // Auto-join class if a classroom code was provided
+      const classCode=(document.getElementById('auth-org-code')?.value||'').trim().toUpperCase();
+      if(currentRole==='org-student' && classCode){
+        const classSnap=await get(child(ref(db),`classes/${classCode}`)).catch(()=>null);
+        if(classSnap?.exists()){
+          const cls=classSnap.val();
+          await set(ref(db,`enrollments/${uid}/${classCode}`),{...cls,role:'student',joinedAt:new Date().toISOString()});
+          await set(ref(db,`classMembers/${classCode}/${uid}`),{name:name||email,joinedAt:new Date().toISOString()});
+        } else {
+          // Code not found — not a fatal error, user can join later
+          msgEl.textContent='Account created! (Class code not found — you can join a class later.)';
+          msgEl.className='msg-ok';
+        }
+      }
     } else {
       await signInWithEmailAndPassword(auth,email,password);
     }
@@ -4060,6 +4248,39 @@ function _closeTutorial() {
 
 window.replayTutorial = function() { startTutorial(true); };
 
+// ═══════════════════════════════════════
+//  PRICING
+// ═══════════════════════════════════════
+let _billingAnnual = false;
+
+window.toggleBilling = function() {
+  _billingAnnual = !_billingAnnual;
+  const tog = document.getElementById('pricing-tog');
+  tog?.classList.toggle('annual', _billingAnnual);
+  document.getElementById('ptog-monthly').style.color = _billingAnnual ? 'var(--text-muted)' : 'var(--text)';
+  document.getElementById('ptog-annual').style.color  = _billingAnnual ? 'var(--text)' : 'var(--text-muted)';
+  document.querySelectorAll('.p-amount').forEach(el => {
+    el.textContent = _billingAnnual ? el.dataset.y : el.dataset.m;
+  });
+  document.querySelectorAll('.p-cadence').forEach(el => {
+    el.textContent = _billingAnnual ? 'per month, billed annually' : 'per month';
+  });
+};
+
+window.openPricingModal = function() {
+  document.getElementById('pricing-modal-overlay')?.classList.add('open');
+};
+window.closePricingModal = function() {
+  document.getElementById('pricing-modal-overlay')?.classList.remove('open');
+};
+
+// Hide upgrade banner for paid users (plan field on Firebase profile)
+window._updateUpgradeBanner = function(plan) {
+  const banner = document.getElementById('upgrade-banner');
+  if (!banner) return;
+  banner.style.display = (plan === 'pro' || plan === 'teacher') ? 'none' : '';
+};
+
 // Add fadeOut keyframe once
 const _fkStyle = document.createElement('style');
 _fkStyle.textContent = '@keyframes fadeOut { to { opacity:0; } }';
@@ -4093,6 +4314,68 @@ document.head.appendChild(_fkStyle);
       </div>
     </div>
 
+  </div>
+</div>
+<!-- ── IN-APP PRICING MODAL ── -->
+<div class="pricing-modal-overlay" id="pricing-modal-overlay" onclick="if(event.target===this)closePricingModal()">
+  <div class="pricing-modal">
+    <button class="pricing-modal-close" onclick="closePricingModal()"><i class="fi fi-br-cross"></i></button>
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="hero-eyebrow" style="margin:0 auto 12px"><i class="fi fi-br-tag" style="font-size:.75rem"></i> Plans &amp; Pricing</div>
+      <h2 style="font-family:var(--font-d);font-size:1.6rem;font-weight:800;letter-spacing:-.025em;margin-bottom:8px">Unlock the full Revynce experience</h2>
+      <p style="color:var(--text-muted);font-size:.875rem">14-day free trial on all paid plans. No credit card required.</p>
+    </div>
+    <div class="pricing-grid" style="max-width:100%">
+      <!-- FREE -->
+      <div class="pricing-card">
+        <div class="pricing-plan">Free</div>
+        <div class="pricing-price">$0</div>
+        <div class="pricing-cadence">forever</div>
+        <div class="pricing-desc">Your current plan.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>5 AI uploads / month</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Notes, Palm Cards &amp; Test</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Archive &amp; AI Tutor</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>Unlimited uploads</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>PDF export</span></li>
+        </ul>
+        <button class="pricing-cta free" disabled style="opacity:.5;cursor:default">Current Plan</button>
+      </div>
+      <!-- PRO -->
+      <div class="pricing-card popular">
+        <div class="pricing-popular-badge">⭐ Most Popular</div>
+        <div class="pricing-plan">Pro</div>
+        <div class="pricing-price">$12</div>
+        <div class="pricing-cadence">per month</div>
+        <div class="pricing-desc">For students serious about top marks.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span><strong>Unlimited</strong> uploads</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>20 Palm Cards per upload</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>PDF &amp; DOCX export</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Priority AI processing</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Advanced analytics</span></li>
+        </ul>
+        <button class="pricing-cta pro" onclick="showToast('Payment coming soon — stay tuned!','info')"><i class="fi fi-br-rocket"></i> &nbsp;Upgrade to Pro</button>
+      </div>
+      <!-- TEACHER -->
+      <div class="pricing-card">
+        <div class="pricing-plan">Teacher</div>
+        <div class="pricing-price">$19</div>
+        <div class="pricing-cadence">per month</div>
+        <div class="pricing-desc">Run classes and track student progress.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Everything in Pro</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Unlimited classes</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>AI Test Builder &amp; Marking</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Student risk alerts</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Class analytics dashboard</span></li>
+        </ul>
+        <button class="pricing-cta teach" onclick="showToast('Payment coming soon — stay tuned!','info')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Get Teacher Plan</button>
+      </div>
+    </div>
   </div>
 </div>
 </body>

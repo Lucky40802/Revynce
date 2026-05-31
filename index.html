@@ -12,6 +12,12 @@
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<!-- Iconify — 200k+ icons from 100+ sets (Phosphor, Tabler, Lucide, Material Symbols, etc.)
+     Usage: <iconify-icon icon="ph:rocket-bold"></iconify-icon>
+            <iconify-icon icon="tabler:brand-google"></iconify-icon>
+            <iconify-icon icon="mdi:school"></iconify-icon>
+     Browse all icons at: https://icon-sets.iconify.design -->
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <style>
 /* ═══════════════════════════════════════
    CSS VARIABLES & RESET
@@ -43,6 +49,8 @@
   --shadow-glow: 0 0 32px var(--cyan-glow);
 }
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+/* Iconify icons inherit colour and size from parent, same as Flaticon */
+iconify-icon { display:inline-flex; align-items:center; vertical-align:-.125em; }
 html { scroll-behavior:smooth; }
 body {
   background: var(--bg);
@@ -429,6 +437,21 @@ body::before {
 .fc-empty { text-align:center; padding:60px 20px; color:var(--text-muted); grid-column:1/-1; }
 .fc-empty i { font-size:2.5rem; color:var(--border); display:block; margin-bottom:14px; }
 .fc-empty p { font-size:.875rem; margin-bottom:18px; }
+/* Edit mode */
+.deck-delete-btn {
+  display:none; position:absolute; top:10px; right:10px;
+  width:32px; height:32px; border-radius:8px;
+  background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.25);
+  color:var(--rose); font-size:.85rem; cursor:pointer;
+  align-items:center; justify-content:center; transition:all .2s; z-index:2;
+  flex-shrink:0;
+}
+.deck-delete-btn:hover { background:var(--rose); color:#fff; border-color:var(--rose); }
+.deck-grid.edit-mode .deck-card { border-color:rgba(244,63,94,0.2); cursor:default; }
+.deck-grid.edit-mode .deck-card:hover { border-color:rgba(244,63,94,0.4); transform:none; box-shadow:none; }
+.deck-grid.edit-mode .deck-card::before { display:none; }
+.deck-grid.edit-mode .deck-delete-btn { display:flex; }
+.btn-edit-active { background:rgba(244,63,94,0.1)!important; border-color:rgba(244,63,94,0.4)!important; color:var(--rose)!important; }
 /* Study mode */
 .fc-decks-view.hidden { display:none; }
 .fc-study-view { display:none; }
@@ -821,9 +844,144 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 /* ── XP pop animation ── */
 .xp-pop { animation: xpPop .35s cubic-bezier(.34,1.56,.64,1); }
 @keyframes xpPop { 0%{transform:scale(1)} 55%{transform:scale(1.35)} 100%{transform:scale(1)} }
+
+/* ═══════════════════════════════════════
+   TUTORIAL OVERLAY
+═══════════════════════════════════════ */
+.tutorial-overlay {
+  position:fixed;inset:0;background:rgba(5,7,15,.88);backdrop-filter:blur(14px);
+  z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn .35s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.tutorial-card {
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:40px 44px;max-width:600px;width:100%;position:relative;
+  box-shadow:0 28px 90px rgba(0,0,0,.55);
+  animation:tutIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes tutIn { from{opacity:0;transform:scale(.94) translateY(16px)} to{opacity:1;transform:none} }
+.tut-step-anim { animation:tutStepIn .28s ease; }
+@keyframes tutStepIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* Progress dots */
+.tutorial-dots { display:flex;gap:7px;justify-content:center;margin-bottom:32px; }
+.tutorial-dot { height:7px;border-radius:4px;background:var(--border);transition:all .3s ease; width:7px; }
+.tutorial-dot.active { background:var(--cyan);width:22px; }
+.tutorial-dot.done { background:var(--cyan);opacity:.35; }
+
+/* Icon */
+.tut-icon-wrap {
+  width:76px;height:76px;border-radius:20px;background:var(--cyan-dim);
+  border:1px solid var(--border-active);display:flex;align-items:center;justify-content:center;
+  font-size:2rem;color:var(--cyan);margin:0 auto 22px;
+}
+/* Welcome & finish icon — larger glow */
+.tut-icon-wrap.hero { width:92px;height:92px;font-size:2.4rem;box-shadow:0 0 40px var(--cyan-glow); }
+
+/* Text */
+.tut-title { font-family:var(--font-d);font-size:1.45rem;font-weight:800;letter-spacing:-.025em;text-align:center;margin-bottom:11px; }
+.tut-desc  { text-align:center;color:var(--text-muted);font-size:.9rem;line-height:1.72;max-width:440px;margin:0 auto 26px; }
+
+/* Feature chips */
+.tut-features { display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:28px; }
+.tut-feat { background:var(--bg-card2);border:1px solid var(--border);border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:.82rem;font-weight:500; }
+.tut-feat i { color:var(--cyan);font-size:.95rem;width:18px;text-align:center; }
+
+/* Navigation row */
+.tut-nav { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
+.tut-skip { background:none;border:none;color:var(--text-muted);font-size:.8rem;cursor:pointer;font-family:var(--font-b);padding:8px 0; }
+.tut-skip:hover { color:var(--text); }
+.tut-step-lbl { font-size:.75rem;color:var(--text-muted); }
+.tut-btns { display:flex;gap:8px; }
+
+/* Replay button in settings */
+.replay-tour-btn { display:flex;align-items:center;gap:9px;background:var(--cyan-dim);border:1px solid var(--border-active);color:var(--cyan);padding:11px 18px;border-radius:10px;font-family:var(--font-b);font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s;width:100%; }
+.replay-tour-btn:hover { background:var(--cyan);color:#05070f; }
+
+@media(max-width:580px) {
+  .tutorial-card { padding:28px 22px; }
+  .tut-title { font-size:1.15rem; }
+  .tut-features { grid-template-columns:1fr; }
+}
+
+/* ═══════════════════════════════════════
+   DOOR OPEN TRANSITION
+═══════════════════════════════════════ */
+#door-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  z-index:99999; display:flex; pointer-events:none;
+}
+.door-panel {
+  width:50%; height:100%;
+  background:#05070f;
+  display:flex; align-items:center; justify-content:center;
+}
+.door-panel.left  { border-right:1px solid rgba(255,255,255,.07); }
+.door-panel.right { border-left:1px solid rgba(255,255,255,.07);  }
+.door-logo {
+  font-family:var(--font-d); font-size:2rem; font-weight:800;
+  color:var(--cyan); text-shadow:0 0 32px rgba(0,240,212,0.35);
+  letter-spacing:-.03em;
+  animation:doorLogoFade .35s ease .05s both;
+}
+.door-logo span { color:#e8eaf0; }
+@keyframes doorLogoFade { from{opacity:0;transform:scale(.94)} to{opacity:1;transform:scale(1)} }
+
+/* ── Flashcard tab bar ── */
+.fc-tab-bar { display:flex;gap:4px;margin-bottom:24px;background:var(--bg-card2);border:1px solid var(--border);border-radius:12px;padding:4px; }
+.fc-tab { flex:1;padding:9px 16px;border-radius:9px;border:none;background:none;color:var(--text-muted);font-family:var(--font-b);font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px; }
+.fc-tab.active { background:var(--cyan);color:#05070f; }
+.fc-tab:not(.active):hover { background:var(--cyan-dim);color:var(--cyan); }
+.fc-panel { display:none; }
+.fc-panel.active { display:block; }
+
+/* ── Archive ── */
+.archive-folder { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden; }
+.archive-folder-hdr { display:flex;align-items:center;gap:12px;padding:15px 18px;cursor:pointer;transition:background .15s;user-select:none; }
+.archive-folder-hdr:hover { background:var(--cyan-dim); }
+.archive-folder-ic { width:36px;height:36px;border-radius:9px;background:var(--cyan-dim);display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:.95rem;flex-shrink:0; }
+.archive-folder-name { font-weight:700;font-size:.875rem;flex:1; }
+.archive-folder-meta { font-size:.73rem;color:var(--text-muted); }
+.archive-chevron { color:var(--text-muted);font-size:.75rem;transition:transform .2s; }
+.archive-folder.open .archive-chevron { transform:rotate(90deg); }
+.archive-items { display:none;border-top:1px solid var(--border); }
+.archive-folder.open .archive-items { display:block; }
+.archive-item { display:flex;align-items:center;gap:12px;padding:11px 18px 11px 26px;border-bottom:1px solid var(--border);transition:background .15s; }
+.archive-item:last-child { border:none; }
+.archive-item:hover { background:rgba(255,255,255,.02); }
+.archive-item-ic { width:30px;height:30px;border-radius:7px;background:var(--bg-card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.78rem;flex-shrink:0; }
+.archive-item-name { font-size:.84rem;font-weight:500;flex:1; }
+.archive-item-date { font-size:.7rem;color:var(--text-muted);white-space:nowrap; }
+.archive-view-btn { background:none;border:1px solid var(--border-active);color:var(--cyan);font-size:.7rem;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .2s;font-family:var(--font-b);white-space:nowrap;margin-left:6px; }
+.archive-view-btn:hover { background:var(--cyan-dim); }
+.archive-empty { text-align:center;padding:60px 20px;color:var(--text-muted); }
+.archive-empty i { font-size:2.5rem;color:var(--border);display:block;margin-bottom:14px; }
+
+/* ── AI deck-name suggestion hint ── */
+.deck-name-hint { font-size:.72rem;color:var(--cyan);margin-top:5px;min-height:14px;display:none; }
+.deck-name-hint.show { display:block; }
+
+/* ── Google Sign-In ── */
+.auth-divider { display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-muted);font-size:.75rem;font-weight:600;letter-spacing:.04em; }
+.auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:var(--border); }
+.btn-google {
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;
+  padding:12px;font-family:var(--font-b);font-size:.9rem;font-weight:600;
+  color:var(--text);cursor:pointer;transition:all .2s;
+}
+.btn-google:hover { border-color:var(--cyan);background:var(--cyan-dim);color:var(--cyan); }
+.btn-google:disabled { opacity:.45;cursor:default; }
 </style>
 </head>
 <body>
+<!-- Door open transition -->
+<div id="door-overlay">
+  <div class="door-panel left"><div class="door-logo">Revy<span>nce</span></div></div>
+  <div class="door-panel right"></div>
+</div>
+
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
@@ -954,6 +1112,18 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <input type="password" class="form-input" id="auth-password" placeholder="Min. 8 characters" onkeydown="if(event.key==='Enter')doAuth()">
         </div>
         <button class="auth-submit" id="auth-btn" onclick="doAuth()">Create Account</button>
+
+        <div class="auth-divider">or</div>
+        <button class="btn-google" id="google-btn" onclick="doGoogleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+
         <p id="auth-msg"></p>
 
         <!-- ── Forgot Password Panel ── -->
@@ -1129,6 +1299,11 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <input type="text" class="form-input" id="upload-subject" placeholder="e.g. Biology, Maths, History">
           </div>
           <div class="form-group">
+            <label class="form-label">Deck Name <span style="color:var(--text-muted);font-weight:400">(optional — AI will suggest one)</span></label>
+            <input type="text" class="form-input" id="upload-deck-name" placeholder="e.g. Chapter 5 — Cell Division">
+            <div class="deck-name-hint" id="deck-name-hint"><i class="fi fi-br-magic-wand" style="font-size:.7rem"></i> AI suggested this title — feel free to rename it</div>
+          </div>
+          <div class="form-group">
             <label class="form-label">Additional Instructions (optional)</label>
             <input type="text" class="form-input" id="upload-instructions" placeholder="e.g. Focus on Chapter 3, create 20 flashcards">
           </div>
@@ -1194,18 +1369,45 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <!-- ── FLASHCARDS ── -->
     <div class="app-panel" id="panel-flashcards">
 
-      <!-- ── Deck Browser ── -->
+      <!-- ── Deck Browser + Archive ── -->
       <div class="fc-decks-view" id="fc-decks-view">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-          <div>
-            <h2 class="section-head" style="margin-bottom:4px">My Flashcard Sets</h2>
-            <p style="color:var(--text-muted);font-size:.875rem">Study your decks Quizlet-style — flip, navigate, shuffle.</p>
+
+        <!-- Tab bar -->
+        <div class="fc-tab-bar">
+          <button class="fc-tab active" id="fc-tab-sets" onclick="switchFcTab('sets')"><i class="fi fi-br-layers"></i> My Sets</button>
+          <button class="fc-tab" id="fc-tab-archive" onclick="switchFcTab('archive')"><i class="fi fi-br-archive"></i> Archive</button>
+        </div>
+
+        <!-- My Sets panel -->
+        <div class="fc-panel active" id="fc-sets-view">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 class="section-head" style="margin-bottom:4px;font-size:1.2rem">My Flashcard Sets</h2>
+              <p style="color:var(--text-muted);font-size:.875rem">Study your decks Quizlet-style — flip, navigate, shuffle.</p>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-ghost" id="fc-edit-btn" onclick="toggleDeckEditMode()"><i class="fi fi-br-pencil"></i> Edit</button>
+              <button class="btn-primary" onclick="showPanel('upload',null)"><i class="fi fi-br-magic-wand"></i> New Set with AI</button>
+            </div>
           </div>
-          <button class="btn-primary" onclick="showPanel('upload',null)"><i class="fi fi-br-magic-wand"></i> New Set with AI</button>
+          <div class="deck-grid" id="deck-grid">
+            <!-- Populated by renderDecks() -->
+          </div>
         </div>
-        <div class="deck-grid" id="deck-grid">
-          <!-- Populated by renderDecks() -->
+
+        <!-- Archive panel -->
+        <div class="fc-panel" id="fc-archive-view">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 class="section-head" style="margin-bottom:4px;font-size:1.2rem">Archive</h2>
+              <p style="color:var(--text-muted);font-size:.875rem">All your uploaded notes, organised by subject. Click any file to view its AI notes.</p>
+            </div>
+          </div>
+          <div id="archive-folders">
+            <!-- Populated by renderArchive() -->
+          </div>
         </div>
+
       </div>
 
       <!-- ── Study Mode ── -->
@@ -1766,9 +1968,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
               </div>
             </div>
 
-            <button class="btn-primary" style="padding:10px 22px" onclick="saveAppearanceSettings()">
-              <i class="fi fi-br-disk"></i> Save Appearance
-            </button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <button class="btn-primary" style="padding:10px 22px" onclick="saveAppearanceSettings()">
+                <i class="fi fi-br-disk"></i> Save Appearance
+              </button>
+              <button class="replay-tour-btn" onclick="replayTutorial()">
+                <i class="fi fi-br-graduation-cap"></i> Replay Feature Tour
+              </button>
+            </div>
           </div>
 
           <!-- ── Notifications ── -->
@@ -1864,8 +2071,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 import { getStorage, ref as sRef, uploadBytes } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -1884,24 +2091,42 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
+const googleProvider = new GoogleAuthProvider();
 
 window._auth = auth; window._db = db; window._storage = storage;
-window._fbRef = ref; window._fbSet = set; window._fbGet = get; window._fbChild = child;
+window._fbRef = ref; window._fbSet = set; window._fbGet = get; window._fbChild = child; window._fbRemove = remove;
 window._sRef = sRef; window._uploadBytes = uploadBytes;
 
 // ── Auth state ──
 onAuthStateChanged(auth, async (user) => {
+  if (window._authResolved) return; // only handle first resolution
+  window._authResolved = true;
   if (user) {
     try {
       const snap = await get(child(ref(db), `users/${user.uid}`));
       const profile = snap.exists() ? snap.val() : { name: user.email, role: 'student', xp: 0, streak: 0 };
+      const isNewUser = !snap.exists();
       window._userProfile = profile; window._uid = user.uid;
       populateApp(profile);
       showPage('app');
       loadClasses();
       loadDashboardStats();
       loadFlashcards();
-    } catch(e) { populateApp({ name: user.email, role:'student', xp:0 }); showPage('app'); }
+      // Open door, then show tutorial for new users after doors finish
+      window._openDoor(() => {
+        if (isNewUser || !localStorage.getItem('revynce-tutorial-done')) {
+          setTimeout(() => window.startTutorial?.(true), 300);
+        }
+      });
+    } catch(e) {
+      populateApp({ name: user.email, role:'student', xp:0 });
+      showPage('app');
+      window._openDoor();
+    }
+  } else {
+    // No user — open door to reveal landing page
+    showPage('landing');
+    window._openDoor();
   }
 });
 
@@ -2147,6 +2372,7 @@ async function generateContentWithAI(fileText, fileName, subject, instructions, 
   const userPrompt = mode === 'teacher'
     ? `${context}${instr}Generate a complete test paper as JSON: {"test":"<full formatted test paper in markdown with MCQ section, short answer, essay, and answer key>"}`
     : `${context}${instr}Generate study materials as JSON with these exact keys:
+- "title": a concise descriptive title for this flashcard deck based on the document (max 6 words, e.g. "Cell Division — Year 12 Biology")
 - "notes": comprehensive markdown study notes with ## headings, bullet points, and **bold** key terms
 - "quiz": array of exactly 6 objects with keys q (string), opts (array of 4 strings), ans (number 0-3), exp (string)
 - "flashcards": array of exactly 8 objects with keys front (string) and back (string)
@@ -2185,6 +2411,9 @@ appDrop.addEventListener('drop', e => { e.preventDefault(); appDrop.classList.re
 function handleAppFile(file) {
   if (!file) return; appUploadedFile = file;
   appDrop.innerHTML = `<i class="fi fi-br-file-check"></i><p><strong style="color:var(--cyan)">${file.name}</strong></p><p style="font-size:.75rem;margin-top:5px">${(file.size/1024).toFixed(1)} KB · Ready to generate</p>`;
+  // Reset deck name hint when a new file is picked
+  const hint = document.getElementById('deck-name-hint');
+  if (hint) hint.classList.remove('show');
 }
 
 let resultContent = { notes:'', quiz:'', flashcards:'', schedule:'', test:'' };
@@ -2198,6 +2427,9 @@ window.appGenerate = async function() {
   if (!proxyUrl || proxyUrl === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
     status.textContent='⚙ AI proxy not configured. See PROXY_URL in the HTML.'; status.style.color='var(--rose)'; return;
   }
+  const deckNameInput = document.getElementById('upload-deck-name');
+  const deckNameHint  = document.getElementById('deck-name-hint');
+  const userDeckName  = deckNameInput?.value.trim() || '';
   status.style.color='var(--cyan)'; status.textContent='⏳ Reading file…'; btn.disabled=true;
   try {
     if (window._uid) {
@@ -2209,6 +2441,16 @@ window.appGenerate = async function() {
     const subject = document.getElementById('upload-subject').value.trim();
     const instructions = document.getElementById('upload-instructions').value.trim();
     const generated = await generateContentWithAI(fileText, appUploadedFile.name, subject, instructions, _currentUploadMode, proxyUrl);
+
+    // Resolve final deck name: user input > AI title > subject > filename
+    const aiTitle = generated.title?.trim() || '';
+    let finalDeckName = userDeckName || aiTitle || subject || appUploadedFile.name.replace(/\.[^.]+$/, '');
+    // If user left blank, pre-fill with AI title and show hint
+    if (!userDeckName && aiTitle && deckNameInput) {
+      deckNameInput.value = aiTitle;
+      deckNameHint?.classList.add('show');
+    }
+
     // Build result content strings
     resultContent.notes = generated.notes || 'Notes could not be generated.';
     resultContent.schedule = generated.schedule || 'Schedule could not be generated.';
@@ -2222,15 +2464,23 @@ window.appGenerate = async function() {
     if (generated.flashcards?.length) {
       resultContent.flashcards = generated.flashcards.map((c,i) => `Card ${i+1}\nQ: ${c.front}\nA: ${c.back}`).join('\n\n');
     } else { resultContent.flashcards = 'Flashcards could not be generated.'; }
+
     // Save to Firebase
     if (window._uid) {
       const key = Date.now().toString();
-      await set(ref(db, `uploads/${window._uid}/${key}`), { fileName: appUploadedFile.name, subject, uploadedAt: new Date().toISOString() });
+      // Save upload record including notes for the archive
+      await set(ref(db, `uploads/${window._uid}/${key}`), {
+        fileName:   appUploadedFile.name,
+        deckTitle:  finalDeckName,
+        subject,
+        notes:      (generated.notes || '').slice(0, 8000),
+        uploadedAt: new Date().toISOString(),
+      });
       if (generated.flashcards?.length) {
         await set(ref(db, `flashcardDecks/${window._uid}/${key}`), {
-          subject: subject || appUploadedFile.name.replace(/\.[^.]+$/, ''),
+          subject:   finalDeckName,
           createdAt: new Date().toISOString(),
-          cards: generated.flashcards
+          cards:     generated.flashcards,
         });
         await loadFlashcards();
         window.renderDecks?.();
@@ -2238,7 +2488,7 @@ window.appGenerate = async function() {
       loadDashboardStats();
       await window._addXP(50);
     }
-    status.textContent = '✓ Done! Switch between Notes, Quiz, Flashcards, and Schedule below.';
+    status.textContent = `✓ Done! Saved as "${finalDeckName}" — switch tabs to explore your content.`;
     document.getElementById('upload-result').classList.add('show');
     document.getElementById('upload-placeholder').style.display = 'none';
     document.getElementById('result-content').textContent = resultContent.notes;
@@ -2315,6 +2565,41 @@ window.doAuth = async function() {
 };
 window.doLogout = async function(){ await signOut(auth); showPage('landing'); };
 
+// ── Google Sign-In ──
+window.doGoogleSignIn = async function() {
+  const msgEl = document.getElementById('auth-msg');
+  const btn   = document.getElementById('google-btn');
+  btn.disabled = true;
+  msgEl.textContent = 'Opening Google sign-in…'; msgEl.className = '';
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user   = result.user;
+    const snap   = await get(child(ref(db), `users/${user.uid}`));
+    if (!snap.exists()) {
+      await set(ref(db, `users/${user.uid}`), {
+        name:      user.displayName || user.email,
+        email:     user.email,
+        role:      currentRole,
+        xp:        0,
+        streak:    0,
+        photoURL:  user.photoURL || '',
+        createdAt: new Date().toISOString(),
+      });
+    }
+    // onAuthStateChanged handles redirect to app
+  } catch(e) {
+    btn.disabled = false;
+    const msgs = {
+      'auth/popup-closed-by-user':    'Sign-in cancelled.',
+      'auth/cancelled-popup-request': 'Sign-in cancelled.',
+      'auth/popup-blocked':           'Pop-up blocked — please allow pop-ups for this site.',
+      'auth/account-exists-with-different-credential': 'An account already exists with this email using a different sign-in method.',
+    };
+    msgEl.textContent = msgs[e.code] || e.message;
+    msgEl.className = 'msg-err';
+  }
+};
+
 // ── Forgot Password ──
 window.doForgotPassword = async function() {
   const email = document.getElementById('forgot-email').value.trim();
@@ -2348,6 +2633,46 @@ window.doForgotPassword = async function() {
 // Uses llama-3.3-70b-versatile — Groq's fastest versatile model
 const PROXY_URL = 'https://us-central1-revynce-740d1.cloudfunctions.net/chat';
 window._PROXY_URL = PROXY_URL;
+
+// ═══════════════════════════════════════
+//  DOOR OPEN TRANSITION
+// ═══════════════════════════════════════
+(function() {
+  let _doorOpened = false;
+  const EASE = 'cubic-bezier(0.77,0,0.18,1)';
+
+  window._openDoor = function(afterFn) {
+    if (_doorOpened) { afterFn?.(); return; }
+    _doorOpened = true;
+
+    const overlay    = document.getElementById('door-overlay');
+    if (!overlay) { afterFn?.(); return; }
+    const leftPanel  = overlay.querySelector('.door-panel.left');
+    const rightPanel = overlay.querySelector('.door-panel.right');
+
+    // Wait for logo to register, then animate
+    setTimeout(() => {
+      // Double RAF: first RAF queues a paint, second fires after that paint
+      // so the browser has definitely rendered the closed state first
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const t = 'transform 0.88s ' + EASE;
+          if (leftPanel)  { leftPanel.style.transition  = t; leftPanel.style.transform  = 'translateX(-101%)'; }
+          if (rightPanel) { rightPanel.style.transition = t; rightPanel.style.transform = 'translateX(101%)';  }
+
+          // Hide overlay after animation completes, then run callback
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            afterFn?.();
+          }, 950);
+        });
+      });
+    }, 520);
+  };
+
+  // Fallback: if auth state never fires within 3 s, open on landing anyway
+  setTimeout(() => { window._authResolved = true; window._openDoor(); }, 3000);
+})();
 
 // ── Forgot Password UI helpers ──
 window.showForgotPassword = function() {
@@ -2689,13 +3014,16 @@ window.renderDecks = function() {
       ? new Date(d.createdAt).toLocaleDateString('en-AU', { day:'numeric', month:'short' })
       : '';
     return `
-      <div class="deck-card" onclick="openDeck('${id}')">
+      <div class="deck-card" onclick="if(!window._deckEditMode)openDeck('${id}')">
+        <button class="deck-delete-btn" title="Remove set" onclick="event.stopPropagation();deleteDeck('${id}')">
+          <i class="fi fi-br-trash"></i>
+        </button>
         <div class="deck-icon"><i class="fi ${icon}"></i></div>
         <div class="deck-name">${d.subject || 'Untitled Set'}</div>
         <div class="deck-count">${count} card${count !== 1 ? 's' : ''}</div>
         <div class="deck-footer">
           <span class="deck-date">${date}</span>
-          <button class="deck-study-btn" onclick="event.stopPropagation();openDeck('${id}')">
+          <button class="deck-study-btn" onclick="event.stopPropagation();if(!window._deckEditMode)openDeck('${id}')">
             <i class="fi fi-rr-play"></i> Study
           </button>
         </div>
@@ -2705,6 +3033,136 @@ window.renderDecks = function() {
       <i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i>
       <span style="font-size:.84rem;color:var(--text-muted);font-weight:600">New Set</span>
     </div>`;
+};
+
+// ═══════════════════════════════════════
+//  FLASHCARD TAB SWITCHER
+// ═══════════════════════════════════════
+window.switchFcTab = function(tab) {
+  const isSets = tab === 'sets';
+  document.getElementById('fc-tab-sets')?.classList.toggle('active', isSets);
+  document.getElementById('fc-tab-archive')?.classList.toggle('active', !isSets);
+  document.getElementById('fc-sets-view')?.classList.toggle('active', isSets);
+  document.getElementById('fc-archive-view')?.classList.toggle('active', !isSets);
+  if (!isSets) window.loadArchive?.();
+  // Exit edit mode when switching tabs
+  if (window._deckEditMode) window.toggleDeckEditMode?.();
+};
+
+// ═══════════════════════════════════════
+//  ARCHIVE
+// ═══════════════════════════════════════
+window._archiveData = {};
+
+window.loadArchive = async function() {
+  if (!window._uid || !window._fbGet) return;
+  const container = document.getElementById('archive-folders');
+  if (container) container.innerHTML = '<p style="color:var(--text-muted);font-size:.84rem;padding:20px 0">Loading archive…</p>';
+  try {
+    const snap = await window._fbGet(window._fbChild(window._fbRef(window._db), `uploads/${window._uid}`));
+    window._archiveData = snap.exists() ? snap.val() : {};
+    renderArchive();
+  } catch(e) { console.error('loadArchive:', e); }
+};
+
+function renderArchive() {
+  const container = document.getElementById('archive-folders');
+  if (!container) return;
+  const data = window._archiveData || {};
+  const entries = Object.entries(data).sort(([,a],[,b]) => new Date(b.uploadedAt||0) - new Date(a.uploadedAt||0));
+
+  if (!entries.length) {
+    container.innerHTML = `
+      <div class="archive-empty">
+        <i class="fi fi-br-archive"></i>
+        <p>No archived notes yet.<br>Upload study material to build your archive.</p>
+        <button class="btn-primary" style="margin-top:16px" onclick="showPanel('upload',null)"><i class="fi fi-br-magic-wand"></i> Upload Material</button>
+      </div>`;
+    return;
+  }
+
+  // Group by subject into folders
+  const folders = {};
+  entries.forEach(([key, item]) => {
+    const folder = item.subject?.trim() || 'Uncategorised';
+    if (!folders[folder]) folders[folder] = [];
+    folders[folder].push({ key, ...item });
+  });
+
+  container.innerHTML = Object.entries(folders).map(([folderName, items], idx) => `
+    <div class="archive-folder" id="arch-folder-${idx}">
+      <div class="archive-folder-hdr" onclick="toggleArchiveFolder(${idx})">
+        <div class="archive-folder-ic"><i class="fi fi-br-folder"></i></div>
+        <div class="archive-folder-name">${folderName}</div>
+        <div class="archive-folder-meta">${items.length} file${items.length !== 1 ? 's' : ''}</div>
+        <i class="fi fi-rr-angle-right archive-chevron"></i>
+      </div>
+      <div class="archive-items">
+        ${items.map(item => {
+          const date = item.uploadedAt
+            ? new Date(item.uploadedAt).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' })
+            : '';
+          const hasNotes = !!(item.notes);
+          return `
+            <div class="archive-item">
+              <div class="archive-item-ic"><i class="fi fi-br-document-signed"></i></div>
+              <div class="archive-item-name">${item.deckTitle || item.fileName || 'Untitled'}</div>
+              <div class="archive-item-date">${date}</div>
+              ${hasNotes ? `<button class="archive-view-btn" onclick="viewArchivedNotes('${item.key}')"><i class="fi fi-br-eye"></i> Notes</button>` : ''}
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+window.toggleArchiveFolder = function(idx) {
+  document.getElementById(`arch-folder-${idx}`)?.classList.toggle('open');
+};
+
+window.viewArchivedNotes = function(key) {
+  const item = (window._archiveData || {})[key];
+  if (!item?.notes) return showToast('No notes saved for this file', 'info');
+  showPanel('upload', null);
+  resultContent.notes = item.notes;
+  resultContent.quiz = ''; resultContent.flashcards = ''; resultContent.schedule = '';
+  document.getElementById('upload-result').classList.add('show');
+  document.getElementById('upload-placeholder').style.display = 'none';
+  document.getElementById('result-content').textContent = item.notes;
+  document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector('.result-tab')?.classList.add('active');
+  showToast(`Viewing notes: ${item.deckTitle || item.fileName || 'Untitled'}`, 'info');
+};
+
+window._deckEditMode = false;
+
+window.toggleDeckEditMode = function() {
+  window._deckEditMode = !window._deckEditMode;
+  const grid = document.getElementById('deck-grid');
+  const btn  = document.getElementById('fc-edit-btn');
+  if (window._deckEditMode) {
+    grid?.classList.add('edit-mode');
+    if (btn) { btn.classList.add('btn-edit-active'); btn.innerHTML = '<i class="fi fi-br-check"></i> Done'; }
+  } else {
+    grid?.classList.remove('edit-mode');
+    if (btn) { btn.classList.remove('btn-edit-active'); btn.innerHTML = '<i class="fi fi-br-pencil"></i> Edit'; }
+  }
+};
+
+window.deleteDeck = async function(deckId) {
+  if (!confirm('Remove this flashcard set? This cannot be undone.')) return;
+  try {
+    if (window._uid && window._fbRemove) {
+      await window._fbRemove(window._fbRef(window._db, `flashcardDecks/${window._uid}/${deckId}`));
+    }
+    const decks = window._fcDecks || {};
+    delete decks[deckId];
+    window._fcDecks = decks;
+    window.renderDecks();
+    showToast('Set removed', 'success');
+  } catch(e) {
+    console.error('deleteDeck:', e);
+    showToast('Could not remove set', 'error');
+  }
 };
 
 // Study mode state
@@ -2953,6 +3411,229 @@ const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, {threshold:.1});
 document.querySelectorAll('.fade-up,.scale-in').forEach(el => obs.observe(el));
+
+// ═══════════════════════════════════════
+//  TUTORIAL SYSTEM
+// ═══════════════════════════════════════
+const _TUT_STEPS = [
+  {
+    icon:'fi-br-rocket', hero:true,
+    title:'Welcome to Revynce! 🎉',
+    desc:"You're all set up. This 60-second tour walks you through every feature — so you can start studying smarter right away.",
+    features:null,
+  },
+  {
+    icon:'fi-br-cloud-upload-alt',
+    title:'AI Upload',
+    desc:'Upload any PDF, DOCX, or TXT and Revynce AI generates smart study notes, a practice quiz, a flashcard deck, and a 4-day study schedule — instantly.',
+    features:[
+      {icon:'fi-br-document-signed', label:'Smart Notes'},
+      {icon:'fi-br-quiz-alt',        label:'Practice Quizzes'},
+      {icon:'fi-br-layers',          label:'Flashcard Decks'},
+      {icon:'fi-br-calendar',        label:'Study Schedule'},
+    ],
+  },
+  {
+    icon:'fi-br-robot',
+    title:'AI Study Tutor',
+    desc:'Chat with Revynce AI — powered by Llama 3.3 70B. Ask it to explain a concept, set you a practice problem, review your essay, or quiz you on any topic.',
+    features:[
+      {icon:'fi-br-lightbulb',  label:'Explain Concepts'},
+      {icon:'fi-br-pencil',     label:'Practice Problems'},
+      {icon:'fi-br-diploma',    label:'Essay Feedback'},
+      {icon:'fi-br-quiz-alt',   label:'Test Me Mode'},
+    ],
+  },
+  {
+    icon:'fi-br-layers',
+    title:'Flashcard Sets',
+    desc:'Study your decks Quizlet-style — large 3D flip cards, shuffle, prev/next navigation, and full keyboard control. AI decks are saved automatically.',
+    features:[
+      {icon:'fi-br-refresh',         label:'3D Flip Cards'},
+      {icon:'fi-br-shuffle',         label:'Shuffle Mode'},
+      {icon:'fi-br-chart-histogram', label:'Progress Bar'},
+      {icon:'fi-br-keyboard',        label:'Keyboard Shortcuts'},
+    ],
+  },
+  {
+    icon:'fi-br-quiz-alt',
+    title:'Quizzes & Scoring',
+    desc:'Take auto-generated or built-in practice quizzes. Every correct answer earns XP, and your scores are saved to your performance history.',
+    features:[
+      {icon:'fi-br-check',      label:'Instant Feedback'},
+      {icon:'fi-br-star',       label:'XP per Answer'},
+      {icon:'fi-br-chart-pie',  label:'Score History'},
+      {icon:'fi-br-magic-wand', label:'AI-Generated Qs'},
+    ],
+  },
+  {
+    icon:'fi-br-school',
+    title:'Classes',
+    desc:'Students: join a class using a code from your teacher. Teachers: create a class, share the code, upload resources, and monitor student progress.',
+    features:[
+      {icon:'fi-br-plus',            label:'Join with Code'},
+      {icon:'fi-br-chalkboard-user', label:'Teacher Dashboard'},
+      {icon:'fi-br-users',           label:'Class Roster'},
+      {icon:'fi-br-share',           label:'Share Resources'},
+    ],
+  },
+  {
+    icon:'fi-br-trophy',
+    title:'XP, Streaks & Leaderboard',
+    desc:'Earn XP for every upload, quiz, and Pomodoro session. Build your daily streak, unlock achievement badges, and compete on the class leaderboard.',
+    features:[
+      {icon:'fi-br-flame',   label:'Daily Streaks'},
+      {icon:'fi-br-star',    label:'XP & Levels'},
+      {icon:'fi-br-award',   label:'Badges'},
+      {icon:'fi-br-trophy',  label:'Leaderboard'},
+    ],
+  },
+  {
+    icon:'fi-br-time-forward',
+    title:'Pomodoro Timer',
+    desc:'Stay in the zone with built-in Pomodoro timers — 25-min focus blocks with short and long breaks. Completing a session earns +20 XP automatically.',
+    features:[
+      {icon:'fi-br-time-forward', label:'Focus Blocks'},
+      {icon:'fi-br-bell',         label:'Break Reminders'},
+      {icon:'fi-br-star',         label:'+20 XP / Session'},
+      {icon:'fi-br-microphone',   label:'Voice Study Rooms'},
+    ],
+  },
+  {
+    icon:'fi-br-palette',
+    title:'Customise Revynce',
+    desc:"Make it yours — Settings → Appearance. Toggle Dark or Light mode, pick from 6 accent colours, and adjust font size. All preferences are saved automatically.",
+    features:[
+      {icon:'fi-br-moon',    label:'Dark / Light Mode'},
+      {icon:'fi-br-palette', label:'6 Accent Colours'},
+      {icon:'fi-sr-text',    label:'Font Size S / M / L'},
+      {icon:'fi-br-disk',    label:'Auto-Saved'},
+    ],
+  },
+  {
+    icon:'fi-br-graduation-cap', hero:true,
+    title:"You're all set! 🚀",
+    desc:"Start by uploading your first study file to generate notes and flashcards, or chat with the AI Tutor. You can replay this tour anytime from Settings.",
+    features:null,
+    cta:true,
+  },
+];
+
+let _tutIdx = 0;
+
+function _renderTutStep(idx) {
+  const step  = _TUT_STEPS[idx];
+  const total = _TUT_STEPS.length;
+
+  // Dots
+  document.getElementById('tut-dots').innerHTML = _TUT_STEPS.map((_,i) =>
+    `<div class="tutorial-dot ${i===idx?'active':i<idx?'done':''}"></div>`
+  ).join('');
+
+  // Animate content
+  const content = document.getElementById('tut-content');
+  content.classList.remove('tut-step-anim');
+  void content.offsetWidth;
+  content.classList.add('tut-step-anim');
+
+  // Icon
+  const iconWrap = document.getElementById('tut-icon-wrap');
+  iconWrap.className = 'tut-icon-wrap' + (step.hero ? ' hero' : '');
+  iconWrap.innerHTML = `<i class="fi ${step.icon}"></i>`;
+
+  // Text
+  document.getElementById('tut-title').textContent = step.title;
+  document.getElementById('tut-desc').textContent  = step.desc;
+
+  // Features
+  const featEl = document.getElementById('tut-features');
+  if (step.features?.length) {
+    featEl.style.display = 'grid';
+    featEl.innerHTML = step.features.map(f =>
+      `<div class="tut-feat"><i class="fi ${f.icon}"></i><span>${f.label}</span></div>`
+    ).join('');
+  } else {
+    featEl.style.display = 'none';
+  }
+
+  // Nav
+  document.getElementById('tut-step-lbl').textContent = `${idx+1} of ${total}`;
+  document.getElementById('tut-prev-btn').style.display = idx > 0 ? '' : 'none';
+  const skipBtn = document.getElementById('tut-skip-btn');
+  skipBtn.style.visibility = (idx === total-1) ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('tut-next-btn');
+  if (step.cta) {
+    nextBtn.innerHTML = '<i class="fi fi-br-rocket"></i> Get Started!';
+    nextBtn.style.background = 'var(--green)';
+    nextBtn.style.boxShadow  = '0 0 24px rgba(34,197,94,.35)';
+  } else {
+    nextBtn.innerHTML = 'Next <i class="fi fi-rr-angle-right"></i>';
+    nextBtn.style.background = '';
+    nextBtn.style.boxShadow  = '';
+  }
+}
+
+window.startTutorial = function(force = false) {
+  if (!force && localStorage.getItem('revynce-tutorial-done')) return;
+  _tutIdx = 0;
+  document.getElementById('tutorial-overlay').style.display = 'flex';
+  _renderTutStep(0);
+};
+
+window.tutNext = function() {
+  if (_tutIdx < _TUT_STEPS.length - 1) { _tutIdx++; _renderTutStep(_tutIdx); }
+  else _closeTutorial();
+};
+
+window.tutPrev = function() {
+  if (_tutIdx > 0) { _tutIdx--; _renderTutStep(_tutIdx); }
+};
+
+window.skipTutorial = function() { _closeTutorial(); };
+
+function _closeTutorial() {
+  const overlay = document.getElementById('tutorial-overlay');
+  overlay.style.animation = 'fadeOut .25s ease forwards';
+  setTimeout(() => { overlay.style.display='none'; overlay.style.animation=''; }, 250);
+  localStorage.setItem('revynce-tutorial-done', '1');
+}
+
+window.replayTutorial = function() { startTutorial(true); };
+
+// Add fadeOut keyframe once
+const _fkStyle = document.createElement('style');
+_fkStyle.textContent = '@keyframes fadeOut { to { opacity:0; } }';
+document.head.appendChild(_fkStyle);
 </script>
+
+<!-- ═══════════════════════════════════════
+     TUTORIAL OVERLAY
+═══════════════════════════════════════ -->
+<div id="tutorial-overlay" class="tutorial-overlay" style="display:none" onclick="void 0">
+  <div class="tutorial-card" onclick="event.stopPropagation()">
+
+    <!-- Progress dots -->
+    <div class="tutorial-dots" id="tut-dots"></div>
+
+    <!-- Step content -->
+    <div id="tut-content">
+      <div id="tut-icon-wrap" class="tut-icon-wrap"></div>
+      <h2 class="tut-title" id="tut-title"></h2>
+      <p  class="tut-desc"  id="tut-desc"></p>
+      <div class="tut-features" id="tut-features" style="display:none"></div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="tut-nav">
+      <button class="tut-skip" id="tut-skip-btn" onclick="skipTutorial()">Skip tour</button>
+      <span class="tut-step-lbl" id="tut-step-lbl">1 of 10</span>
+      <div class="tut-btns">
+        <button class="btn-ghost"   id="tut-prev-btn" onclick="tutPrev()" style="padding:9px 16px;display:none">← Prev</button>
+        <button class="btn-primary" id="tut-next-btn" onclick="tutNext()" style="padding:9px 22px">Next <i class="fi fi-rr-angle-right"></i></button>
+      </div>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>

@@ -1011,6 +1011,86 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 .archive-empty { text-align:center;padding:60px 20px;color:var(--text-muted); }
 .archive-empty i { font-size:2.5rem;color:var(--border);display:block;margin-bottom:14px; }
 
+/* ═══════════════════════════════════════
+   ARCHIVE PANEL — GOOGLE DRIVE STYLE
+═══════════════════════════════════════ */
+/* Breadcrumb */
+.ar-breadcrumb { display:flex;align-items:center;gap:6px;margin-bottom:22px;font-size:.8rem;flex-wrap:wrap; }
+.ar-bc-btn { background:none;border:none;color:var(--text-muted);cursor:pointer;font-family:var(--font-b);font-size:.8rem;padding:0;transition:color .15s; }
+.ar-bc-btn:hover { color:var(--cyan); }
+.ar-bc-sep { color:var(--border);font-size:.65rem;user-select:none; }
+.ar-bc-current { color:var(--text);font-weight:600; }
+
+/* Views */
+.ar-view { display:none; }
+.ar-view.active { display:block; }
+
+/* Folder grid */
+.ar-folder-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px; }
+.ar-folder-card {
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 16px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:14px;
+}
+.ar-folder-card:hover { border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.05);transform:translateY(-2px); }
+.ar-folder-ic { width:42px;height:42px;border-radius:10px;background:rgba(245,158,11,.12);
+  border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;
+  font-size:1.25rem;color:var(--amber);flex-shrink:0; }
+.ar-folder-name { font-weight:700;font-size:.9rem;margin-bottom:2px;line-height:1.2; }
+.ar-folder-count { font-size:.72rem;color:var(--text-muted); }
+.ar-empty { text-align:center;padding:60px 20px;color:var(--text-muted); }
+.ar-empty i { font-size:2.5rem;color:var(--border);display:block;margin-bottom:14px; }
+
+/* Upload list inside a folder */
+.ar-upload-list { display:flex;flex-direction:column;gap:8px; }
+.ar-upload-row {
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 18px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:14px;
+}
+.ar-upload-row:hover { border-color:var(--cyan);background:var(--cyan-dim); }
+.ar-upload-ic { width:36px;height:36px;border-radius:9px;background:var(--bg-card2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:.9rem;flex-shrink:0; }
+.ar-upload-title { font-weight:600;font-size:.875rem;flex:1; }
+.ar-upload-date { font-size:.72rem;color:var(--text-muted);white-space:nowrap; }
+.ar-chips { display:flex;gap:5px;flex-shrink:0; }
+.ar-chip { font-size:.64rem;font-weight:700;padding:2px 8px;border-radius:100px;white-space:nowrap; }
+.ar-chip-n { background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2); }
+.ar-chip-c { background:var(--cyan-dim);color:var(--cyan);border:1px solid var(--border-active); }
+.ar-chip-t { background:rgba(124,58,237,.1);color:#a78bfa;border:1px solid rgba(124,58,237,.2); }
+
+/* File cards (3 per set) */
+.ar-file-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;margin-bottom:24px; }
+.ar-file-card {
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:32px 22px 24px;cursor:pointer;transition:all .25s;text-align:center;
+  position:relative;overflow:hidden;
+}
+.ar-file-card::after { content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--ar-accent,var(--cyan));opacity:0;transition:opacity .2s; }
+.ar-file-card:hover { transform:translateY(-4px);box-shadow:0 10px 32px rgba(0,0,0,.18); }
+.ar-file-card:hover::after { opacity:1; }
+.ar-file-card:hover { border-color:var(--ar-accent,var(--cyan)); }
+.ar-file-card.type-notes  { --ar-accent:#3b82f6; }
+.ar-file-card.type-cards  { --ar-accent:#00f0d4; }
+.ar-file-card.type-test   { --ar-accent:#7c3aed; }
+.ar-file-ic-wrap { width:60px;height:60px;border-radius:16px;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem; }
+.ar-file-card.type-notes  .ar-file-ic-wrap { background:rgba(59,130,246,.1);color:#60a5fa; }
+.ar-file-card.type-cards  .ar-file-ic-wrap { background:var(--cyan-dim);color:var(--cyan); }
+.ar-file-card.type-test   .ar-file-ic-wrap { background:rgba(124,58,237,.1);color:#a78bfa; }
+.ar-file-title { font-family:var(--font-d);font-weight:700;font-size:1.05rem;margin-bottom:6px; }
+.ar-file-desc { font-size:.76rem;color:var(--text-muted);line-height:1.5; }
+
+/* Content viewer */
+.ar-viewer-tabs { display:flex;gap:0;margin-bottom:0;border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;overflow:hidden; }
+.ar-viewer-tab { flex:1;padding:10px;background:var(--bg-card2);border:none;color:var(--text-muted);font-family:var(--font-b);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border-right:1px solid var(--border); }
+.ar-viewer-tab:last-child { border-right:none; }
+.ar-viewer-tab.active { background:var(--bg-card);color:var(--cyan); }
+.ar-content-viewer { background:var(--bg-card);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);
+  padding:24px;line-height:1.85;font-size:.875rem;white-space:pre-line;
+  max-height:62vh;overflow-y:auto;min-height:200px; }
+
 /* ── AI deck-name suggestion hint ── */
 .deck-name-hint { font-size:.72rem;color:var(--cyan);margin-top:5px;min-height:14px;display:none; }
 .deck-name-hint.show { display:block; }
@@ -1383,8 +1463,10 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <button class="nav-item active" onclick="showPanel('dashboard',this)"><i class="fi fi-br-home"></i> Dashboard</button>
     <button class="nav-item" onclick="showPanel('upload',this)"><i class="fi fi-br-cloud-upload-alt"></i> AI Upload</button>
     <button class="nav-item" onclick="showPanel('chatbot',this)"><i class="fi fi-br-robot"></i> AI Tutor</button>
-    <button class="nav-item" onclick="showPanel('flashcards',this)"><i class="fi fi-br-layers"></i> Flashcards</button>
-    <button class="nav-item" onclick="showPanel('quizzes',this)"><i class="fi fi-br-quiz-alt"></i> Quizzes</button>
+    <button class="nav-item" onclick="showPanel('archive',this)"><i class="fi fi-br-archive"></i> Archive</button>
+    <div class="sb-section">Study</div>
+    <button class="nav-item" onclick="showPanel('flashcards',this)"><i class="fi fi-br-layers"></i> Palm Cards</button>
+    <button class="nav-item" onclick="showPanel('quizzes',this)"><i class="fi fi-br-quiz-alt"></i> Practice Test</button>
     <div class="sb-section">Organise</div>
     <button class="nav-item" onclick="showPanel('classes',this)"><i class="fi fi-br-school"></i> My Classes</button>
     <button class="nav-item" onclick="showPanel('schedule',this)"><i class="fi fi-br-calendar"></i> Study Schedule</button>
@@ -1537,10 +1619,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="result-box" id="upload-result">
             <div class="result-tabs">
               <button class="result-tab active" onclick="switchResult(this,'notes')"><i class="fi fi-br-document-signed"></i> Notes</button>
-              <button class="result-tab" onclick="switchResult(this,'quiz')"><i class="fi fi-br-quiz-alt"></i> Quiz</button>
-              <button class="result-tab" onclick="switchResult(this,'flashcards')"><i class="fi fi-br-layers"></i> Flashcards</button>
-              <button class="result-tab" onclick="switchResult(this,'schedule')"><i class="fi fi-br-calendar"></i> Schedule</button>
-              <button class="result-tab" id="test-tab" onclick="switchResult(this,'test')" style="display:none"><i class="fi fi-br-pencil-ruler"></i> Test Paper</button>
+              <button class="result-tab" onclick="switchResult(this,'palmCards')"><i class="fi fi-br-layers"></i> Palm Cards</button>
+              <button class="result-tab" onclick="switchResult(this,'test')"><i class="fi fi-br-pencil-ruler"></i> Test</button>
             </div>
             <div class="result-content" id="result-content"></div>
             <div class="result-actions">
@@ -1592,12 +1672,6 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 
       <!-- ── Deck Browser + Archive ── -->
       <div class="fc-decks-view" id="fc-decks-view">
-
-        <!-- Tab bar -->
-        <div class="fc-tab-bar">
-          <button class="fc-tab active" id="fc-tab-sets" onclick="switchFcTab('sets')"><i class="fi fi-br-layers"></i> My Sets</button>
-          <button class="fc-tab" id="fc-tab-archive" onclick="switchFcTab('archive')"><i class="fi fi-br-archive"></i> Archive</button>
-        </div>
 
         <!-- My Sets panel -->
         <div class="fc-panel active" id="fc-sets-view">
@@ -1713,6 +1787,45 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- ── ARCHIVE ── -->
+    <div class="app-panel" id="panel-archive">
+
+      <!-- Breadcrumb nav -->
+      <div class="ar-breadcrumb" id="ar-breadcrumb">
+        <span class="ar-bc-current">Archive</span>
+      </div>
+
+      <!-- VIEW 1: Subject folder grid -->
+      <div class="ar-view active" id="ar-home">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 class="section-head" style="margin-bottom:4px;font-size:1.2rem">My Archive</h2>
+            <p style="color:var(--text-muted);font-size:.875rem">All your uploaded notes — click a subject to open its files.</p>
+          </div>
+          <button class="btn-primary" onclick="showPanel('upload',null)"><i class="fi fi-br-cloud-upload-alt"></i> Upload Notes</button>
+        </div>
+        <div class="ar-folder-grid" id="ar-folder-grid"></div>
+      </div>
+
+      <!-- VIEW 2: Uploads inside a subject folder -->
+      <div class="ar-view" id="ar-folder-view">
+        <div class="ar-upload-list" id="ar-upload-list"></div>
+      </div>
+
+      <!-- VIEW 3: 3 file cards for one upload set -->
+      <div class="ar-view" id="ar-set-view">
+        <div class="ar-file-grid" id="ar-file-grid"></div>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-top:4px">Click a file to open it.</p>
+      </div>
+
+      <!-- VIEW 4: Content viewer -->
+      <div class="ar-view" id="ar-content-view">
+        <div class="ar-viewer-tabs" id="ar-viewer-tabs"></div>
+        <div class="ar-content-viewer" id="ar-content-viewer"></div>
+      </div>
+
     </div>
 
     <!-- ── MY CLASSES ── -->
@@ -2593,11 +2706,10 @@ async function generateContentWithAI(fileText, fileName, subject, instructions, 
   const userPrompt = mode === 'teacher'
     ? `${context}${instr}Generate a complete test paper as JSON: {"test":"<full formatted test paper in markdown with MCQ section, short answer, essay, and answer key>"}`
     : `${context}${instr}Generate study materials as JSON with these exact keys:
-- "title": a concise descriptive title for this flashcard deck based on the document (max 6 words, e.g. "Cell Division — Year 12 Biology")
-- "notes": comprehensive markdown study notes with ## headings, bullet points, and **bold** key terms
-- "quiz": array of exactly 6 objects with keys q (string), opts (array of 4 strings), ans (number 0-3), exp (string)
-- "flashcards": array of exactly 8 objects with keys front (string) and back (string)
-- "schedule": 4-day study schedule as formatted plain text
+- "title": concise descriptive title based on the document content (max 7 words, e.g. "Cell Division — Year 12 Biology")
+- "notes": comprehensive markdown study notes with ## headings, bullet points, **bold** key terms, and concise explanations
+- "palmCards": array of exactly 12 objects with keys front (question string) and back (answer string) — cover all key concepts
+- "test": a complete practice test in plain text with three sections: "MULTIPLE CHOICE" (10 questions A/B/C/D), "SHORT ANSWER" (4 questions with 3-5 sentence expected responses), and "ANSWER KEY" listing all correct answers with brief explanations
 Return only the raw JSON object.`;
 
   const res = await fetch(proxyUrl, {
@@ -2637,7 +2749,7 @@ function handleAppFile(file) {
   if (hint) hint.classList.remove('show');
 }
 
-let resultContent = { notes:'', quiz:'', flashcards:'', schedule:'', test:'' };
+let resultContent = { notes:'', palmCards:'', test:'' };
 let currentResultTab = 'notes';
 
 window.appGenerate = async function() {
@@ -2672,44 +2784,39 @@ window.appGenerate = async function() {
       deckNameHint?.classList.add('show');
     }
 
-    // Build result content strings
-    resultContent.notes = generated.notes || 'Notes could not be generated.';
-    resultContent.schedule = generated.schedule || 'Schedule could not be generated.';
-    if (generated.test) resultContent.test = generated.test;
-    if (generated.quiz?.length) {
-      window._generatedQuizData = generated.quiz;
-      resultContent.quiz = generated.quiz.map((q,i) =>
-        `Q${i+1}: ${q.q}\n${(q.opts||[]).map((o,j)=>String.fromCharCode(65+j)+'. '+o).join('\n')}\nAnswer: ${String.fromCharCode(65+(q.ans||0))}. ${q.exp||''}`
-      ).join('\n\n');
-    } else { resultContent.quiz = 'Quiz could not be generated.'; }
-    if (generated.flashcards?.length) {
-      resultContent.flashcards = generated.flashcards.map((c,i) => `Card ${i+1}\nQ: ${c.front}\nA: ${c.back}`).join('\n\n');
-    } else { resultContent.flashcards = 'Flashcards could not be generated.'; }
+    // Build result content
+    resultContent.notes     = generated.notes     || 'Notes could not be generated.';
+    resultContent.test      = generated.test      || 'Test could not be generated.';
+    resultContent.palmCards = generated.palmCards?.length
+      ? generated.palmCards.map((c,i) => `Card ${i+1}\nQ: ${c.front}\nA: ${c.back}`).join('\n\n')
+      : 'Palm cards could not be generated.';
 
     // Save to Firebase
     if (window._uid) {
       const key = Date.now().toString();
-      // Save upload record including notes for the archive
       await set(ref(db, `uploads/${window._uid}/${key}`), {
         fileName:   appUploadedFile.name,
         deckTitle:  finalDeckName,
         subject,
-        notes:      (generated.notes || '').slice(0, 8000),
+        notes:      (generated.notes  || '').slice(0, 10000),
+        test:       (generated.test   || '').slice(0, 10000),
         uploadedAt: new Date().toISOString(),
       });
-      if (generated.flashcards?.length) {
+      if (generated.palmCards?.length) {
         await set(ref(db, `flashcardDecks/${window._uid}/${key}`), {
           subject:   finalDeckName,
           createdAt: new Date().toISOString(),
-          cards:     generated.flashcards,
+          cards:     generated.palmCards,
         });
+        // Also store palmCards on the upload record (for archive viewer)
+        await set(ref(db, `uploads/${window._uid}/${key}/palmCards`), generated.palmCards);
         await loadFlashcards();
         window.renderDecks?.();
       }
       loadDashboardStats();
       await window._addXP(50);
     }
-    status.textContent = `✓ Done! Saved as "${finalDeckName}" — switch tabs to explore your content.`;
+    status.textContent = `✓ Saved to Archive as "${finalDeckName}" — Notes, Palm Cards & Test are ready.`;
     document.getElementById('upload-result').classList.add('show');
     document.getElementById('upload-placeholder').style.display = 'none';
     document.getElementById('result-content').textContent = resultContent.notes;
@@ -2870,22 +2977,29 @@ window._PROXY_URL = PROXY_URL;
     if (!overlay) { afterFn?.(); return; }
     const leftPanel  = overlay.querySelector('.door-panel.left');
     const rightPanel = overlay.querySelector('.door-panel.right');
+    const centerLogo = overlay.querySelector('.door-center');
 
     // Wait for logo to register, then animate
     setTimeout(() => {
-      // Double RAF: first RAF queues a paint, second fires after that paint
-      // so the browser has definitely rendered the closed state first
+      // Double RAF: ensures browser has painted the closed state before transition starts
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+          // Fade the center logo out at the same time the panels slide away
+          if (centerLogo) {
+            centerLogo.style.transition = 'opacity 0.3s ease';
+            centerLogo.style.opacity    = '0';
+          }
+
+          // Slide panels open
           const t = 'transform 0.88s ' + EASE;
           if (leftPanel)  { leftPanel.style.transition  = t; leftPanel.style.transform  = 'translateX(-101%)'; }
           if (rightPanel) { rightPanel.style.transition = t; rightPanel.style.transform = 'translateX(101%)';  }
 
-          // Hide overlay after animation completes, then run callback
+          // Hide entire overlay once panels finish sliding
           setTimeout(() => {
             overlay.style.display = 'none';
             afterFn?.();
-          }, 950);
+          }, 920);
         });
       });
     }, 520);
@@ -2936,11 +3050,12 @@ window.showPanel = function(name, navEl) {
   if (panel) panel.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (navEl) navEl.classList.add('active');
-  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',flashcards:'Flashcards',quizzes:'Quizzes',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
+  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',archive:'Archive',flashcards:'Palm Cards',quizzes:'Practice Test',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
   document.getElementById('topbar-title').textContent = titles[name] || name;
   if (name === 'quizzes') initQuiz();
   if (name === 'schedule') renderSchedule();
   if (name === 'flashcards') renderDecks();
+  if (name === 'archive') { arGoHome?.(); window.loadArchive?.(); }
   if (name === 'notifications') markAllRead();
   window.scrollTo(0, 0);
 };
@@ -3254,6 +3369,190 @@ window.renderDecks = function() {
       <i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i>
       <span style="font-size:.84rem;color:var(--text-muted);font-weight:600">New Set</span>
     </div>`;
+};
+
+// ═══════════════════════════════════════
+//  ARCHIVE — GOOGLE DRIVE STYLE
+// ═══════════════════════════════════════
+window._archiveData   = {};
+let _arCurrentSubject = null;
+let _arCurrentKey     = null;
+
+// Navigate between archive views, updating breadcrumb
+function arShowView(viewId) {
+  document.querySelectorAll('.ar-view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId)?.classList.add('active');
+}
+
+function arSetBreadcrumb(parts) {
+  const bc = document.getElementById('ar-breadcrumb');
+  if (!bc) return;
+  bc.innerHTML = parts.map((p, i) => {
+    const isLast = i === parts.length - 1;
+    if (isLast) return `<span class="ar-bc-current">${p.label}</span>`;
+    return `<button class="ar-bc-btn" onclick="${p.fn}()">${p.label}</button>
+            <span class="ar-bc-sep"><i class="fi fi-rr-angle-right"></i></span>`;
+  }).join('');
+}
+
+// ── View 1: folder grid ──
+window.renderArchiveFolders = function() {
+  const grid = document.getElementById('ar-folder-grid');
+  if (!grid) return;
+  const data = window._archiveData || {};
+  const entries = Object.entries(data).sort(([,a],[,b]) => new Date(b.uploadedAt||0) - new Date(a.uploadedAt||0));
+
+  if (!entries.length) {
+    grid.innerHTML = `<div class="ar-empty" style="grid-column:1/-1">
+      <i class="fi fi-br-archive"></i>
+      <p>No notes uploaded yet.<br>Use AI Upload to generate notes, palm cards and a test.</p>
+      <button class="btn-primary" style="margin-top:16px" onclick="showPanel('upload',null)"><i class="fi fi-br-cloud-upload-alt"></i> Upload Notes</button>
+    </div>`;
+    return;
+  }
+
+  // Group by subject
+  const folders = {};
+  entries.forEach(([key, item]) => {
+    const sub = item.subject?.trim() || 'Uncategorised';
+    if (!folders[sub]) folders[sub] = [];
+    folders[sub].push({ key, ...item });
+  });
+
+  grid.innerHTML = Object.entries(folders).map(([sub, items]) => `
+    <div class="ar-folder-card" onclick="arOpenFolder('${sub.replace(/'/g,"\\'")}')">
+      <div class="ar-folder-ic"><i class="fi fi-br-folder"></i></div>
+      <div>
+        <div class="ar-folder-name">${sub}</div>
+        <div class="ar-folder-count">${items.length} set${items.length !== 1 ? 's' : ''}</div>
+      </div>
+    </div>`).join('');
+};
+
+// ── View 2: uploads inside a folder ──
+window.arOpenFolder = function(subject) {
+  _arCurrentSubject = subject;
+  arSetBreadcrumb([
+    { label:'Archive', fn:'arGoHome' },
+    { label: subject }
+  ]);
+
+  const data    = window._archiveData || {};
+  const uploads = Object.entries(data)
+    .filter(([, item]) => (item.subject?.trim() || 'Uncategorised') === subject)
+    .sort(([,a],[,b]) => new Date(b.uploadedAt||0) - new Date(a.uploadedAt||0));
+
+  const list = document.getElementById('ar-upload-list');
+  list.innerHTML = uploads.map(([key, item]) => {
+    const date = item.uploadedAt
+      ? new Date(item.uploadedAt).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})
+      : '';
+    const hasNotes = !!item.notes, hasCards = !!(item.palmCards?.length), hasTest = !!item.test;
+    return `
+      <div class="ar-upload-row" onclick="arOpenSet('${key}')">
+        <div class="ar-upload-ic"><i class="fi fi-br-document-signed"></i></div>
+        <div class="ar-upload-title">${item.deckTitle || item.fileName || 'Untitled'}</div>
+        <div class="ar-chips">
+          ${hasNotes ? '<span class="ar-chip ar-chip-n">Notes</span>' : ''}
+          ${hasCards ? '<span class="ar-chip ar-chip-c">Cards</span>' : ''}
+          ${hasTest  ? '<span class="ar-chip ar-chip-t">Test</span>'  : ''}
+        </div>
+        <div class="ar-upload-date">${date}</div>
+      </div>`;
+  }).join('');
+
+  arShowView('ar-folder-view');
+};
+
+// ── View 3: 3 file cards for one set ──
+window.arOpenSet = function(key) {
+  _arCurrentKey = key;
+  const item = (window._archiveData || {})[key];
+  if (!item) return;
+
+  const sub = _arCurrentSubject || item.subject || 'Uncategorised';
+  arSetBreadcrumb([
+    { label:'Archive', fn:'arGoHome' },
+    { label: sub, fn:`arOpenFolder.bind(null,'${sub.replace(/'/g,"\\'")}')` },
+    { label: item.deckTitle || item.fileName || 'Set' }
+  ]);
+
+  const grid = document.getElementById('ar-file-grid');
+  grid.innerHTML = `
+    <div class="ar-file-card type-notes" onclick="arOpenFile('${key}','notes')">
+      <div class="ar-file-ic-wrap"><i class="fi fi-br-document-signed"></i></div>
+      <div class="ar-file-title">Notes</div>
+      <div class="ar-file-desc">AI-generated study notes with headings and key terms</div>
+    </div>
+    <div class="ar-file-card type-cards" onclick="arOpenFile('${key}','palmCards')">
+      <div class="ar-file-ic-wrap"><i class="fi fi-br-layers"></i></div>
+      <div class="ar-file-title">Palm Cards</div>
+      <div class="ar-file-desc">12 flip cards covering all key concepts — open in study mode</div>
+    </div>
+    <div class="ar-file-card type-test" onclick="arOpenFile('${key}','test')">
+      <div class="ar-file-ic-wrap"><i class="fi fi-br-pencil-ruler"></i></div>
+      <div class="ar-file-title">Practice Test</div>
+      <div class="ar-file-desc">Full test: 10 MCQ + 4 short answer + answer key</div>
+    </div>`;
+
+  arShowView('ar-set-view');
+};
+
+// ── View 4: file content viewer ──
+window.arOpenFile = function(key, type) {
+  const item = (window._archiveData || {})[key];
+  if (!item) return;
+
+  // Palm Cards → load into study mode and switch to palm cards panel
+  if (type === 'palmCards') {
+    if (item.palmCards?.length) {
+      window._fcDecks = window._fcDecks || {};
+      window._fcDecks[key] = {
+        subject:   item.deckTitle || item.subject || 'Palm Cards',
+        createdAt: item.uploadedAt,
+        cards:     item.palmCards,
+      };
+      showPanel('flashcards', null);
+      window.openDeck?.(key);
+    } else {
+      showToast('No palm cards saved for this set', 'info');
+    }
+    return;
+  }
+
+  const label = type === 'notes' ? 'Notes' : 'Practice Test';
+  const content = type === 'notes' ? item.notes : item.test;
+  if (!content) { showToast(`No ${label.toLowerCase()} saved for this set`, 'info'); return; }
+
+  const sub = _arCurrentSubject || item.subject || 'Uncategorised';
+  const title = item.deckTitle || item.fileName || 'Set';
+  arSetBreadcrumb([
+    { label:'Archive', fn:'arGoHome' },
+    { label: sub,   fn:`arOpenFolder.bind(null,'${sub.replace(/'/g,"\\'")}')` },
+    { label: title, fn:`arOpenSet.bind(null,'${key}')` },
+    { label: label }
+  ]);
+
+  document.getElementById('ar-content-viewer').textContent = content;
+  arShowView('ar-content-view');
+};
+
+// ── Navigation helpers ──
+window.arGoHome = function() {
+  _arCurrentSubject = null; _arCurrentKey = null;
+  arSetBreadcrumb([{ label:'Archive' }]);
+  arShowView('ar-home');
+};
+
+window.loadArchive = async function() {
+  if (!window._uid || !window._fbGet) return;
+  const grid = document.getElementById('ar-folder-grid');
+  if (grid) grid.innerHTML = '<p style="color:var(--text-muted);font-size:.84rem;padding:20px 0">Loading…</p>';
+  try {
+    const snap = await window._fbGet(window._fbChild(window._fbRef(window._db), `uploads/${window._uid}`));
+    window._archiveData = snap.exists() ? snap.val() : {};
+    window.renderArchiveFolders();
+  } catch(e) { console.error('loadArchive:', e); }
 };
 
 // ═══════════════════════════════════════

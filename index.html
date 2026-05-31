@@ -1464,9 +1464,6 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <button class="nav-item" onclick="showPanel('upload',this)"><i class="fi fi-br-cloud-upload-alt"></i> AI Upload</button>
     <button class="nav-item" onclick="showPanel('chatbot',this)"><i class="fi fi-br-robot"></i> AI Tutor</button>
     <button class="nav-item" onclick="showPanel('archive',this)"><i class="fi fi-br-archive"></i> Archive</button>
-    <div class="sb-section">Study</div>
-    <button class="nav-item" onclick="showPanel('flashcards',this)"><i class="fi fi-br-layers"></i> Palm Cards</button>
-    <button class="nav-item" onclick="showPanel('quizzes',this)"><i class="fi fi-br-quiz-alt"></i> Practice Test</button>
     <div class="sb-section">Organise</div>
     <button class="nav-item" onclick="showPanel('classes',this)"><i class="fi fi-br-school"></i> My Classes</button>
     <button class="nav-item" onclick="showPanel('schedule',this)"><i class="fi fi-br-calendar"></i> Study Schedule</button>
@@ -1538,7 +1535,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <div class="quick-actions">
               <button class="quick-btn" onclick="showPanel('upload',null)"><i class="fi fi-br-cloud-upload-alt"></i> Upload new material</button>
               <button class="quick-btn" onclick="showPanel('chatbot',null)"><i class="fi fi-br-robot"></i> Ask AI Tutor</button>
-              <button class="quick-btn" onclick="showPanel('quizzes',null)"><i class="fi fi-br-quiz-alt"></i> Take a practice quiz</button>
+              <button class="quick-btn" onclick="showPanel('archive',null)"><i class="fi fi-br-archive"></i> Open my Archive</button>
               <button class="quick-btn" onclick="showPanel('pomodoro',null)"><i class="fi fi-br-time-forward"></i> Start focus timer</button>
               <button class="quick-btn" onclick="showPanel('classes',null)"><i class="fi fi-br-school"></i> View my classes</button>
             </div>
@@ -1625,7 +1622,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <div class="result-content" id="result-content"></div>
             <div class="result-actions">
               <button class="btn-primary" style="font-size:.8rem;padding:8px 16px"><i class="fi fi-br-download"></i> Download</button>
-              <button class="btn-ghost" style="font-size:.8rem;padding:8px 16px" onclick="showPanel('flashcards',null)"><i class="fi fi-br-layers"></i> Open Flashcards</button>
+              <button class="btn-ghost" style="font-size:.8rem;padding:8px 16px" onclick="showPanel('archive',null)"><i class="fi fi-br-archive"></i> Go to Archive</button>
             </div>
           </div>
           <div id="upload-placeholder" style="text-align:center;padding:60px 20px;color:var(--text-muted)">
@@ -1667,128 +1664,6 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       </div>
     </div>
 
-    <!-- ── FLASHCARDS ── -->
-    <div class="app-panel" id="panel-flashcards">
-
-      <!-- ── Deck Browser + Archive ── -->
-      <div class="fc-decks-view" id="fc-decks-view">
-
-        <!-- My Sets panel -->
-        <div class="fc-panel active" id="fc-sets-view">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-            <div>
-              <h2 class="section-head" style="margin-bottom:4px;font-size:1.2rem">My Flashcard Sets</h2>
-              <p style="color:var(--text-muted);font-size:.875rem">Study your decks Quizlet-style — flip, navigate, shuffle.</p>
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn-ghost" id="fc-edit-btn" onclick="toggleDeckEditMode()"><i class="fi fi-br-pencil"></i> Edit</button>
-              <button class="btn-primary" onclick="showPanel('upload',null)"><i class="fi fi-br-magic-wand"></i> New Set with AI</button>
-            </div>
-          </div>
-          <div class="deck-grid" id="deck-grid">
-            <!-- Populated by renderDecks() -->
-          </div>
-        </div>
-
-        <!-- Archive panel -->
-        <div class="fc-panel" id="fc-archive-view">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-            <div>
-              <h2 class="section-head" style="margin-bottom:4px;font-size:1.2rem">Archive</h2>
-              <p style="color:var(--text-muted);font-size:.875rem">All your uploaded notes, organised by subject. Click any file to view its AI notes.</p>
-            </div>
-          </div>
-          <div id="archive-folders">
-            <!-- Populated by renderArchive() -->
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ── Study Mode ── -->
-      <div class="fc-study-view" id="fc-study-view">
-        <div class="fc-study-topbar">
-          <button class="btn-ghost" style="padding:8px 14px;font-size:.82rem" onclick="closeStudyMode()">
-            <i class="fi fi-rr-angle-left"></i> All Sets
-          </button>
-          <div class="fc-study-meta">
-            <span class="badge" id="fc-study-subject">Subject</span>
-            <span style="font-size:.82rem;color:var(--text-muted)" id="fc-counter">0 / 0</span>
-          </div>
-          <div class="fc-study-actions">
-            <button class="btn-ghost" style="padding:8px 13px;font-size:.82rem" title="Shuffle (S)" onclick="shuffleStudyDeck()"><i class="fi fi-br-shuffle"></i></button>
-            <button class="btn-ghost" style="padding:8px 13px;font-size:.82rem" title="Restart (R)" onclick="restartStudyDeck()"><i class="fi fi-br-rotate-left"></i></button>
-          </div>
-        </div>
-
-        <div class="fc-progress-wrap">
-          <div class="fc-progress-label">
-            <span id="fc-prog-label">Card 1</span>
-            <span id="fc-prog-pct">0%</span>
-          </div>
-          <div class="fc-progress-bar"><div class="fc-progress-fill" id="fc-prog-fill" style="width:0%"></div></div>
-        </div>
-
-        <!-- 3D Flip Card -->
-        <div class="fc-scene" id="fc-scene" onclick="flipStudyCard()">
-          <div class="fc-inner" id="fc-inner">
-            <div class="fc-face fc-face-front">
-              <div class="fc-face-label">Question</div>
-              <div class="fc-face-text" id="fc-front-text">Loading…</div>
-              <span class="fc-flip-hint">Click or press Space to flip</span>
-            </div>
-            <div class="fc-face fc-face-back">
-              <div class="fc-face-label">Answer</div>
-              <div class="fc-face-text" id="fc-back-text"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="fc-nav">
-          <button class="fc-nav-btn" id="fc-prev-btn" onclick="prevStudyCard()" title="Previous (←)">
-            <i class="fi fi-rr-angle-left"></i>
-          </button>
-          <button class="fc-flip-btn" onclick="flipStudyCard()">
-            <i class="fi fi-br-refresh"></i> Flip
-          </button>
-          <button class="fc-nav-btn" id="fc-next-btn" onclick="nextStudyCard()" title="Next (→)">
-            <i class="fi fi-rr-angle-right"></i>
-          </button>
-        </div>
-
-        <div class="fc-shortcuts">
-          <span class="fc-shortcut-key"><kbd>Space</kbd> Flip</span>
-          <span class="fc-shortcut-key"><kbd>←</kbd> Prev</span>
-          <span class="fc-shortcut-key"><kbd>→</kbd> Next</span>
-          <span class="fc-shortcut-key"><kbd>R</kbd> Restart</span>
-          <span class="fc-shortcut-key"><kbd>S</kbd> Shuffle</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── QUIZZES ── -->
-    <div class="app-panel" id="panel-quizzes">
-      <h2 class="section-head">Practice Quiz</h2>
-      <p class="section-sub">Instant feedback on every answer. XP awarded for correct answers.</p>
-      <div class="quiz-wrap">
-        <div class="quiz-header">
-          <span class="badge">General Knowledge</span>
-          <span class="quiz-score" id="quiz-score-header">Score: 0/0</span>
-        </div>
-        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
-        <div class="quiz-card">
-          <div class="quiz-q" id="quiz-q"></div>
-          <div class="quiz-opts" id="quiz-opts"></div>
-          <div class="quiz-fb" id="quiz-fb"></div>
-          <div class="quiz-nav">
-            <button class="btn-primary" id="quiz-next" onclick="nextQ()" style="padding:9px 22px;font-size:.875rem;display:none"><i class="fi fi-rr-angle-right"></i> Next</button>
-            <span class="quiz-score" id="quiz-prog"></span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- ── ARCHIVE ── -->
     <div class="app-panel" id="panel-archive">
 
@@ -1820,10 +1695,63 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <p style="font-size:.78rem;color:var(--text-muted);margin-top:4px">Click a file to open it.</p>
       </div>
 
-      <!-- VIEW 4: Content viewer -->
+      <!-- VIEW 4: Notes / Test text viewer -->
       <div class="ar-view" id="ar-content-view">
         <div class="ar-viewer-tabs" id="ar-viewer-tabs"></div>
         <div class="ar-content-viewer" id="ar-content-viewer"></div>
+      </div>
+
+      <!-- VIEW 5: Palm Card flip-card study mode (lives here, not in a separate panel) -->
+      <div class="ar-view" id="ar-study-view">
+        <div class="fc-study-topbar">
+          <button class="btn-ghost" style="padding:8px 14px;font-size:.82rem" onclick="closeStudyMode()">
+            <i class="fi fi-rr-angle-left"></i> Back
+          </button>
+          <div class="fc-study-meta">
+            <span class="badge" id="fc-study-subject">Subject</span>
+            <span style="font-size:.82rem;color:var(--text-muted)" id="fc-counter">0 / 0</span>
+          </div>
+          <div class="fc-study-actions">
+            <button class="btn-ghost" style="padding:8px 13px;font-size:.82rem" title="Shuffle (S)" onclick="shuffleStudyDeck()"><i class="fi fi-br-shuffle"></i></button>
+            <button class="btn-ghost" style="padding:8px 13px;font-size:.82rem" title="Restart (R)" onclick="restartStudyDeck()"><i class="fi fi-br-rotate-left"></i></button>
+          </div>
+        </div>
+
+        <div class="fc-progress-wrap">
+          <div class="fc-progress-label">
+            <span id="fc-prog-label">Card 1</span>
+            <span id="fc-prog-pct">0%</span>
+          </div>
+          <div class="fc-progress-bar"><div class="fc-progress-fill" id="fc-prog-fill" style="width:0%"></div></div>
+        </div>
+
+        <div class="fc-scene" id="fc-scene" onclick="flipStudyCard()">
+          <div class="fc-inner" id="fc-inner">
+            <div class="fc-face fc-face-front">
+              <div class="fc-face-label">Question</div>
+              <div class="fc-face-text" id="fc-front-text">Loading…</div>
+              <span class="fc-flip-hint">Click or press Space to flip</span>
+            </div>
+            <div class="fc-face fc-face-back">
+              <div class="fc-face-label">Answer</div>
+              <div class="fc-face-text" id="fc-back-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fc-nav">
+          <button class="fc-nav-btn" id="fc-prev-btn" onclick="prevStudyCard()" title="Previous (←)"><i class="fi fi-rr-angle-left"></i></button>
+          <button class="fc-flip-btn" onclick="flipStudyCard()"><i class="fi fi-br-refresh"></i> Flip</button>
+          <button class="fc-nav-btn" id="fc-next-btn" onclick="nextStudyCard()" title="Next (→)"><i class="fi fi-rr-angle-right"></i></button>
+        </div>
+
+        <div class="fc-shortcuts">
+          <span class="fc-shortcut-key"><kbd>Space</kbd> Flip</span>
+          <span class="fc-shortcut-key"><kbd>←</kbd> Prev</span>
+          <span class="fc-shortcut-key"><kbd>→</kbd> Next</span>
+          <span class="fc-shortcut-key"><kbd>R</kbd> Restart</span>
+          <span class="fc-shortcut-key"><kbd>S</kbd> Shuffle</span>
+        </div>
       </div>
 
     </div>
@@ -1932,7 +1860,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:10px;padding:14px">
               <div style="font-weight:700;font-size:.84rem;color:var(--amber);margin-bottom:4px"><i class="fi fi-br-exclamation"></i> &nbsp;Review: Organic Chemistry</div>
               <div style="font-size:.78rem;color:var(--text-muted)">55% average. Focus on reaction mechanisms and functional groups.</div>
-              <button class="btn-ghost" style="margin-top:10px;padding:7px 14px;font-size:.78rem" onclick="showPanel('flashcards',null)"><i class="fi fi-br-layers"></i> Study Flashcards</button>
+              <button class="btn-ghost" style="margin-top:10px;padding:7px 14px;font-size:.78rem" onclick="showPanel('archive',null)"><i class="fi fi-br-archive"></i> Open Archive</button>
             </div>
           </div>
         </div>
@@ -3050,12 +2978,10 @@ window.showPanel = function(name, navEl) {
   if (panel) panel.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (navEl) navEl.classList.add('active');
-  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',archive:'Archive',flashcards:'Palm Cards',quizzes:'Practice Test',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
+  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',archive:'Archive',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
   document.getElementById('topbar-title').textContent = titles[name] || name;
-  if (name === 'quizzes') initQuiz();
   if (name === 'schedule') renderSchedule();
-  if (name === 'flashcards') renderDecks();
-  if (name === 'archive') { arGoHome?.(); window.loadArchive?.(); }
+  if (name === 'archive') { window.arGoHome?.(); window.loadArchive?.(); }
   if (name === 'notifications') markAllRead();
   window.scrollTo(0, 0);
 };
@@ -3378,11 +3304,11 @@ window._archiveData   = {};
 let _arCurrentSubject = null;
 let _arCurrentKey     = null;
 
-// Navigate between archive views, updating breadcrumb
-function arShowView(viewId) {
+// Navigate between archive views
+window.arShowView = function(viewId) {
   document.querySelectorAll('.ar-view').forEach(v => v.classList.remove('active'));
   document.getElementById(viewId)?.classList.add('active');
-}
+};
 
 function arSetBreadcrumb(parts) {
   const bc = document.getElementById('ar-breadcrumb');
@@ -3503,7 +3429,7 @@ window.arOpenFile = function(key, type) {
   const item = (window._archiveData || {})[key];
   if (!item) return;
 
-  // Palm Cards → load into study mode and switch to palm cards panel
+  // Palm Cards → open the flip-card viewer inside the archive panel
   if (type === 'palmCards') {
     if (item.palmCards?.length) {
       window._fcDecks = window._fcDecks || {};
@@ -3512,7 +3438,6 @@ window.arOpenFile = function(key, type) {
         createdAt: item.uploadedAt,
         cards:     item.palmCards,
       };
-      showPanel('flashcards', null);
       window.openDeck?.(key);
     } else {
       showToast('No palm cards saved for this set', 'info');
@@ -3695,15 +3620,30 @@ window.openDeck = function(deckId) {
   _studyIdx     = 0;
   _studyFlipped = false;
   document.getElementById('fc-study-subject').textContent = deck.subject || 'Study';
-  document.getElementById('fc-decks-view').classList.add('hidden');
-  document.getElementById('fc-study-view').classList.add('active');
+  // Open the flip-card view inside the archive panel
+  window.arShowView?.('ar-study-view');
+  // Update breadcrumb
+  const sub   = window._arCurrentSubject || '';
+  const title = deck.subject || 'Palm Cards';
+  const key   = window._arCurrentKey;
+  const setLabel = (key && window._archiveData?.[key]?.deckTitle) || title;
+  window.arSetBreadcrumb?.([
+    { label:'Archive', fn:'arGoHome' },
+    ...(sub ? [{ label: sub, fn:`arOpenFolder.bind(null,'${sub.replace(/'/g,"\\'")}')` }] : []),
+    ...(key  ? [{ label: setLabel, fn:`arOpenSet.bind(null,'${key}')` }] : []),
+    { label: 'Palm Cards' },
+  ]);
   _renderStudyCard();
 };
 
 window.closeStudyMode = function() {
-  document.getElementById('fc-study-view').classList.remove('active');
-  document.getElementById('fc-decks-view').classList.remove('hidden');
-  document.getElementById('fc-inner').classList.remove('flipped');
+  document.getElementById('fc-inner')?.classList.remove('flipped');
+  // Go back to the set file cards
+  if (window._arCurrentKey) {
+    window.arOpenSet?.(window._arCurrentKey);
+  } else {
+    window.arGoHome?.();
+  }
 };
 
 function _renderStudyCard() {

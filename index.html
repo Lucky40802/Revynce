@@ -2584,17 +2584,22 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <div class="app-panel" id="panel-notifications">
       <h2 class="section-head">Notifications</h2>
       <p class="section-sub">Stay up to date with your classes, assignments, and alerts.</p>
-      <div style="display:flex;gap:10px;margin-bottom:18px">
-        <button class="btn-primary" style="padding:7px 14px;font-size:.8rem" onclick="markAllRead()"><i class="fi fi-br-check"></i> Mark all read</button>
-        <span style="font-size:.82rem;color:var(--text-muted);align-self:center"><span id="unread-count">3</span> unread</span>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+        <div class="lb-filter" id="notif-filter-tabs">
+          <button class="lb-filter-btn active" onclick="filterNotifTab(this,'all')">All</button>
+          <button class="lb-filter-btn" onclick="filterNotifTab(this,'unread')">Unread <span id="notif-tab-unread-badge" style="background:var(--rose);color:#fff;border-radius:100px;padding:1px 7px;font-size:.65rem;margin-left:3px">0</span></button>
+          <button class="lb-filter-btn" onclick="filterNotifTab(this,'class')">Classes</button>
+          <button class="lb-filter-btn" onclick="filterNotifTab(this,'system')">System</button>
+        </div>
+        <button class="btn-ghost" style="padding:6px 13px;font-size:.78rem;margin-left:auto" onclick="markAllRead()"><i class="fi fi-br-check"></i> Mark all read</button>
+        <span style="font-size:.82rem;color:var(--text-muted)"><span id="unread-count">0</span> unread</span>
       </div>
-      <ul class="notif-list">
-        <li class="notif-item unread"><div class="notif-icon danger"><i class="fi fi-br-exclamation-triangle"></i></div><div style="flex:1"><div class="notif-title">🚨 At-Risk Alert — James Miller</div><div class="notif-desc">James has scored below 50% on his last 3 Physics assessments. Intervention recommended.</div><div class="notif-time">2 hours ago</div></div><div class="notif-unread-dot"></div></li>
-        <li class="notif-item unread"><div class="notif-icon warn"><i class="fi fi-br-bell"></i></div><div style="flex:1"><div class="notif-title">Quiz due tomorrow</div><div class="notif-desc">Physics Chapter 3 test is due tomorrow at 9:00 AM in your class.</div><div class="notif-time">5 hours ago</div></div><div class="notif-unread-dot"></div></li>
-        <li class="notif-item unread"><div class="notif-icon success"><i class="fi fi-br-star"></i></div><div style="flex:1"><div class="notif-title">New badge unlocked — 7-Day Streak!</div><div class="notif-desc">You've studied 7 days in a row. Keep it up! +50 bonus XP awarded.</div><div class="notif-time">1 day ago</div></div><div class="notif-unread-dot"></div></li>
-        <li class="notif-item"><div class="notif-icon info"><i class="fi fi-br-megaphone"></i></div><div style="flex:1"><div class="notif-title">New material added</div><div class="notif-desc">Mrs Clarke uploaded Chapter 5 notes to Biology Year 12.</div><div class="notif-time">2 days ago</div></div></li>
-        <li class="notif-item"><div class="notif-icon success"><i class="fi fi-br-trophy"></i></div><div style="flex:1"><div class="notif-title">Leaderboard update</div><div class="notif-desc">You've moved up to rank 6 on the weekly leaderboard!</div><div class="notif-time">3 days ago</div></div></li>
-      </ul>
+      <ul class="notif-list" id="notif-list-el" style="max-width:680px"></ul>
+      <div id="notif-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text-muted)">
+        <i class="fi fi-br-bell" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.25"></i>
+        <div style="font-weight:600;margin-bottom:4px">No notifications</div>
+        <div style="font-size:.8rem">You're all caught up!</div>
+      </div>
     </div>
 
     <!-- ── PROFILE & SETTINGS ── -->
@@ -3015,7 +3020,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+import { getDatabase, ref, set, get, child, remove, push, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 import { getStorage, ref as sRef, uploadBytes } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -3055,6 +3060,7 @@ onAuthStateChanged(auth, async (user) => {
       loadClasses();
       loadDashboardStats();
       loadFlashcards();
+      window._initNotifications(user.uid, profile.role || 'student');
       // Open door, then show tutorial for new users after doors finish
       window._openDoor(() => {
         if (isNewUser || !localStorage.getItem('revynce-tutorial-done')) {
@@ -3064,6 +3070,7 @@ onAuthStateChanged(auth, async (user) => {
     } catch(e) {
       populateApp({ name: user.email, role:'student', xp:0 });
       showPage('app');
+      window._initNotifications(user.uid, 'student');
       window._openDoor();
     }
   } else {
@@ -3725,13 +3732,256 @@ window.createClassSubmit = async function() {
   } else { alert('Error creating class. Please try again.'); }
 };
 
-// ── Notifications ──
-window.markAllRead = function() {
-  document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
-  document.querySelectorAll('.notif-unread-dot').forEach(el => el.style.display = 'none');
-  document.getElementById('notif-count').textContent = '0';
-  document.getElementById('unread-count').textContent = '0';
-  document.getElementById('notif-dot').style.display = 'none';
+// ═══════════════════════════════════════
+// NOTIFICATION ENGINE
+// Firebase path: notifications/{uid}/{pushId}
+//   { title, desc, type, icon, category, read, createdAt, link? }
+// ═══════════════════════════════════════
+
+let _notifCache = {};       // pushId → notif object (kept in sync by onValue listener)
+let _notifFilter = 'all';   // current tab filter
+let _notifUnsub  = null;    // onValue unsubscribe handle
+
+// ── Time formatter ──
+function _timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'just now';
+  if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + ' hour' + (h > 1 ? 's' : '') + ' ago';
+  const d = Math.floor(h / 24);
+  if (d < 7)  return d + ' day' + (d > 1 ? 's' : '') + ' ago';
+  return new Date(iso).toLocaleDateString();
+}
+
+// ── Icon map ──
+const _notifIconMap = {
+  info:    { cls:'fi-br-info',              bg:'var(--cyan-dim)',            color:'var(--cyan)'  },
+  warn:    { cls:'fi-br-bell',              bg:'rgba(245,158,11,.1)',        color:'var(--amber)' },
+  danger:  { cls:'fi-br-exclamation-triangle', bg:'rgba(244,63,94,.1)',     color:'var(--rose)'  },
+  success: { cls:'fi-br-check-circle',      bg:'var(--green-dim)',           color:'var(--green)' },
+  badge:   { cls:'fi-br-star',              bg:'rgba(245,158,11,.1)',        color:'var(--amber)' },
+  notice:  { cls:'fi-br-megaphone',         bg:'var(--cyan-dim)',            color:'var(--cyan)'  },
+  trophy:  { cls:'fi-br-trophy',            bg:'rgba(245,158,11,.1)',        color:'var(--amber)' },
+  alert:   { cls:'fi-br-exclamation-triangle', bg:'rgba(244,63,94,.1)',     color:'var(--rose)'  },
+  roll:    { cls:'fi-br-user-check',        bg:'var(--green-dim)',           color:'var(--green)' },
+};
+
+// ── Render the notification list ──
+function _renderNotifs() {
+  const list  = document.getElementById('notif-list-el');
+  const empty = document.getElementById('notif-empty');
+  if (!list) return;
+
+  // Sort newest first
+  const all = Object.entries(_notifCache)
+    .sort((a, b) => new Date(b[1].createdAt) - new Date(a[1].createdAt));
+
+  // Apply filter
+  const visible = all.filter(([, n]) => {
+    if (_notifFilter === 'unread')  return !n.read;
+    if (_notifFilter === 'class')   return n.category === 'class';
+    if (_notifFilter === 'system')  return n.category === 'system' || n.category === 'badge';
+    return true;
+  });
+
+  list.innerHTML = '';
+  if (!visible.length) {
+    list.style.display = 'none';
+    empty.style.display = '';
+    return;
+  }
+  list.style.display = '';
+  empty.style.display = 'none';
+
+  visible.forEach(([id, n]) => {
+    const ic   = _notifIconMap[n.icon] || _notifIconMap.info;
+    const li   = document.createElement('li');
+    li.className = 'notif-item' + (n.read ? '' : ' unread');
+    li.dataset.id = id;
+    li.innerHTML = `
+      <div class="notif-icon" style="background:${ic.bg};color:${ic.color}"><i class="fi ${ic.cls}"></i></div>
+      <div style="flex:1;min-width:0">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-time">${_timeAgo(n.createdAt)}</div>
+      </div>
+      ${n.read ? '' : '<div class="notif-unread-dot"></div>'}
+    `;
+    // Click: mark read + navigate if link
+    li.addEventListener('click', () => {
+      _markOneRead(id);
+      if (n.link) showPanel(n.link, null);
+    });
+    list.appendChild(li);
+  });
+}
+
+// ── Update badges (topbar dot + sidebar count) ──
+function _updateNotifBadges() {
+  const unread = Object.values(_notifCache).filter(n => !n.read).length;
+  const countEl = document.getElementById('notif-count');
+  const unreadEl = document.getElementById('unread-count');
+  const dotEl   = document.getElementById('notif-dot');
+  const tabBadge = document.getElementById('notif-tab-unread-badge');
+  if (countEl)  countEl.textContent = unread || '0';
+  if (unreadEl) unreadEl.textContent = unread;
+  if (tabBadge) tabBadge.textContent = unread;
+  if (dotEl)    dotEl.style.display  = unread > 0 ? '' : 'none';
+}
+
+// ── Mark one notification read ──
+async function _markOneRead(id) {
+  if (!window._uid || !_notifCache[id] || _notifCache[id].read) return;
+  _notifCache[id].read = true;
+  _renderNotifs();
+  _updateNotifBadges();
+  try { await set(ref(db, `notifications/${window._uid}/${id}/read`), true); } catch(e) {}
+}
+
+// ── Mark all read ──
+window.markAllRead = async function() {
+  if (!window._uid) return;
+  const updates = {};
+  Object.keys(_notifCache).forEach(id => {
+    _notifCache[id].read = true;
+    updates[`notifications/${window._uid}/${id}/read`] = true;
+  });
+  _renderNotifs();
+  _updateNotifBadges();
+  // Write all at once
+  try {
+    for (const [path, val] of Object.entries(updates)) {
+      await set(ref(db, path), val);
+    }
+  } catch(e) {}
+};
+
+// ── Public helper: push a notification to any user ──
+window._pushNotif = async function(uid, { title, desc, type = 'info', icon = 'info', category = 'system', link = null }) {
+  if (!uid) return;
+  try {
+    await push(ref(db, `notifications/${uid}`), {
+      title, desc, type, icon, category,
+      link: link || null,
+      read: false,
+      createdAt: new Date().toISOString(),
+    });
+  } catch(e) { console.warn('_pushNotif error', e); }
+};
+
+// ── Start real-time listener for current user ──
+function _startNotifListener(uid) {
+  if (_notifUnsub) _notifUnsub();   // detach any previous listener
+  _notifCache = {};
+  const notifRef = ref(db, `notifications/${uid}`);
+  _notifUnsub = onValue(notifRef, snap => {
+    _notifCache = snap.exists() ? snap.val() : {};
+    _updateNotifBadges();
+    // Only re-render list if the panel is currently open
+    const panel = document.getElementById('panel-notifications');
+    if (panel && panel.classList.contains('active')) _renderNotifs();
+  });
+}
+
+// ── Filter tab ──
+window.filterNotifTab = function(btn, filter) {
+  document.querySelectorAll('#notif-filter-tabs .lb-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _notifFilter = filter;
+  _renderNotifs();
+};
+
+// ── Seed notifications for a new/empty user ──
+async function _seedNotifications(uid, role) {
+  const snap = await get(child(ref(db), `notifications/${uid}`));
+  if (snap.exists()) return;  // already has notifications
+  const now = Date.now();
+  const seeds = role === 'teacher' ? [
+    { title: 'Welcome to Revynce!', desc: 'Set up your first class and start adding students. Use AI Test Builder to generate assessments.', type:'info', icon:'info', category:'system', read:false, createdAt: new Date(now - 1000*60*10).toISOString() },
+    { title: '🚨 At-Risk Alert — James Miller', desc: 'James has scored below 50% on 3 consecutive Physics assessments. Consider reaching out.', type:'danger', icon:'alert', category:'class', link:'teacher', read:false, createdAt: new Date(now - 1000*60*60*2).toISOString() },
+    { title: 'Roll not yet marked — Biology Yr 12', desc: "You haven't marked today's roll for Biology Year 12 (Period 3). Don't forget!", type:'warn', icon:'roll', category:'class', link:'attendance-marking', read:false, createdAt: new Date(now - 1000*60*60*5).toISOString() },
+    { title: 'New school notice posted', desc: 'Admin Office posted: "Sports Carnival — Friday". 28 students in your classes were notified.', type:'info', icon:'notice', category:'class', link:'notices', read:true, createdAt: new Date(now - 1000*60*60*24).toISOString() },
+  ] : [
+    { title: 'Welcome to Revynce!', desc: 'Upload your first notes, generate flashcards, and start earning XP. Good luck!', type:'info', icon:'info', category:'system', read:false, createdAt: new Date(now - 1000*60*5).toISOString() },
+    { title: 'Maths — Calculus Assignment Due Monday', desc: 'Reminder from Mr Peterson: your integration assignment is due Monday at 11:59 PM.', type:'warn', icon:'warn', category:'class', link:'notices', read:false, createdAt: new Date(now - 1000*60*60*3).toISOString() },
+    { title: '🏅 Badge unlocked — First Upload', desc: "You uploaded your first file and earned the First Upload badge. +50 XP!", type:'success', icon:'badge', category:'badge', link:'rewards', read:false, createdAt: new Date(now - 1000*60*60*24).toISOString() },
+    { title: 'Biology — Chapter 5 Test Rescheduled', desc: 'Mrs Clarke moved the Chapter 5 test to next Tuesday. Extra practice questions are in the Archive.', type:'info', icon:'notice', category:'class', link:'notices', read:true, createdAt: new Date(now - 1000*60*60*24*2).toISOString() },
+    { title: 'Leaderboard — You moved up!', desc: "You've climbed to rank 6 on this week's leaderboard. Keep studying to reach the top 3!", type:'success', icon:'trophy', category:'system', link:'leaderboard', read:true, createdAt: new Date(now - 1000*60*60*24*3).toISOString() },
+  ];
+  for (const n of seeds) {
+    await push(ref(db, `notifications/${uid}`), n);
+  }
+}
+
+// ── Hook into auth: start listener + seed when user signs in ──
+const _origPopulateApp = window._populateApp;
+window._populateApp = function(profile) {
+  if (_origPopulateApp) _origPopulateApp(profile);
+};
+
+// Called from onAuthStateChanged after profile is loaded
+window._initNotifications = async function(uid, role) {
+  await _seedNotifications(uid, role);
+  _startNotifListener(uid);
+};
+
+// ── Hook into showPanel: render notifications when panel opens ──
+const _origShowPanelNotif = window.showPanel;
+window.showPanel = function(name, navEl) {
+  if (_origShowPanelNotif) _origShowPanelNotif(name, navEl);
+  if (name === 'notifications') {
+    _notifFilter = 'all';
+    document.querySelectorAll('#notif-filter-tabs .lb-filter-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+    _renderNotifs();
+  }
+};
+
+// ── Hook postNotice to push notifications to enrolled students ──
+const _origPostNotice = window.postNotice;
+window.postNotice = async function() {
+  if (_origPostNotice) await _origPostNotice();
+  // Also push to students in the selected class
+  const title    = document.getElementById('notice-title')?.value?.trim();
+  const audience = document.getElementById('notice-audience')?.value;
+  if (!title || !audience || !window._uid) return;
+  try {
+    if (audience === 'school') return; // school-wide — skip per-user push for now
+    const classSnap = await get(child(ref(db), `classRoster/${audience}`));
+    if (!classSnap.exists()) return;
+    const students = Object.keys(classSnap.val());
+    for (const sid of students) {
+      await window._pushNotif(sid, {
+        title: `${audience} — ${title}`,
+        desc:  `Your teacher posted a new notice. Tap to read.`,
+        type: 'info', icon: 'notice', category: 'class', link: 'notices',
+      });
+    }
+  } catch(e) {}
+};
+
+// ── Hook XP add: notify on badge milestones ──
+const _origAddXP = window._addXP;
+window._addXP = async function(amount) {
+  const prev = window._userProfile?.xp || 0;
+  if (_origAddXP) await _origAddXP(amount);
+  const next = prev + amount;
+  const milestones = [
+    { xp:50,   badge:'First Steps',   desc:'You earned your first 50 XP on Revynce!' },
+    { xp:250,  badge:'Getting Going',  desc:'250 XP reached — you\'re on a roll!' },
+    { xp:500,  badge:'Rising Scholar', desc:'500 XP! You\'ve hit Level 4.' },
+    { xp:1000, badge:'Star Student',   desc:'1,000 XP — Star Student badge unlocked. Incredible work!' },
+  ];
+  for (const m of milestones) {
+    if (prev < m.xp && next >= m.xp && window._uid) {
+      await window._pushNotif(window._uid, {
+        title: `🏅 Badge unlocked — ${m.badge}`,
+        desc:  m.desc + ' +XP bonus awarded.',
+        type: 'success', icon: 'badge', category: 'badge', link: 'rewards',
+      });
+    }
+  }
 };
 
 // ── Dynamic schedule ──

@@ -574,6 +574,28 @@ body::before {
 .prog-bar { height:5px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden; min-width:80px; }
 .prog-bar-fill { height:100%; border-radius:3px; }
 .risk-badge { display:inline-flex; align-items:center; gap:4px; font-size:.7rem; font-weight:700; padding:3px 9px; border-radius:100px; }
+
+/* ── Toggle switch ── */
+.toggle-switch { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; cursor:pointer; inset:0; background:rgba(255,255,255,.1); border-radius:24px; transition:.25s; }
+.toggle-slider::before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.25s; }
+.toggle-switch input:checked + .toggle-slider { background:var(--cyan); }
+.toggle-switch input:checked + .toggle-slider::before { transform:translateX(20px); }
+
+/* ── Timetable grid ── */
+.timetable-grid { display:grid; grid-template-columns:64px repeat(5,1fr); gap:4px; }
+.tt-corner { background:transparent; }
+.tt-day { background:var(--bg-card2); border-radius:8px; padding:8px 6px; text-align:center; font-size:.75rem; font-weight:700; color:var(--text-muted); letter-spacing:.03em; text-transform:uppercase; }
+.tt-period-label { background:var(--bg-card2); border-radius:8px; padding:8px 6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.tt-period-num { font-size:.68rem; font-weight:700; color:var(--text-muted); }
+.tt-period-time { font-size:.62rem; color:var(--text-muted); opacity:.7; }
+.tt-cell { border-radius:8px; padding:10px 10px; min-height:64px; display:flex; flex-direction:column; justify-content:center; font-size:.78rem; border:1px solid var(--border); background:var(--bg-card); cursor:default; transition:border-color .15s; }
+.tt-cell:hover { border-color:var(--border-active); }
+.tt-cell.tt-has-class { border-color:rgba(0,240,212,.18); }
+.tt-cell-subject { font-weight:700; font-size:.82rem; margin-bottom:2px; }
+.tt-cell-room { font-size:.7rem; color:var(--text-muted); }
+.tt-cell-teacher { font-size:.7rem; color:var(--text-muted); }
 .risk-ok { background:var(--green-dim); color:var(--green); }
 .risk-warn { background:rgba(245,158,11,.1); color:var(--amber); }
 .risk-danger { background:rgba(244,63,94,.1); color:var(--rose); }
@@ -960,14 +982,21 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 .door-panel.left  .door-seam { right:0; background:linear-gradient(to left, rgba(0,240,212,0.22), transparent); }
 .door-panel.right .door-seam { left:0;  background:linear-gradient(to right,rgba(0,240,212,0.22), transparent); }
 
-/* Centred logo floating over both panels */
-.door-center {
-  position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center; z-index:10; pointer-events:none;
-  animation:doorCenterFade .5s ease .08s both;
+/* Split logo — one copy inside each panel, centered on the seam */
+.door-logo-half {
+  position:absolute; top:50%; pointer-events:none; white-space:nowrap;
+  text-align:center;
+  animation:doorLogoIn .5s ease .08s both;
 }
-@keyframes doorCenterFade { from{opacity:0;transform:translate(-50%,-50%) scale(.92)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
+/* Left panel: center of text sits at panel's RIGHT edge */
+.door-panel.left  .door-logo-half { right:0; transform:translate(50%,-50%); }
+/* Right panel: center of text sits at panel's LEFT edge */
+.door-panel.right .door-logo-half { left:0;  transform:translate(-50%,-50%); }
+
+@keyframes doorLogoIn { from{opacity:0;transform:translate(50%,-50%) scale(.92)} to{opacity:1;transform:translate(50%,-50%) scale(1)} }
+
+.door-panel.right .door-logo-half { animation-name:doorLogoInR; }
+@keyframes doorLogoInR { from{opacity:0;transform:translate(-50%,-50%) scale(.92)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
 
 .door-logo {
   font-family:'Syne',sans-serif; font-size:2.6rem; font-weight:800;
@@ -1271,6 +1300,11 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           from="0,-2" to="0,902" dur="3.2s" repeatCount="indefinite"/>
       </rect>
     </svg>
+    <!-- Left half of split logo -->
+    <div class="door-logo-half">
+      <div class="door-logo">Revy<span>nce</span></div>
+      <div class="door-sub">AI Student Platform</div>
+    </div>
     <div class="door-seam"></div>
   </div>
 
@@ -1352,13 +1386,12 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           from="0,-2" to="0,902" dur="3.2s" begin="1.6s" repeatCount="indefinite"/>
       </rect>
     </svg>
+    <!-- Right half of split logo -->
+    <div class="door-logo-half">
+      <div class="door-logo">Revy<span>nce</span></div>
+      <div class="door-sub">AI Student Platform</div>
+    </div>
     <div class="door-seam"></div>
-  </div>
-
-  <!-- Centred logo floating over both panels -->
-  <div class="door-center">
-    <div class="door-logo">Revy<span>nce</span></div>
-    <div class="door-sub">AI Student Platform</div>
   </div>
 
 </div>
@@ -1639,11 +1672,18 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <button class="nav-item" onclick="showPanel('voice',this)"><i class="fi fi-br-microphone"></i> Voice Rooms</button>
     <button class="nav-item" onclick="showPanel('leaderboard',this)"><i class="fi fi-br-trophy"></i> Leaderboard</button>
     <button class="nav-item" onclick="showPanel('rewards',this)"><i class="fi fi-br-star"></i> Rewards</button>
+    <!-- School section (Sentral-like) -->
+    <div class="sb-section">School</div>
+    <button class="nav-item" id="timetable-nav" onclick="showPanel('timetable',this)"><i class="fi fi-br-calendar-lines"></i> Timetable</button>
+    <button class="nav-item" id="notices-nav" onclick="showPanel('notices',this)"><i class="fi fi-br-megaphone"></i> Notices</button>
+    <button class="nav-item" id="attendance-nav" onclick="showPanel('attendance',this)"><i class="fi fi-br-user-check"></i> Attendance</button>
     <!-- Teacher-only -->
     <div class="sb-section" id="teach-section" style="display:none">Teaching</div>
     <button class="nav-item" id="teach-nav" onclick="showPanel('teacher',this)" style="display:none"><i class="fi fi-br-chalkboard-user"></i> Teacher Dashboard</button>
     <button class="nav-item" id="testbuilder-nav" onclick="showPanel('testbuilder',this)" style="display:none"><i class="fi fi-br-pencil-ruler"></i> AI Test Builder</button>
     <button class="nav-item" id="marking-nav" onclick="showPanel('marking',this)" style="display:none"><i class="fi fi-br-diploma"></i> AI Marking</button>
+    <button class="nav-item" id="mark-roll-nav" onclick="showPanel('attendance-marking',this)" style="display:none"><i class="fi fi-br-clipboard-list-check"></i> Mark Roll</button>
+    <button class="nav-item" id="post-notice-nav" onclick="showPanel('manage-notices',this)" style="display:none"><i class="fi fi-br-pen-field"></i> Post Notice</button>
     <div class="sidebar-bottom sb-bottom">
       <div class="user-chip">
         <div class="user-ava" id="sb-avatar">?</div>
@@ -1936,8 +1976,12 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <input type="text" class="form-input" id="class-code-input" placeholder="Enter class code e.g. BIO-2024" style="text-transform:uppercase;letter-spacing:.08em">
         <button class="btn-primary" onclick="joinClass()"><i class="fi fi-br-plus"></i> Join</button>
       </div>
-      <div id="teacher-class-actions" style="display:none;margin-bottom:20px">
+      <div id="teacher-class-actions" style="display:none;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn-primary" onclick="openCreateClassModal()"><i class="fi fi-br-plus"></i> Create New Class</button>
+        <button class="btn-ghost" onclick="connectGoogleClassroom()" id="gc-import-btn"><iconify-icon icon="mdi:google-classroom" style="font-size:1.1rem"></iconify-icon> &nbsp;Import from Google Classroom</button>
+      </div>
+      <div id="student-gc-import" style="margin-bottom:16px">
+        <button class="btn-ghost" onclick="connectGoogleClassroom()" style="font-size:.82rem;padding:8px 14px"><iconify-icon icon="mdi:google-classroom" style="font-size:1rem"></iconify-icon> &nbsp;Import classes from Google Classroom</button>
       </div>
       <div class="classes-grid" id="classes-grid">
         <div class="class-card">
@@ -2079,9 +2123,16 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <button class="lb-filter-btn" onclick="setLbFilter(this,'alltime')">All Time</button>
         </div>
         <div class="lb-filter" style="margin-left:auto">
-          <button class="lb-filter-btn active" onclick="setLbFilter(this,'global')">Global</button>
-          <button class="lb-filter-btn" onclick="setLbFilter(this,'class')">My Class</button>
+          <button class="lb-filter-btn active" onclick="setLbScope(this,'global')">Global</button>
+          <button class="lb-filter-btn" onclick="setLbScope(this,'class')">My Class</button>
+          <button class="lb-filter-btn" id="lb-subject-btn" onclick="setLbScope(this,'subject')" style="display:none">Subject</button>
         </div>
+      </div>
+      <div id="lb-subject-selector" style="display:none;margin-bottom:14px">
+        <select class="form-input" id="lb-subject-select" style="max-width:260px;font-size:.83rem" onchange="loadSubjectLeaderboard()">
+          <option value="">— Select a subject —</option>
+        </select>
+        <p id="lb-subject-note" style="font-size:.75rem;color:var(--text-muted);margin-top:6px"><i class="fi fi-br-info"></i> Subject rankings are enabled by your teacher per class.</p>
       </div>
       <div class="lb-podium">
         <div class="podium-item silver">
@@ -2189,6 +2240,23 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           </tbody>
         </table>
       </div>
+      <!-- Class leaderboard settings -->
+      <div class="card card-pad" style="margin-bottom:20px">
+        <div class="card-title"><i class="fi fi-br-trophy" style="color:var(--cyan)"></i> &nbsp;Subject Ranking Settings</div>
+        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px">Choose which classes have a visible subject leaderboard for students. Students can only see rankings if you enable it.</p>
+        <div id="teacher-lb-toggles">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div><div style="font-weight:600;font-size:.87rem">Biology Year 12</div><div style="font-size:.75rem;color:var(--text-muted)">BIO-2024 · 28 students</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="lb-toggle-BIO2024" onchange="saveLeaderboardToggle('BIO-2024',this.checked)"><span class="toggle-slider"></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+            <div><div style="font-weight:600;font-size:.87rem">Advanced Mathematics</div><div style="font-size:.75rem;color:var(--text-muted)">MAT-ADV · 22 students</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="lb-toggle-MATADV" onchange="saveLeaderboardToggle('MAT-ADV',this.checked)"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-top:10px"><i class="fi fi-br-info"></i> Rankings are based on quiz & test scores within that subject, not XP.</p>
+      </div>
+
       <!-- Topic difficulty -->
       <div class="two-col">
         <div class="card card-pad">
@@ -2473,6 +2541,220 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <button class="btn-primary" style="padding:10px 22px" onclick="showToast('Study preferences saved!','success')">
               <i class="fi fi-br-disk"></i> Save
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TIMETABLE (Sentral-style) ── -->
+    <div class="app-panel" id="panel-timetable">
+      <h2 class="section-head">Timetable</h2>
+      <p class="section-sub">Your weekly class schedule. Teachers manage periods; students view their timetable here.</p>
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+        <div class="lb-filter">
+          <button class="lb-filter-btn active" onclick="setTimetableWeek(this,0)">This Week</button>
+          <button class="lb-filter-btn" onclick="setTimetableWeek(this,1)">Next Week</button>
+        </div>
+        <button class="btn-ghost" id="add-period-btn" style="display:none;padding:7px 14px;font-size:.82rem" onclick="openAddPeriodModal()"><i class="fi fi-br-plus"></i> Add Period</button>
+      </div>
+      <div class="timetable-grid" id="timetable-grid">
+        <!-- Days header -->
+        <div class="tt-corner"></div>
+        <div class="tt-day">Monday</div>
+        <div class="tt-day">Tuesday</div>
+        <div class="tt-day">Wednesday</div>
+        <div class="tt-day">Thursday</div>
+        <div class="tt-day">Friday</div>
+        <!-- Period rows rendered by JS -->
+      </div>
+      <div id="tt-empty" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
+        <i class="fi fi-br-calendar-lines" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>
+        <p>No timetable set up yet.</p>
+        <p id="tt-empty-sub" style="font-size:.8rem;margin-top:6px">Ask your teacher to add your class periods.</p>
+      </div>
+    </div>
+
+    <!-- ── NOTICES (Sentral-style) ── -->
+    <div class="app-panel" id="panel-notices">
+      <h2 class="section-head">Notices</h2>
+      <p class="section-sub">School and class announcements posted by your teachers.</p>
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+        <div class="lb-filter">
+          <button class="lb-filter-btn active" onclick="filterNotices(this,'all')">All</button>
+          <button class="lb-filter-btn" onclick="filterNotices(this,'school')">School</button>
+          <button class="lb-filter-btn" onclick="filterNotices(this,'class')">My Classes</button>
+        </div>
+      </div>
+      <div id="notices-list" style="display:flex;flex-direction:column;gap:14px">
+        <!-- Populated by loadNotices() -->
+        <div class="card card-pad notice-item" data-category="school">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="background:var(--cyan-dim);color:var(--cyan);border-radius:10px;padding:10px;flex-shrink:0"><i class="fi fi-br-megaphone"></i></div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-weight:700;font-size:.9rem">School Sports Carnival — Friday</span>
+                <span class="pill" style="background:var(--cyan-dim);color:var(--cyan);font-size:.68rem">School</span>
+              </div>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">All students are required to attend the annual sports carnival this Friday. Bring a water bottle and wear house colours. Absences must be notified to the office by Thursday.</p>
+              <div style="font-size:.75rem;color:var(--text-muted)"><i class="fi fi-rr-clock"></i> Posted 1 day ago &nbsp;·&nbsp; Admin Office</div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-pad notice-item" data-category="class">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="background:rgba(124,58,237,0.12);color:#a78bfa;border-radius:10px;padding:10px;flex-shrink:0"><i class="fi fi-br-flask"></i></div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-weight:700;font-size:.9rem">Biology — Chapter 5 Test Rescheduled</span>
+                <span class="pill" style="background:rgba(124,58,237,0.12);color:#a78bfa;font-size:.68rem">BIO-2024</span>
+              </div>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">The Chapter 5 test has been moved to next Tuesday. Use the extra time to review Cell Division and Genetics. Practice questions have been uploaded to the Archive.</p>
+              <div style="font-size:.75rem;color:var(--text-muted)"><i class="fi fi-rr-clock"></i> Posted 3 hours ago &nbsp;·&nbsp; Mrs Clarke</div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-pad notice-item" data-category="class">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="background:rgba(245,158,11,0.1);color:var(--amber);border-radius:10px;padding:10px;flex-shrink:0"><i class="fi fi-br-calculator"></i></div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-weight:700;font-size:.9rem">Maths — Calculus Assignment Due Monday</span>
+                <span class="pill" style="background:rgba(245,158,11,0.1);color:var(--amber);font-size:.68rem">MAT-ADV</span>
+                <span class="pill" style="background:rgba(244,63,94,.1);color:var(--rose);font-size:.68rem">Due Soon</span>
+              </div>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">Reminder: the integration and differentiation assignment is due Monday at 11:59 PM. Submit via Google Classroom. Late submissions will receive a 10% penalty per day.</p>
+              <div style="font-size:.75rem;color:var(--text-muted)"><i class="fi fi-rr-clock"></i> Posted 2 days ago &nbsp;·&nbsp; Mr Peterson</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="notices-empty" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
+        <i class="fi fi-br-megaphone" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>
+        <p>No notices match this filter.</p>
+      </div>
+    </div>
+
+    <!-- ── ATTENDANCE (Student view) ── -->
+    <div class="app-panel" id="panel-attendance">
+      <h2 class="section-head">Attendance</h2>
+      <p class="section-sub">Your attendance record across all enrolled classes.</p>
+      <div class="stat-grid" style="margin-bottom:22px">
+        <div class="stat-card"><div class="stat-card-num" style="color:var(--green)" id="att-pct">—</div><div class="stat-card-label">Attendance Rate</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="att-present">—</div><div class="stat-card-label">Days Present</div></div>
+        <div class="stat-card"><div class="stat-card-num" style="color:var(--rose)" id="att-absent">—</div><div class="stat-card-label">Absences</div></div>
+        <div class="stat-card"><div class="stat-card-num" style="color:var(--amber)" id="att-late">—</div><div class="stat-card-label">Late Arrivals</div></div>
+      </div>
+      <div class="card card-pad" style="margin-bottom:18px">
+        <div class="card-title"><i class="fi fi-br-calendar-lines" style="color:var(--cyan)"></i> &nbsp;Recent Attendance</div>
+        <table class="marks-table" id="att-table">
+          <thead><tr><th>Date</th><th>Class</th><th>Period</th><th>Status</th><th>Note</th></tr></thead>
+          <tbody id="att-tbody">
+            <tr><td style="color:var(--text-muted)">02 Jun 2026</td><td>Biology Yr 12</td><td>Period 3</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span></td><td style="color:var(--text-muted)">—</td></tr>
+            <tr><td style="color:var(--text-muted)">02 Jun 2026</td><td>Advanced Maths</td><td>Period 5</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span></td><td style="color:var(--text-muted)">—</td></tr>
+            <tr><td style="color:var(--text-muted)">01 Jun 2026</td><td>Physics</td><td>Period 2</td><td><span class="risk-badge risk-warn"><i class="fi fi-br-clock"></i> Late</span></td><td style="color:var(--text-muted)">5 min late</td></tr>
+            <tr><td style="color:var(--text-muted)">30 May 2026</td><td>Chemistry</td><td>Period 4</td><td><span class="risk-badge risk-danger"><i class="fi fi-br-cross"></i> Absent</span></td><td style="color:var(--text-muted)">Parent notified</td></tr>
+            <tr><td style="color:var(--text-muted)">29 May 2026</td><td>Biology Yr 12</td><td>Period 3</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span></td><td style="color:var(--text-muted)">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card card-pad">
+        <div class="card-title"><i class="fi fi-br-info" style="color:var(--cyan)"></i> &nbsp;Attendance by Subject</div>
+        <div id="att-by-subject" style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+          <div class="topic-row"><div class="topic-name">Biology Yr 12</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:95%;background:var(--green)"></div></div></div><div class="topic-score" style="color:var(--green)">95%</div></div>
+          <div class="topic-row"><div class="topic-name">Advanced Maths</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:92%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">92%</div></div>
+          <div class="topic-row"><div class="topic-name">Physics</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:78%;background:var(--amber)"></div></div></div><div class="topic-score" style="color:var(--amber)">78%</div></div>
+          <div class="topic-row"><div class="topic-name">Chemistry</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:85%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">85%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MARK ROLL (Teacher) ── -->
+    <div class="app-panel" id="panel-attendance-marking">
+      <h2 class="section-head">Mark Roll</h2>
+      <p class="section-sub">Record attendance for each period. Absences trigger automatic parent notifications.</p>
+      <div class="card card-pad" style="margin-bottom:18px;max-width:700px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="form-group" style="margin:0"><label class="form-label">Class</label>
+            <select class="form-input" id="roll-class-select" onchange="loadRollStudents()">
+              <option value="">Select class…</option>
+              <option value="BIO-2024">Biology Year 12 (BIO-2024)</option>
+              <option value="MAT-ADV">Advanced Maths (MAT-ADV)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0"><label class="form-label">Date</label><input type="date" class="form-input" id="roll-date"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Period</label>
+            <select class="form-input" id="roll-period">
+              <option>Period 1</option><option>Period 2</option><option>Period 3</option>
+              <option>Period 4</option><option>Period 5</option><option>Period 6</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card card-pad" id="roll-card" style="display:none;overflow-x:auto">
+        <div class="card-title" id="roll-card-title"><i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;Student Roll</div>
+        <table class="marks-table" style="margin-top:12px">
+          <thead><tr><th>Student</th><th>Status</th><th>Note</th></tr></thead>
+          <tbody id="roll-tbody"></tbody>
+        </table>
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn-ghost" style="padding:8px 16px;font-size:.82rem" onclick="markAllPresent()"><i class="fi fi-br-check"></i> Mark All Present</button>
+          <button class="btn-primary" style="padding:8px 20px;font-size:.82rem" onclick="submitRoll()"><i class="fi fi-br-disk"></i> &nbsp;Save Roll</button>
+        </div>
+      </div>
+      <div id="roll-empty" style="padding:30px;text-align:center;color:var(--text-muted);font-size:.85rem">Select a class above to load the student list.</div>
+    </div>
+
+    <!-- ── POST NOTICE (Teacher) ── -->
+    <div class="app-panel" id="panel-manage-notices">
+      <h2 class="section-head">Post Notice</h2>
+      <p class="section-sub">Broadcast announcements to your classes or the whole school.</p>
+      <div class="two-col">
+        <div>
+          <div class="card card-pad" style="margin-bottom:18px">
+            <div class="card-title"><i class="fi fi-br-pen-field" style="color:var(--cyan)"></i> &nbsp;New Notice</div>
+            <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="notice-title" placeholder="e.g. Test rescheduled to Tuesday"></div>
+            <div class="form-group">
+              <label class="form-label">Audience</label>
+              <select class="form-input" id="notice-audience">
+                <option value="school">Whole School</option>
+                <option value="BIO-2024">Biology Year 12 (BIO-2024)</option>
+                <option value="MAT-ADV">Advanced Maths (MAT-ADV)</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Priority</label>
+              <div style="display:flex;gap:8px">
+                <button class="upload-mode-btn active" onclick="setPriority(this,'normal')">Normal</button>
+                <button class="upload-mode-btn" onclick="setPriority(this,'urgent')">Urgent</button>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="notice-body" rows="5" placeholder="Write your notice here…" style="resize:vertical"></textarea></div>
+            <div style="display:flex;gap:10px">
+              <button class="btn-primary" style="padding:10px 22px" onclick="postNotice()"><i class="fi fi-br-megaphone"></i> &nbsp;Post Notice</button>
+              <button class="btn-ghost" style="padding:10px 18px" onclick="previewNotice()"><i class="fi fi-br-eye"></i> Preview</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card card-pad">
+            <div class="card-title"><i class="fi fi-br-list" style="color:var(--cyan)"></i> &nbsp;Recent Notices You've Posted</div>
+            <div id="teacher-notices-list" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+                <div style="font-weight:600;font-size:.85rem">Biology — Chapter 5 Test Rescheduled</div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px">BIO-2024 &nbsp;·&nbsp; 3 hours ago &nbsp;·&nbsp; 28 students reached</div>
+                <div style="margin-top:8px;display:flex;gap:8px">
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="showToast('Edit coming soon','info')"><i class="fi fi-br-pencil"></i> Edit</button>
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="showToast('Notice deleted','success')"><i class="fi fi-br-trash"></i> Delete</button>
+                </div>
+              </div>
+              <div style="padding:10px 0">
+                <div style="font-weight:600;font-size:.85rem">Maths — Calculus Assignment Due Monday</div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px">MAT-ADV &nbsp;·&nbsp; 2 days ago &nbsp;·&nbsp; 22 students reached</div>
+                <div style="margin-top:8px;display:flex;gap:8px">
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="showToast('Edit coming soon','info')"><i class="fi fi-br-pencil"></i> Edit</button>
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="showToast('Notice deleted','success')"><i class="fi fi-br-trash"></i> Delete</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3093,20 +3375,13 @@ window._PROXY_URL = PROXY_URL;
     if (!overlay) { afterFn?.(); return; }
     const leftPanel  = overlay.querySelector('.door-panel.left');
     const rightPanel = overlay.querySelector('.door-panel.right');
-    const centerLogo = overlay.querySelector('.door-center');
 
     // Wait for logo to register, then animate
     setTimeout(() => {
       // Double RAF: ensures browser has painted the closed state before transition starts
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          // Fade the center logo out at the same time the panels slide away
-          if (centerLogo) {
-            centerLogo.style.transition = 'opacity 0.3s ease';
-            centerLogo.style.opacity    = '0';
-          }
-
-          // Slide panels open
+          // Slide panels open — logo halves ride along with their panels
           const t = 'transform 0.88s ' + EASE;
           if (leftPanel)  { leftPanel.style.transition  = t; leftPanel.style.transform  = 'translateX(-101%)'; }
           if (rightPanel) { rightPanel.style.transition = t; rightPanel.style.transform = 'translateX(101%)';  }
@@ -4285,6 +4560,373 @@ window._updateUpgradeBanner = function(plan) {
 const _fkStyle = document.createElement('style');
 _fkStyle.textContent = '@keyframes fadeOut { to { opacity:0; } }';
 document.head.appendChild(_fkStyle);
+
+// ── Teacher role: show extra nav items ──
+const _origApplyProfile = window._applyProfileToUI;
+window._applyProfileToUI = function(profile) {
+  if (_origApplyProfile) _origApplyProfile(profile);
+  const role = profile?.role || 'student';
+  if (role === 'teacher') {
+    ['mark-roll-nav','post-notice-nav'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+    const addPeriodBtn = document.getElementById('add-period-btn');
+    if (addPeriodBtn) addPeriodBtn.style.display = '';
+    document.getElementById('student-gc-import').style.display = 'none';
+    // Load teacher's leaderboard toggles from Firebase
+    loadTeacherLbToggles();
+  }
+};
+
+// ── Timetable ──
+const TIMETABLE_PERIODS = [
+  { num:1, time:'8:30–9:25' },
+  { num:2, time:'9:25–10:20' },
+  { num:3, time:'10:35–11:30' },
+  { num:4, time:'11:30–12:25' },
+  { num:5, time:'13:10–14:05' },
+  { num:6, time:'14:05–15:00' },
+];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const ACCENT_COLORS = [
+  {bg:'rgba(0,240,212,0.1)',color:'var(--cyan)'},
+  {bg:'rgba(124,58,237,0.12)',color:'#a78bfa'},
+  {bg:'rgba(245,158,11,0.1)',color:'var(--amber)'},
+  {bg:'rgba(244,63,94,0.1)',color:'var(--rose)'},
+  {bg:'rgba(34,197,94,0.1)',color:'var(--green)'},
+];
+
+window.setTimetableWeek = function(btn, offset) {
+  document.querySelectorAll('.lb-filter-btn').forEach(b => { if (b.closest('#panel-timetable')) b.classList.remove('active'); });
+  btn.classList.add('active');
+};
+
+window.renderTimetable = async function() {
+  const grid = document.getElementById('timetable-grid');
+  if (!grid) return;
+
+  // Load classes the user is enrolled in
+  let classes = {};
+  if (window._uid) {
+    try {
+      const snap = await get(child(ref(db), `timetable/${window._uid}`));
+      if (snap.exists()) classes = snap.val();
+    } catch(e) {}
+  }
+
+  // Rebuild grid (keep header row)
+  grid.innerHTML = `
+    <div class="tt-corner"></div>
+    ${DAYS.map(d=>`<div class="tt-day">${d}</div>`).join('')}
+  `;
+
+  let hasAny = false;
+  TIMETABLE_PERIODS.forEach(p => {
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'tt-period-label';
+    labelDiv.innerHTML = `<span class="tt-period-num">P${p.num}</span><span class="tt-period-time">${p.time}</span>`;
+    grid.appendChild(labelDiv);
+
+    DAYS.forEach((day, di) => {
+      const cell = document.createElement('div');
+      const key = `p${p.num}_${day.toLowerCase()}`;
+      const entry = classes[key];
+      if (entry) {
+        hasAny = true;
+        const acc = ACCENT_COLORS[di % ACCENT_COLORS.length];
+        cell.className = 'tt-cell tt-has-class';
+        cell.style.background = acc.bg;
+        cell.style.borderColor = acc.color.replace('var(--','').replace(')','');
+        cell.innerHTML = `
+          <div class="tt-cell-subject" style="color:${acc.color}">${entry.subject||'—'}</div>
+          <div class="tt-cell-room">${entry.room||''}</div>
+          <div class="tt-cell-teacher">${entry.teacher||''}</div>`;
+      } else {
+        cell.className = 'tt-cell';
+        cell.style.background = 'transparent';
+        cell.style.borderStyle = 'dashed';
+      }
+      grid.appendChild(cell);
+    });
+  });
+
+  document.getElementById('tt-empty').style.display = hasAny ? 'none' : '';
+  grid.style.display = hasAny ? 'grid' : 'none';
+
+  // Demo timetable if nothing saved
+  if (!hasAny) {
+    const demoClasses = {
+      p3_monday:   { subject:'Biology Yr 12', room:'Room 14', teacher:'Mrs Clarke' },
+      p5_monday:   { subject:'Advanced Maths', room:'Room 7', teacher:'Mr Peterson' },
+      p2_tuesday:  { subject:'Physics', room:'Lab 2', teacher:'Mr Smith' },
+      p4_wednesday:{ subject:'Chemistry', room:'Lab 1', teacher:'Ms Nguyen' },
+      p1_thursday: { subject:'Advanced Maths', room:'Room 7', teacher:'Mr Peterson' },
+      p3_thursday: { subject:'Biology Yr 12', room:'Room 14', teacher:'Mrs Clarke' },
+      p5_friday:   { subject:'Physics', room:'Lab 2', teacher:'Mr Smith' },
+    };
+    // Re-render with demo data
+    grid.innerHTML = `<div class="tt-corner"></div>${DAYS.map(d=>`<div class="tt-day">${d}</div>`).join('')}`;
+    grid.style.display = 'grid';
+    document.getElementById('tt-empty').style.display = 'none';
+    TIMETABLE_PERIODS.forEach(p => {
+      const lbl = document.createElement('div');
+      lbl.className = 'tt-period-label';
+      lbl.innerHTML = `<span class="tt-period-num">P${p.num}</span><span class="tt-period-time">${p.time}</span>`;
+      grid.appendChild(lbl);
+      DAYS.forEach((day, di) => {
+        const cell = document.createElement('div');
+        const key = `p${p.num}_${day.toLowerCase()}`;
+        const entry = demoClasses[key];
+        if (entry) {
+          const acc = ACCENT_COLORS[di % ACCENT_COLORS.length];
+          cell.className = 'tt-cell tt-has-class';
+          cell.innerHTML = `<div class="tt-cell-subject" style="color:${acc.color}">${entry.subject}</div><div class="tt-cell-room">${entry.room}</div><div class="tt-cell-teacher">${entry.teacher}</div>`;
+        } else {
+          cell.className = 'tt-cell';
+          cell.style.borderStyle = 'dashed';
+        }
+        grid.appendChild(cell);
+      });
+    });
+  }
+};
+
+// ── Notices filter ──
+window.filterNotices = function(btn, category) {
+  document.querySelectorAll('#panel-notices .lb-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const items = document.querySelectorAll('.notice-item');
+  let anyVisible = false;
+  items.forEach(item => {
+    const show = category === 'all' || item.dataset.category === category;
+    item.style.display = show ? '' : 'none';
+    if (show) anyVisible = true;
+  });
+  document.getElementById('notices-empty').style.display = anyVisible ? 'none' : '';
+};
+
+// ── Mark Roll ──
+const DEMO_STUDENTS = ['Alex Johnson','Sarah Chen','James Miller','Priya Lal','Tom Wu','Lucy Park','Ben Nguyen','Emma Walsh'];
+
+window.loadRollStudents = function() {
+  const cls = document.getElementById('roll-class-select').value;
+  const card = document.getElementById('roll-card');
+  const empty = document.getElementById('roll-empty');
+  const title = document.getElementById('roll-card-title');
+  if (!cls) { card.style.display = 'none'; empty.style.display = ''; return; }
+  card.style.display = '';
+  empty.style.display = 'none';
+  title.innerHTML = `<i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;${cls} — ${document.getElementById('roll-period').value}`;
+  const tbody = document.getElementById('roll-tbody');
+  tbody.innerHTML = DEMO_STUDENTS.map(name => `
+    <tr>
+      <td style="font-weight:600">${name}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="roll-status-btn active" data-student="${name}" data-status="present" onclick="setRollStatus(this,'present')" style="padding:4px 10px;font-size:.72rem;background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.2);border-radius:8px;cursor:pointer">Present</button>
+          <button class="roll-status-btn" data-student="${name}" data-status="absent" onclick="setRollStatus(this,'absent')" style="padding:4px 10px;font-size:.72rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer">Absent</button>
+          <button class="roll-status-btn" data-student="${name}" data-status="late" onclick="setRollStatus(this,'late')" style="padding:4px 10px;font-size:.72rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer">Late</button>
+        </div>
+      </td>
+      <td><input type="text" placeholder="Optional note…" style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:.75rem;padding:2px 4px;width:140px;outline:none"></td>
+    </tr>`).join('');
+};
+
+window.setRollStatus = function(btn, status) {
+  const row = btn.closest('tr');
+  row.querySelectorAll('.roll-status-btn').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.color = 'var(--text-muted)';
+    b.style.borderColor = 'var(--border)';
+  });
+  const colors = { present:['var(--green-dim)','var(--green)','rgba(34,197,94,.2)'], absent:['rgba(244,63,94,.08)','var(--rose)','rgba(244,63,94,.2)'], late:['rgba(245,158,11,.08)','var(--amber)','rgba(245,158,11,.2)'] };
+  const [bg, color, border] = colors[status];
+  btn.style.background = bg;
+  btn.style.color = color;
+  btn.style.borderColor = border;
+};
+
+window.markAllPresent = function() {
+  document.querySelectorAll('#roll-tbody .roll-status-btn[data-status="present"]').forEach(b => window.setRollStatus(b,'present'));
+};
+
+window.submitRoll = async function() {
+  const cls = document.getElementById('roll-class-select').value;
+  const date = document.getElementById('roll-date').value || new Date().toISOString().slice(0,10);
+  const period = document.getElementById('roll-period').value;
+  if (!window._uid) { showToast('Sign in to save roll','error'); return; }
+  const rollData = {};
+  document.querySelectorAll('#roll-tbody tr').forEach(row => {
+    const activeBtn = row.querySelector('.roll-status-btn[style*="background:var(--green-dim)"], .roll-status-btn[style*="background:rgba(244"], .roll-status-btn[style*="background:rgba(245"]');
+    const student = row.querySelector('.roll-status-btn')?.dataset.student;
+    if (student) rollData[student.replace(/ /g,'_')] = activeBtn?.dataset.status || 'present';
+  });
+  try {
+    await set(ref(db, `attendance/${cls}/${date.replace(/-/g,'')}/${period.replace(/ /g,'')}`), rollData);
+    showToast('Roll saved successfully!','success');
+  } catch(e) { showToast('Error saving roll','error'); }
+};
+
+// ── Post Notice ──
+let _noticePriority = 'normal';
+window.setPriority = function(btn, priority) {
+  _noticePriority = priority;
+  btn.closest('div').querySelectorAll('.upload-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+};
+
+window.postNotice = async function() {
+  const title = document.getElementById('notice-title').value.trim();
+  const body = document.getElementById('notice-body').value.trim();
+  const audience = document.getElementById('notice-audience').value;
+  if (!title || !body) { showToast('Please fill in title and message','error'); return; }
+  if (!window._uid) { showToast('Sign in to post notices','error'); return; }
+  const notice = { title, body, audience, priority: _noticePriority, postedBy: window._uid, postedByName: window._userProfile?.name || 'Teacher', postedAt: new Date().toISOString() };
+  try {
+    const key = Date.now().toString();
+    await set(ref(db, `notices/${audience}/${key}`), notice);
+    showToast('Notice posted!', 'success');
+    document.getElementById('notice-title').value = '';
+    document.getElementById('notice-body').value = '';
+  } catch(e) { showToast('Error posting notice','error'); }
+};
+
+window.previewNotice = function() {
+  const title = document.getElementById('notice-title').value || '(No title)';
+  const body = document.getElementById('notice-body').value || '(No message)';
+  showToast(`Preview: "${title}" — ${body.slice(0,60)}…`,'info');
+};
+
+// ── Leaderboard scope toggle ──
+window.setLbScope = function(btn, scope) {
+  document.querySelectorAll('#panel-leaderboard .lb-filter:last-child .lb-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const subjectSel = document.getElementById('lb-subject-selector');
+  subjectSel.style.display = scope === 'subject' ? '' : 'none';
+  if (scope === 'subject') loadSubjectLeaderboardClasses();
+};
+
+function loadSubjectLeaderboardClasses() {
+  const sel = document.getElementById('lb-subject-select');
+  if (!window._uid) return;
+  get(child(ref(db), `enrollments/${window._uid}`)).then(snap => {
+    if (!snap.exists()) return;
+    sel.innerHTML = '<option value="">— Select a subject —</option>';
+    Object.entries(snap.val()).forEach(([code, cls]) => {
+      if (cls.leaderboardEnabled) {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = `${cls.name || code} (${code})`;
+        sel.appendChild(opt);
+      }
+    });
+    if (sel.options.length <= 1) {
+      sel.innerHTML = '<option value="">No subject rankings enabled by your teachers yet</option>';
+    }
+  }).catch(()=>{});
+}
+
+window.loadSubjectLeaderboard = function() {
+  const code = document.getElementById('lb-subject-select').value;
+  if (!code) return;
+  showToast(`Loading rankings for ${code}…`,'info');
+};
+
+// ── Teacher: leaderboard toggle per class ──
+window.saveLeaderboardToggle = async function(classCode, enabled) {
+  if (!window._uid) return;
+  try {
+    await set(ref(db, `classes/${classCode}/leaderboardEnabled`), enabled);
+    showToast(`Subject ranking ${enabled ? 'enabled' : 'disabled'} for ${classCode}`,'success');
+  } catch(e) { showToast('Error saving setting','error'); }
+};
+
+async function loadTeacherLbToggles() {
+  const container = document.getElementById('teacher-lb-toggles');
+  if (!container || !window._uid) return;
+  try {
+    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    if (!snap.exists()) return;
+    const classes = Object.entries(snap.val()).filter(([,v]) => v.role === 'teacher');
+    if (!classes.length) return;
+    container.innerHTML = '';
+    classes.forEach(([code, cls], i) => {
+      const row = document.createElement('div');
+      row.style.cssText = `display:flex;align-items:center;justify-content:space-between;padding:10px 0;${i < classes.length-1 ? 'border-bottom:1px solid var(--border)' : ''}`;
+      const safeId = 'lb-toggle-' + code.replace(/[^a-z0-9]/gi,'');
+      row.innerHTML = `
+        <div><div style="font-weight:600;font-size:.87rem">${cls.name||code}</div><div style="font-size:.75rem;color:var(--text-muted)">${code}</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="${safeId}" ${cls.leaderboardEnabled?'checked':''} onchange="saveLeaderboardToggle('${code}',this.checked)"><span class="toggle-slider"></span></label>`;
+      container.appendChild(row);
+    });
+  } catch(e) {}
+}
+
+// ── Google Classroom OAuth import ──
+window.connectGoogleClassroom = function() {
+  const CLIENT_ID = '624890666308-placeholder.apps.googleusercontent.com';
+  const SCOPES = 'https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters.readonly';
+  if (typeof google === 'undefined' || !google.accounts) {
+    showToast('Loading Google sign-in… please try again in a moment','info');
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = () => window.connectGoogleClassroom();
+    document.head.appendChild(s);
+    return;
+  }
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: async (tokenResponse) => {
+      if (tokenResponse.error) { showToast('Google sign-in cancelled','error'); return; }
+      showToast('Connected to Google Classroom! Importing classes…','success');
+      await importGoogleClassroomCourses(tokenResponse.access_token);
+    },
+  });
+  tokenClient.requestAccessToken();
+};
+
+async function importGoogleClassroomCourses(token) {
+  try {
+    const res = await fetch('https://classroom.googleapis.com/v1/courses?courseStates=ACTIVE', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const courses = data.courses || [];
+    if (!courses.length) { showToast('No active Google Classroom courses found','info'); return; }
+    for (const course of courses) {
+      const code = (course.enrollmentCode || course.id).toUpperCase();
+      const entry = { name: course.name, subject: course.section||'', teacherName: course.ownerId||'Google Classroom', yearLevel: '', gcId: course.id, source: 'google_classroom', role: 'student' };
+      if (window._uid) await set(ref(db, `enrollments/${window._uid}/${code}`), entry);
+    }
+    showToast(`Imported ${courses.length} class${courses.length>1?'es':''} from Google Classroom!`,'success');
+    loadClasses();
+  } catch(e) { showToast('Error importing Google Classroom courses','error'); }
+}
+
+// ── showPanel hook: render timetable on first visit ──
+const _origShowPanel = window.showPanel;
+window.showPanel = function(name, navEl) {
+  if (_origShowPanel) _origShowPanel(name, navEl);
+  if (name === 'timetable') window.renderTimetable();
+  if (name === 'leaderboard') {
+    const btn = document.getElementById('lb-subject-btn');
+    if (btn && window._userProfile?.role !== 'teacher') {
+      get(child(ref(db), `enrollments/${window._uid}`)).then(snap => {
+        if (!snap.exists()) return;
+        const hasRanking = Object.values(snap.val()).some(c => c.leaderboardEnabled);
+        if (btn) btn.style.display = hasRanking ? '' : 'none';
+      }).catch(()=>{});
+    }
+  }
+};
+
+// Set today's date on the roll date picker
+(function() {
+  const el = document.getElementById('roll-date');
+  if (el) el.value = new Date().toISOString().slice(0,10);
+})();
 </script>
 
 <!-- ═══════════════════════════════════════

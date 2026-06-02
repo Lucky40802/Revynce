@@ -1204,6 +1204,28 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 
 @media(max-width:860px) { .pricing-grid { grid-template-columns:1fr; } .pricing-section { padding:60px 20px; } }
 
+/* ── Organisation pricing section ── */
+.org-pricing-section {
+  margin-top:52px; border-radius:var(--radius-lg);
+  background:linear-gradient(135deg,rgba(0,240,212,0.06) 0%,rgba(124,58,237,0.06) 100%);
+  border:1px solid rgba(0,240,212,0.18);
+  overflow:hidden;
+}
+.org-pricing-inner {
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+}
+.org-pricing-left {
+  padding:44px 40px; border-right:1px solid rgba(0,240,212,0.12);
+}
+.org-pricing-right {
+  padding:44px 40px; background:rgba(0,0,0,0.18);
+}
+@media(max-width:860px) {
+  .org-pricing-inner { grid-template-columns:1fr; }
+  .org-pricing-left { border-right:none; border-bottom:1px solid rgba(0,240,212,0.12); padding:32px 24px; }
+  .org-pricing-right { padding:32px 24px; }
+}
+
 /* ── Google Sign-In ── */
 .auth-divider { display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-muted);font-size:.75rem;font-weight:600;letter-spacing:.04em; }
 .auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:var(--border); }
@@ -1299,6 +1321,70 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <animateTransform attributeName="transform" type="translate"
           from="0,-2" to="0,902" dur="3.2s" repeatCount="indefinite"/>
       </rect>
+
+      <!-- ── GEAR & PISTON ASSEMBLY (left panel) ── -->
+      <!-- Piston cylinder housing -->
+      <rect x="289" y="610" width="12" height="128" rx="3" fill="none" stroke="rgba(0,240,212,0.22)" stroke-width="1"/>
+      <!-- Cylinder cap -->
+      <line x1="284" y1="610" x2="306" y2="610" stroke="rgba(0,240,212,0.38)" stroke-width="1.8"/>
+      <line x1="284" y1="738" x2="306" y2="738" stroke="rgba(0,240,212,0.18)" stroke-width="1"/>
+      <!-- Port dimples -->
+      <circle cx="289" cy="626" r="2" fill="rgba(0,240,212,0.22)"/>
+      <circle cx="301" cy="626" r="2" fill="rgba(0,240,212,0.22)"/>
+
+      <!-- Piston head + connecting rod (animated up/down, period = 1 gear rev = 8s) -->
+      <g>
+        <animateTransform attributeName="transform" type="translate"
+          values="0 0;0 -28;0 0" dur="8s"
+          keyTimes="0;0.5;1" calcMode="spline"
+          keySplines="0.42 0 0.58 1;0.42 0 0.58 1"
+          repeatCount="indefinite"/>
+        <rect x="289" y="720" width="12" height="11" rx="2"
+          fill="rgba(0,240,212,0.2)" stroke="rgba(0,240,212,0.55)" stroke-width="1.5"/>
+        <circle cx="295" cy="725.5" r="2.2" fill="rgba(0,240,212,0.65)"/>
+        <line x1="295" y1="731" x2="295" y2="768"
+          stroke="rgba(0,240,212,0.38)" stroke-width="2" stroke-linecap="round"/>
+      </g>
+
+      <!-- Main gear (clockwise, 8s/rev) -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 295 775" to="360 295 775" dur="8s" repeatCount="indefinite"/>
+        <circle cx="295" cy="775" r="28" fill="rgba(0,240,212,0.04)" stroke="rgba(0,240,212,0.32)" stroke-width="1.8"/>
+        <!-- 4 spokes -->
+        <line x1="295" y1="755" x2="295" y2="763" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+        <line x1="295" y1="787" x2="295" y2="795" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+        <line x1="275" y1="775" x2="283" y2="775" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+        <line x1="307" y1="775" x2="315" y2="775" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+        <!-- Hub -->
+        <circle cx="295" cy="775" r="8" fill="rgba(0,240,212,0.1)" stroke="rgba(0,240,212,0.42)" stroke-width="1.4"/>
+        <circle cx="295" cy="775" r="3" fill="rgba(0,240,212,0.72)"/>
+        <!-- 8 teeth (rect rotated around gear centre) -->
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(0,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(45,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(90,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(135,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(180,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(225,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(270,295,775)"/>
+        <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(315,295,775)"/>
+      </g>
+
+      <!-- Small gear (counter-clockwise, 2× speed — 4s/rev) -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 338 732" to="-360 338 732" dur="4s" repeatCount="indefinite"/>
+        <circle cx="338" cy="732" r="15" fill="rgba(0,240,212,0.04)" stroke="rgba(0,240,212,0.26)" stroke-width="1.4"/>
+        <circle cx="338" cy="732" r="5" fill="rgba(0,240,212,0.1)" stroke="rgba(0,240,212,0.36)" stroke-width="1.2"/>
+        <circle cx="338" cy="732" r="2.2" fill="rgba(0,240,212,0.65)"/>
+        <!-- 6 teeth -->
+        <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(0,338,732)"/>
+        <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(60,338,732)"/>
+        <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(120,338,732)"/>
+        <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(180,338,732)"/>
+        <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(240,338,732)"/>
+        <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(300,338,732)"/>
+      </g>
     </svg>
     <!-- Left half of split logo -->
     <div class="door-logo-half">
@@ -1385,6 +1471,66 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <animateTransform attributeName="transform" type="translate"
           from="0,-2" to="0,902" dur="3.2s" begin="1.6s" repeatCount="indefinite"/>
       </rect>
+
+      <!-- ── GEAR & PISTON ASSEMBLY (right panel — mirror of left via scale) ── -->
+      <g transform="scale(-1,1) translate(-400,0)">
+        <!-- Piston cylinder housing -->
+        <rect x="289" y="610" width="12" height="128" rx="3" fill="none" stroke="rgba(0,240,212,0.22)" stroke-width="1"/>
+        <line x1="284" y1="610" x2="306" y2="610" stroke="rgba(0,240,212,0.38)" stroke-width="1.8"/>
+        <line x1="284" y1="738" x2="306" y2="738" stroke="rgba(0,240,212,0.18)" stroke-width="1"/>
+        <circle cx="289" cy="626" r="2" fill="rgba(0,240,212,0.22)"/>
+        <circle cx="301" cy="626" r="2" fill="rgba(0,240,212,0.22)"/>
+
+        <!-- Piston head + rod (animated — offset by 0.5 gear period so right is out-of-phase) -->
+        <g>
+          <animateTransform attributeName="transform" type="translate"
+            values="0 0;0 -28;0 0" dur="8s" begin="4s"
+            keyTimes="0;0.5;1" calcMode="spline"
+            keySplines="0.42 0 0.58 1;0.42 0 0.58 1"
+            repeatCount="indefinite"/>
+          <rect x="289" y="720" width="12" height="11" rx="2"
+            fill="rgba(0,240,212,0.2)" stroke="rgba(0,240,212,0.55)" stroke-width="1.5"/>
+          <circle cx="295" cy="725.5" r="2.2" fill="rgba(0,240,212,0.65)"/>
+          <line x1="295" y1="731" x2="295" y2="768"
+            stroke="rgba(0,240,212,0.38)" stroke-width="2" stroke-linecap="round"/>
+        </g>
+
+        <!-- Main gear (clockwise, offset 4s so pistons alternate) -->
+        <g>
+          <animateTransform attributeName="transform" type="rotate"
+            from="0 295 775" to="360 295 775" dur="8s" begin="4s" repeatCount="indefinite"/>
+          <circle cx="295" cy="775" r="28" fill="rgba(0,240,212,0.04)" stroke="rgba(0,240,212,0.32)" stroke-width="1.8"/>
+          <line x1="295" y1="755" x2="295" y2="763" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+          <line x1="295" y1="787" x2="295" y2="795" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+          <line x1="275" y1="775" x2="283" y2="775" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+          <line x1="307" y1="775" x2="315" y2="775" stroke="rgba(0,240,212,0.22)" stroke-width="1.2"/>
+          <circle cx="295" cy="775" r="8" fill="rgba(0,240,212,0.1)" stroke="rgba(0,240,212,0.42)" stroke-width="1.4"/>
+          <circle cx="295" cy="775" r="3" fill="rgba(0,240,212,0.72)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(0,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(45,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(90,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(135,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(180,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(225,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(270,295,775)"/>
+          <rect x="290" y="737" width="10" height="10" rx="2" fill="rgba(0,240,212,0.28)" transform="rotate(315,295,775)"/>
+        </g>
+
+        <!-- Small gear (counter-clockwise, 4s/rev, offset) -->
+        <g>
+          <animateTransform attributeName="transform" type="rotate"
+            from="0 338 732" to="-360 338 732" dur="4s" begin="4s" repeatCount="indefinite"/>
+          <circle cx="338" cy="732" r="15" fill="rgba(0,240,212,0.04)" stroke="rgba(0,240,212,0.26)" stroke-width="1.4"/>
+          <circle cx="338" cy="732" r="5" fill="rgba(0,240,212,0.1)" stroke="rgba(0,240,212,0.36)" stroke-width="1.2"/>
+          <circle cx="338" cy="732" r="2.2" fill="rgba(0,240,212,0.65)"/>
+          <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(0,338,732)"/>
+          <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(60,338,732)"/>
+          <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(120,338,732)"/>
+          <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(180,338,732)"/>
+          <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(240,338,732)"/>
+          <rect x="334" y="710" width="8" height="7" rx="1.5" fill="rgba(0,240,212,0.24)" transform="rotate(300,338,732)"/>
+        </g>
+      </g>
     </svg>
     <!-- Right half of split logo -->
     <div class="door-logo-half">
@@ -1554,6 +1700,87 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <p style="text-align:center;color:var(--text-muted);font-size:.75rem;margin-top:28px">
       All plans include a <strong style="color:var(--text)">14-day free trial</strong>. No credit card required. Cancel anytime.
     </p>
+
+    <!-- ── ORGANISATION / SCHOOL PLAN ── -->
+    <div class="org-pricing-section" id="org-pricing">
+      <div class="org-pricing-inner">
+        <div class="org-pricing-left">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px">Enterprise &amp; Schools</div>
+          <h3 style="font-family:var(--font-d);font-size:1.8rem;font-weight:800;line-height:1.15;margin-bottom:14px">Revynce for your<br>whole school</h3>
+          <p style="font-size:.875rem;color:var(--text-muted);line-height:1.65;margin-bottom:20px">Custom pricing for schools, TAFEs, and education organisations. One platform — no more juggling Quizlet, Education Perfect, Sentral, and Google Classroom.</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;font-size:.84rem">
+            <li style="display:flex;align-items:center;gap:10px"><span style="color:var(--cyan);font-size:.7rem">✦</span> Unlimited students &amp; teachers</li>
+            <li style="display:flex;align-items:center;gap:10px"><span style="color:var(--cyan);font-size:.7rem">✦</span> School-wide admin dashboard</li>
+            <li style="display:flex;align-items:center;gap:10px"><span style="color:var(--cyan);font-size:.7rem">✦</span> SSO &amp; LMS integration</li>
+            <li style="display:flex;align-items:center;gap:10px"><span style="color:var(--cyan);font-size:.7rem">✦</span> Timetable, attendance &amp; notices</li>
+            <li style="display:flex;align-items:center;gap:10px"><span style="color:var(--cyan);font-size:.7rem">✦</span> Dedicated onboarding &amp; support</li>
+            <li style="display:flex;align-items:center;gap:10px"><span style="color:var(--cyan);font-size:.7rem">✦</span> Custom branding available</li>
+          </ul>
+        </div>
+        <div class="org-pricing-right">
+          <div style="font-weight:700;font-size:.95rem;margin-bottom:18px;font-family:var(--font-d)">Get a quote for your school</div>
+          <div id="org-form-wrap">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">School / Organisation</label>
+                <input type="text" class="form-input" id="org-name" placeholder="e.g. Baulkham Hills High">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Your Name</label>
+                <input type="text" class="form-input" id="org-contact" placeholder="First &amp; last name">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="org-email" placeholder="you@school.edu.au">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Phone (optional)</label>
+                <input type="tel" class="form-input" id="org-phone" placeholder="+61 4xx xxx xxx">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">No. of Students</label>
+                <select class="form-input" id="org-size">
+                  <option value="">Select range…</option>
+                  <option>Under 100</option>
+                  <option>100 – 300</option>
+                  <option>300 – 700</option>
+                  <option>700 – 1500</option>
+                  <option>1500+</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Role</label>
+                <select class="form-input" id="org-role">
+                  <option value="">Select…</option>
+                  <option>Principal / Deputy</option>
+                  <option>Head of Department</option>
+                  <option>IT / Systems Admin</option>
+                  <option>Teacher</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label">Message (optional)</label>
+              <textarea class="form-input" id="org-message" rows="3" placeholder="Any specific requirements, questions, or integrations you need…" style="resize:vertical"></textarea>
+            </div>
+            <button class="btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:.9rem" onclick="submitOrgForm()" id="org-submit-btn">
+              <i class="fi fi-br-paper-plane"></i> &nbsp;Send Enquiry
+            </button>
+            <p style="font-size:.7rem;color:var(--text-muted);text-align:center;margin-top:10px">We respond within 1 business day. No spam, ever.</p>
+          </div>
+          <div id="org-form-success" style="display:none;text-align:center;padding:32px 20px">
+            <div style="font-size:2.2rem;margin-bottom:12px">🎉</div>
+            <div style="font-weight:700;font-size:1.1rem;font-family:var(--font-d);margin-bottom:8px">Enquiry received!</div>
+            <p style="font-size:.84rem;color:var(--text-muted)">Thanks for reaching out. We'll be in touch within 1 business day to discuss the best plan for your school.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <div class="cta-section">
@@ -3393,11 +3620,11 @@ window._PROXY_URL = PROXY_URL;
           }, 920);
         });
       });
-    }, 520);
+    }, 1800);
   };
 
-  // Fallback: if auth state never fires within 3 s, open on landing anyway
-  setTimeout(() => { window._authResolved = true; window._openDoor(); }, 3000);
+  // Fallback: if auth state never fires within 5.5 s, open on landing anyway
+  setTimeout(() => { window._authResolved = true; window._openDoor(); }, 5500);
 })();
 
 // ── Forgot Password UI helpers ──
@@ -4927,6 +5154,60 @@ window.showPanel = function(name, navEl) {
   const el = document.getElementById('roll-date');
   if (el) el.value = new Date().toISOString().slice(0,10);
 })();
+
+// ── Organisation enquiry form ──
+window.submitOrgForm = async function() {
+  const orgName  = document.getElementById('org-name').value.trim();
+  const contact  = document.getElementById('org-contact').value.trim();
+  const email    = document.getElementById('org-email').value.trim();
+  const phone    = document.getElementById('org-phone').value.trim();
+  const size     = document.getElementById('org-size').value;
+  const role     = document.getElementById('org-role').value;
+  const message  = document.getElementById('org-message').value.trim();
+
+  if (!orgName || !contact || !email) {
+    showToast('Please fill in school name, your name and email.', 'error');
+    return;
+  }
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(email)) {
+    showToast('Please enter a valid email address.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('org-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fi fi-br-loading"></i> &nbsp;Sending…';
+
+  try {
+    const res = await fetch('https://formsubmit.co/ajax/lakshan.jagadeishan@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject:      `Revynce School Enquiry — ${orgName}`,
+        organisation:  orgName,
+        contact_name:  contact,
+        email,
+        phone:         phone || 'Not provided',
+        students:      size  || 'Not specified',
+        role:          role  || 'Not specified',
+        message:       message || 'No message provided',
+        _template:     'table',
+      }),
+    });
+    const data = await res.json();
+    if (data.success === 'true' || data.success === true) {
+      document.getElementById('org-form-wrap').style.display = 'none';
+      document.getElementById('org-form-success').style.display = '';
+    } else {
+      throw new Error('Submission failed');
+    }
+  } catch(e) {
+    showToast('Error sending enquiry — please email us directly at lakshan.jagadeishan@gmail.com', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fi fi-br-paper-plane"></i> &nbsp;Send Enquiry';
+  }
+};
 </script>
 
 <!-- ═══════════════════════════════════════

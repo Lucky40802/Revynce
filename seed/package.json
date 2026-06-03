@@ -1,0 +1,12 @@
+{
+  "name": "revynce-seed",
+  "version": "1.0.0",
+  "description": "One-time seed script to create demo accounts and sample data",
+  "main": "seed.js",
+  "scripts": {
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

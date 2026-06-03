@@ -2,113 +2,78 @@
  * Revynce — Groq AI Proxy
  * Firebase Cloud Function (2nd gen)
  *
+ * Model: llama-3.3-70b-versatile
+ *
  * HOW TO DEPLOY:
- * 1. cd into the folder that contains this `functions/` directory
- * 2. npm install -g firebase-tools   (if not already installed)
- * 3. firebase login
- * 4. firebase init functions         (choose your revynce-740d1 project, JavaScript, no ESLint)
- * 5. Copy this file into functions/index.js
- * 6. cd functions && npm install     (installs firebase-functions, firebase-admin)
- * 7. Store your secret key:
- *       firebase functions:secrets:set GROQ_API_KEY
- *    Paste your key when prompted: gsk_JNTSTg...
- * 8. Deploy:
- *       firebase deploy --only functions
- * 9. Copy the printed Function URL — looks like:
- *       https://chat-XXXXXXXX-uc.a.run.app
- *    Paste it into revynce.html as PROXY_URL (see comment there).
+ * 1. firebase login
+ * 2. firebase init functions  (choose revynce-740d1, JavaScript, no ESLint)
+ * 3. Copy this file into functions/index.js
+ * 4. cd functions && npm install
+ * 5. firebase functions:secrets:set GROQ_API_KEY  (paste your key)
+ * 6. firebase deploy --only functions
  */
 
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 
-// This references the secret stored in Google Secret Manager via Firebase
 const groqKey = defineSecret("GROQ_API_KEY");
 
 exports.chat = onRequest(
   {
-    secrets: [groqKey],          // injects secret as env var at runtime only
-    cors: true,                  // auto-handles OPTIONS preflight
-    region: "us-central1",       // change if you prefer a closer region
+    secrets: [groqKey],
+    cors: true,
+    region: "us-central1",
     timeoutSeconds: 30,
-    minInstances: 0,             // scales to zero when idle (free tier friendly)
+    minInstances: 0,
   },
   async (req, res) => {
-
-    // ── CORS headers — restrict to your domain in production ──
     const allowedOrigins = [
       "https://revynce-740d1.web.app",
       "https://revynce-740d1.firebaseapp.com",
-      "http://localhost",          // for local testing
+      "http://localhost",
       "http://127.0.0.1",
-      "null",                      // file:// in browser during dev
+      "null",
     ];
-
     const origin = req.headers.origin || "";
-    if (allowedOrigins.includes(origin)) {
-      res.set("Access-Control-Allow-Origin", origin);
-    } else {
-      // Uncomment the line below to lock down to allowed origins only.
-      // For now we allow all so you can test before deploying to your domain.
-      res.set("Access-Control-Allow-Origin", "*");
-    }
-
+    res.set("Access-Control-Allow-Origin", allowedOrigins.includes(origin) ? origin : "*");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type");
 
-    // Handle CORS preflight
-    if (req.method === "OPTIONS") {
-      res.status(204).send("");
-      return;
-    }
+    if (req.method === "OPTIONS") { res.status(204).send(""); return; }
+    if (req.method !== "POST") { res.status(405).json({ error: "Method not allowed" }); return; }
 
-    // Only allow POST
-    if (req.method !== "POST") {
-      res.status(405).json({ error: "Method not allowed" });
-      return;
-    }
-
-    // Validate request body
     const { messages, model, max_tokens, temperature } = req.body;
-
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: "messages array is required" });
       return;
     }
 
-    // ── Forward to Groq ──
     try {
-      const groqResponse = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":  "application/json",
-            "Authorization": `Bearer ${groqKey.value()}`,  // key never sent to browser
-          },
-          body: JSON.stringify({
-            model:       model       || "llama3-70b-8192",
-            messages:    messages,
-            max_tokens:  max_tokens  || 1024,
-            temperature: temperature || 0.7,
-          }),
-        }
-      );
+      const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${groqKey.value()}`,
+        },
+        body: JSON.stringify({
+          model: model || "llama-3.3-70b-versatile",
+          messages,
+          max_tokens: max_tokens || 1024,
+          temperature: temperature || 0.7,
+        }),
+      });
 
       if (!groqResponse.ok) {
         const errBody = await groqResponse.json();
         console.error("Groq API error:", errBody);
-        res.status(groqResponse.status).json({
-          error: errBody.error?.message || "Groq API error",
-        });
+        res.status(groqResponse.status).json({ error: errBody.error?.message || "Groq API error" });
         return;
       }
 
       const data = await groqResponse.json();
       res.status(200).json(data);
-
     } catch (err) {
-      console.error("Proxy fetch error:", err);
+      console.error("Proxy error:", err);
       res.status(500).json({ error: "Internal proxy error: " + err.message });
     }
   }

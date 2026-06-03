@@ -308,7 +308,16 @@ body::before {
 .logout-btn { width:100%; background:none; border:1px solid var(--border); color:var(--text-muted); padding:9px; border-radius:9px; font-family:var(--font-b); font-size:.8rem; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:7px; }
 .logout-btn:hover { border-color:var(--rose); color:var(--rose); }
 
-.app-main { margin-left:var(--sidebar); flex:1; min-height:100vh; position:relative; z-index:1; }
+.app-main { margin-left:var(--sidebar); flex:1; min-height:100vh; position:relative; z-index:1; display:flex; flex-direction:column; }
+.app-footer {
+  margin-top:auto; padding:14px 28px;
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  font-size:.72rem; color:var(--text-muted);
+}
+.app-footer a { color:var(--text-muted); text-decoration:none; transition:color .15s; }
+.app-footer a:hover { color:var(--cyan); }
+.app-footer-links { display:flex; gap:16px; }
 .topbar {
   display:flex; align-items:center; justify-content:space-between;
   padding:13px 32px; border-bottom:1px solid var(--border);
@@ -3264,6 +3273,15 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         </div>
       </div>
     </div>
+
+    <!-- ── IN-APP FOOTER ── -->
+    <footer class="app-footer">
+      <span>© 2026 Revynce · Built by <a href="https://lakshan-tcj.my.canva.site" target="_blank" rel="noopener">Lakshan Jagadeishan</a></span>
+      <div class="app-footer-links">
+        <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a>
+      </div>
+    </footer>
 
   </main>
 </div>

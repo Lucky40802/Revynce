@@ -7,7 +7,8 @@
 <!-- Apply saved theme before paint to prevent flash -->
 <script>(function(){var t=localStorage.getItem('revynce-theme'),a=localStorage.getItem('revynce-accent');if(t)document.documentElement.setAttribute('data-theme',t);if(a)document.documentElement.setAttribute('data-accent',a);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap" rel="stylesheet">
 <!-- Flaticon Uicons -->
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
@@ -43,8 +44,8 @@
   --radius: 14px;
   --radius-lg: 20px;
   --sidebar: 240px;
-  --font-d: 'Syne', sans-serif;
-  --font-b: 'DM Sans', sans-serif;
+  --font-d: 'Syne', system-ui, -apple-system, sans-serif;
+  --font-b: 'Inter', system-ui, -apple-system, sans-serif;
   --shadow: 0 4px 24px rgba(0,0,0,0.4);
   --shadow-glow: 0 0 32px var(--cyan-glow);
 }
@@ -81,8 +82,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-b);
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: 16px;
+  line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
 }
@@ -1010,13 +1011,13 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 @keyframes doorLogoInR { from{opacity:0;transform:translate(-50%,-50%) scale(.92)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
 
 .door-logo {
-  font-family:'Syne',sans-serif; font-size:2.6rem; font-weight:800;
+  font-family:'Syne',system-ui,sans-serif; font-size:2.6rem; font-weight:800;
   color:#00f0d4; text-shadow:0 0 40px rgba(0,240,212,.5),0 0 80px rgba(0,240,212,.2);
   letter-spacing:-.035em; line-height:1;
 }
 .door-logo span { color:#e8eaf0; }
 .door-sub {
-  margin-top:8px; font-family:'DM Sans',sans-serif;
+  margin-top:8px; font-family:'Inter',system-ui,sans-serif;
   font-size:.72rem; font-weight:700; letter-spacing:.18em;
   text-transform:uppercase; color:rgba(0,240,212,.5);
 }

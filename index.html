@@ -149,6 +149,18 @@ body::before {
   padding:11px 14px; color:var(--text); font-family:var(--font-b); font-size:.9rem; outline:none; transition:border-color .2s;
 }
 .form-input:focus { border-color:var(--cyan); }
+
+/* ── Show/hide password toggle ── */
+.pw-wrap { position:relative; display:flex; align-items:center; }
+.pw-wrap .form-input { width:100%; padding-right:42px; }
+.pw-toggle {
+  position:absolute; right:10px;
+  background:none; border:none; cursor:pointer;
+  color:var(--text-muted); font-size:.9rem;
+  display:flex; align-items:center; justify-content:center;
+  padding:4px; transition:color .15s;
+}
+.pw-toggle:hover { color:var(--cyan); }
 .form-input::placeholder { color:var(--text-muted); }
 
 .section-head { font-family:var(--font-d); font-size:clamp(1.4rem,3vw,2rem); font-weight:800; letter-spacing:-.025em; margin-bottom:6px; }
@@ -2058,7 +2070,10 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <label class="form-label" style="margin:0">Password</label>
             <button id="forgot-pw-link" onclick="showForgotPassword()" style="display:none;background:none;border:none;color:var(--cyan);font-size:.75rem;font-family:var(--font-b);cursor:pointer;padding:0">Forgot password?</button>
           </div>
-          <input type="password" class="form-input" id="auth-password" placeholder="Min. 8 characters" onkeydown="if(event.key==='Enter')doAuth()">
+          <div class="pw-wrap">
+            <input type="password" class="form-input" id="auth-password" placeholder="Min. 8 characters" onkeydown="if(event.key==='Enter')doAuth()">
+            <button type="button" class="pw-toggle" onclick="togglePw('auth-password',this)" tabindex="-1"><i class="fi fi-rr-eye"></i></button>
+          </div>
         </div>
         <button class="auth-submit" id="auth-btn" onclick="doAuth()">Create Account</button>
 
@@ -3373,9 +3388,9 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 <div class="modal-overlay" id="change-pw-modal">
   <div class="modal" style="max-width:420px">
     <div class="modal-header"><div class="modal-title">Change Password</div><button class="modal-close" onclick="closeModal('change-pw-modal')"><i class="fi fi-rr-cross"></i></button></div>
-    <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="cpw-current" placeholder="Your current password"></div>
-    <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="cpw-new" placeholder="Min. 8 characters"></div>
-    <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" id="cpw-confirm" placeholder="Repeat new password"></div>
+    <div class="form-group"><label class="form-label">Current Password</label><div class="pw-wrap"><input type="password" class="form-input" id="cpw-current" placeholder="Your current password"><button type="button" class="pw-toggle" onclick="togglePw('cpw-current',this)" tabindex="-1"><i class="fi fi-rr-eye"></i></button></div></div>
+    <div class="form-group"><label class="form-label">New Password</label><div class="pw-wrap"><input type="password" class="form-input" id="cpw-new" placeholder="Min. 8 characters"><button type="button" class="pw-toggle" onclick="togglePw('cpw-new',this)" tabindex="-1"><i class="fi fi-rr-eye"></i></button></div></div>
+    <div class="form-group"><label class="form-label">Confirm New Password</label><div class="pw-wrap"><input type="password" class="form-input" id="cpw-confirm" placeholder="Repeat new password"><button type="button" class="pw-toggle" onclick="togglePw('cpw-confirm',this)" tabindex="-1"><i class="fi fi-rr-eye"></i></button></div></div>
     <p id="cpw-msg" style="font-size:.8rem;min-height:18px;margin-bottom:8px"></p>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('change-pw-modal')">Cancel</button>
@@ -4174,6 +4189,19 @@ window._PROXY_URL = PROXY_URL;
   // Fallback: if auth state never fires within 5.5 s, open on landing anyway
   setTimeout(() => { window._authResolved = true; window._openDoor(); }, 5500);
 })();
+
+// ── Show / hide password toggle ──
+window.togglePw = function(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  const icon = btn.querySelector('i');
+  if (icon) {
+    icon.className = show ? 'fi fi-rr-eye-crossed' : 'fi fi-rr-eye';
+  }
+  input.focus();
+};
 
 // ── Forgot Password UI helpers ──
 window.showForgotPassword = function() {

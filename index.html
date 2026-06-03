@@ -576,6 +576,15 @@ body::before {
 .prog-bar-fill { height:100%; border-radius:3px; }
 .risk-badge { display:inline-flex; align-items:center; gap:4px; font-size:.7rem; font-weight:700; padding:3px 9px; border-radius:100px; }
 
+/* ── Google Calendar add button ── */
+.cal-add-btn {
+  background:rgba(66,133,244,.1); border:1px solid rgba(66,133,244,.2);
+  color:#4285F4; border-radius:8px; width:30px; height:30px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:all .15s; font-size:.8rem;
+}
+.cal-add-btn:hover { background:rgba(66,133,244,.2); transform:scale(1.08); }
+
 /* ── Google Drive file browser ── */
 .drive-file-card {
   display:flex; align-items:center; gap:12px;
@@ -2476,15 +2485,20 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <div class="form-group"><label class="form-label">Study hours per day</label><input type="number" class="form-input" value="3" min="1" max="12" style="max-width:120px"></div>
         <button class="btn-primary" onclick="generateSchedule()"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Schedule</button>
       </div>
-      <h3 style="font-family:var(--font-d);font-weight:700;font-size:.95rem;margin-bottom:14px">This Week</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <h3 style="font-family:var(--font-d);font-weight:700;font-size:.95rem;margin:0">This Week</h3>
+        <button class="btn-ghost" onclick="syncScheduleToCalendar()" style="padding:6px 14px;font-size:.79rem;display:flex;align-items:center;gap:7px">
+          <iconify-icon icon="mdi:google" style="font-size:1rem"></iconify-icon> Sync to Google Calendar
+        </button>
+      </div>
       <div class="schedule-grid" id="schedule-week-grid">
         <!-- Populated dynamically by renderSchedule() -->
       </div>
       <h3 style="font-family:var(--font-d);font-weight:700;font-size:.95rem;margin:22px 0 14px">Today's Agenda</h3>
-      <ul class="agenda-list">
-        <li class="agenda-item"><div class="agenda-time">09:00 AM</div><div><div class="agenda-subject">Physics Chapter 3</div><div class="agenda-desc">Waves and Electromagnetism — focus on weak areas</div><span class="agenda-pill" style="background:rgba(244,63,94,.1);color:var(--rose)">Priority</span></div></li>
-        <li class="agenda-item"><div class="agenda-time">11:00 AM</div><div><div class="agenda-subject">Chemistry Flashcards</div><div class="agenda-desc">Organic Chemistry deck — 30 cards due</div><span class="agenda-pill" style="background:rgba(245,158,11,.1);color:var(--amber)">Review</span></div></li>
-        <li class="agenda-item"><div class="agenda-time">02:00 PM</div><div><div class="agenda-subject">Maths Practice Test</div><div class="agenda-desc">Calculus — timed 45 min test</div><span class="agenda-pill" style="background:var(--cyan-dim);color:var(--cyan)">Test</span></div></li>
+      <ul class="agenda-list" id="agenda-list">
+        <li class="agenda-item"><div class="agenda-time">09:00 AM</div><div style="flex:1"><div class="agenda-subject">Physics Chapter 3</div><div class="agenda-desc">Waves and Electromagnetism — focus on weak areas</div><span class="agenda-pill" style="background:rgba(244,63,94,.1);color:var(--rose)">Priority</span></div><button class="cal-add-btn" onclick="addSingleEventToCalendar('Physics Chapter 3','09:00','60','Waves and Electromagnetism — focus on weak areas')"><iconify-icon icon="mdi:google" style="font-size:.85rem"></iconify-icon></button></li>
+        <li class="agenda-item"><div class="agenda-time">11:00 AM</div><div style="flex:1"><div class="agenda-subject">Chemistry Flashcards</div><div class="agenda-desc">Organic Chemistry deck — 30 cards due</div><span class="agenda-pill" style="background:rgba(245,158,11,.1);color:var(--amber)">Review</span></div><button class="cal-add-btn" onclick="addSingleEventToCalendar('Chemistry Flashcards','11:00','45','Organic Chemistry deck — 30 cards due')"><iconify-icon icon="mdi:google" style="font-size:.85rem"></iconify-icon></button></li>
+        <li class="agenda-item"><div class="agenda-time">02:00 PM</div><div style="flex:1"><div class="agenda-subject">Maths Practice Test</div><div class="agenda-desc">Calculus — timed 45 min test</div><span class="agenda-pill" style="background:var(--cyan-dim);color:var(--cyan)">Test</span></div><button class="cal-add-btn" onclick="addSingleEventToCalendar('Maths Practice Test','14:00','45','Calculus — timed 45 min test')"><iconify-icon icon="mdi:google" style="font-size:.85rem"></iconify-icon></button></li>
       </ul>
     </div>
 
@@ -5971,6 +5985,133 @@ async function loadTeacherLbToggles() {
     });
   } catch(e) {}
 }
+
+// ═══════════════════════════════════════
+// GOOGLE CALENDAR INTEGRATION
+// OAuth Client: 624890666308-titg48anfm4gi2knrdnnuvsk4eb5p2qv.apps.googleusercontent.com
+// Scope: calendar.events — creates events, never reads or deletes existing ones
+// ═══════════════════════════════════════
+const CAL_CLIENT_ID = '624890666308-titg48anfm4gi2knrdnnuvsk4eb5p2qv.apps.googleusercontent.com';
+const CAL_SCOPE     = 'https://www.googleapis.com/auth/calendar.events';
+let _calToken       = null;
+
+// ── Get/refresh Calendar OAuth token ──
+function _getCalToken() {
+  return new Promise((resolve, reject) => {
+    if (_calToken) { resolve(_calToken); return; }
+    if (typeof google === 'undefined' || !google?.accounts?.oauth2) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = () => _getCalToken().then(resolve).catch(reject);
+      document.head.appendChild(s);
+      return;
+    }
+    google.accounts.oauth2.initTokenClient({
+      client_id: CAL_CLIENT_ID,
+      scope: CAL_SCOPE,
+      callback: (resp) => {
+        if (resp.error) { reject(new Error(resp.error)); return; }
+        _calToken = resp.access_token;
+        resolve(_calToken);
+      },
+    }).requestAccessToken();
+  });
+}
+
+// ── Build a Google Calendar event body ──
+function _buildCalEvent(title, dateStr, startTime, durationMin, description) {
+  // dateStr: 'YYYY-MM-DD', startTime: 'HH:MM', durationMin: number
+  const [h, m]   = startTime.split(':').map(Number);
+  const start    = new Date(dateStr);
+  start.setHours(h, m, 0, 0);
+  const end      = new Date(start.getTime() + durationMin * 60000);
+  const fmt      = d => d.toISOString();
+  return {
+    summary:     `📚 ${title}`,
+    description: description || `Revynce study session — ${title}`,
+    start:       { dateTime: fmt(start), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    end:         { dateTime: fmt(end),   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    colorId:     '7',  // cyan/peacock in Google Calendar
+    reminders:   { useDefault: false, overrides: [{ method: 'popup', minutes: 10 }] },
+  };
+}
+
+// ── POST a single event to Google Calendar ──
+async function _postCalEvent(event) {
+  const token = await _getCalToken();
+  const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(event),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Calendar API ${res.status}`);
+  }
+  return res.json();
+}
+
+// ── Add a single agenda item to Calendar ──
+window.addSingleEventToCalendar = async function(title, startTime, durationMin, description) {
+  try {
+    showToast('Connecting to Google Calendar…', 'info');
+    const today = new Date().toISOString().slice(0, 10);
+    const event = _buildCalEvent(title, today, startTime, Number(durationMin), description);
+    const result = await _postCalEvent(event);
+    const link = result.htmlLink;
+    showToast(`"${title}" added to your Google Calendar!`, 'success');
+    if (link) setTimeout(() => window.open(link, '_blank'), 800);
+  } catch(e) {
+    showToast('Calendar error: ' + e.message, 'error');
+    _calToken = null; // reset so user can retry auth
+  }
+};
+
+// ── Sync entire week's schedule to Calendar ──
+window.syncScheduleToCalendar = async function() {
+  try {
+    showToast('Connecting to Google Calendar…', 'info');
+    // Build events from the current week schedule (Mon–Fri)
+    const now    = new Date();
+    const dow    = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+
+    const weekSubjects = [
+      ['Biology'],
+      ['Physics', 'Chemistry'],
+      ['Maths'],
+      ['Biology', 'History'],
+      ['Chemistry'],
+      ['Maths'],
+      ['Revision'],
+    ];
+    const times = ['09:00', '11:00', '14:00'];
+    let count = 0;
+
+    for (let d = 0; d < 5; d++) {  // Mon–Fri only
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + d);
+      const dateStr = date.toISOString().slice(0, 10);
+      const subjects = weekSubjects[d] || [];
+      for (let s = 0; s < subjects.length; s++) {
+        const event = _buildCalEvent(
+          `${subjects[s]} — Study Session`,
+          dateStr,
+          times[s % times.length],
+          60,
+          `Revynce AI-generated study session for ${subjects[s]}`
+        );
+        await _postCalEvent(event);
+        count++;
+      }
+    }
+    showToast(`${count} study sessions synced to Google Calendar! ✅`, 'success');
+  } catch(e) {
+    showToast('Calendar sync error: ' + e.message, 'error');
+    _calToken = null;
+  }
+};
 
 // ═══════════════════════════════════════
 // GOOGLE DRIVE INTEGRATION

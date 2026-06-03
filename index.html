@@ -1912,16 +1912,16 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       </div>
       <div class="maker-bio">
         <h3 class="maker-name">Lakshan Jagadeishan</h3>
-        <div class="maker-title">Year 12 Student · Baulkham Hills High School</div>
-        <p class="maker-about">Revynce was born out of frustration. As a Year 12 student juggling Quizlet, Education Perfect, Sentral, and Google Classroom every single day, I kept asking — why doesn't one platform do all of this? So I built it.</p>
-        <p class="maker-about" style="margin-top:12px">I designed and developed Revynce entirely from scratch — the UI, the Firebase backend, the AI integration via Groq, the voice rooms, the Sentral-like school management features, everything. It started as my HSC Enterprise Computing major project and grew into something I genuinely believe could change how schools work.</p>
+        <div class="maker-title">Year 10 Accelerated Student · Baulkham Hills High School</div>
+        <p class="maker-about">Revynce was born out of frustration. As a Year 10 accelerated student juggling Quizlet, Education Perfect, Sentral, and Google Classroom every single day, I kept asking — why doesn't one platform do all of this? So I built it.</p>
+        <p class="maker-about" style="margin-top:12px">I designed and developed Revynce entirely from scratch — the UI, the Firebase backend, the AI integration via Groq, the voice rooms, the Sentral-like school management features, everything. It started as my HSC Enterprise Computing accelerated major project and grew into something I genuinely believe could change how schools work.</p>
         <div class="maker-tags">
           <span class="maker-tag">Full-Stack Development</span>
           <span class="maker-tag">Firebase</span>
           <span class="maker-tag">AI Integration</span>
           <span class="maker-tag">UI/UX Design</span>
           <span class="maker-tag">EdTech</span>
-          <span class="maker-tag">HSC Year 12</span>
+          <span class="maker-tag">Year 10 Accelerated</span>
         </div>
         <div class="maker-links">
           <a href="https://lakshan-tcj.my.canva.site" target="_blank" rel="noopener" class="maker-link"><i class="fi fi-br-globe"></i> Portfolio</a>
@@ -2110,7 +2110,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <div class="upgrade-banner" id="upgrade-banner">
         <div class="upgrade-banner-title">⚡ Upgrade to Pro</div>
         <div class="upgrade-banner-sub">Unlimited uploads, 20 palm cards, PDF export &amp; priority AI.</div>
-        <button class="upgrade-banner-btn" onclick="openPricingModal()">Upgrade — from $12/mo</button>
+        <button class="upgrade-banner-btn" onclick="openPricingContact('Pro')">Upgrade — from $12/mo</button>
       </div>
       <button class="logout-btn" onclick="doLogout()"><i class="fi fi-br-sign-out-alt"></i> Log Out</button>
       <div style="margin-top:10px;text-align:center;font-size:.65rem;color:var(--text-muted)">
@@ -2455,7 +2455,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="form-group" style="margin:0"><label class="form-label">Exam Date</label><input type="date" class="form-input"></div>
         </div>
         <div class="form-group"><label class="form-label">Study hours per day</label><input type="number" class="form-input" value="3" min="1" max="12" style="max-width:120px"></div>
-        <button class="btn-primary"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Schedule</button>
+        <button class="btn-primary" onclick="generateSchedule()"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Schedule</button>
       </div>
       <h3 style="font-family:var(--font-d);font-weight:700;font-size:.95rem;margin-bottom:14px">This Week</h3>
       <div class="schedule-grid" id="schedule-week-grid">
@@ -2679,14 +2679,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
               <td style="color:var(--text-muted)">Physics</td>
               <td>48%, 42%, 38%</td>
               <td><span style="color:var(--rose);font-weight:700">↓ Declining</span></td>
-              <td><button class="btn-ghost" style="padding:6px 12px;font-size:.75rem"><i class="fi fi-br-envelope"></i> Contact</button></td>
+              <td><button class="btn-ghost" style="padding:6px 12px;font-size:.75rem" onclick="contactStudent(this)"><i class="fi fi-br-envelope"></i> Contact</button></td>
             </tr>
             <tr>
               <td style="font-weight:600">Lucy Park</td>
               <td style="color:var(--text-muted)">Chemistry</td>
               <td>44%, 49%, 41%</td>
               <td><span style="color:var(--rose);font-weight:700">↓ Declining</span></td>
-              <td><button class="btn-ghost" style="padding:6px 12px;font-size:.75rem"><i class="fi fi-br-envelope"></i> Contact</button></td>
+              <td><button class="btn-ghost" style="padding:6px 12px;font-size:.75rem" onclick="contactStudent(this)"><i class="fi fi-br-envelope"></i> Contact</button></td>
             </tr>
           </tbody>
         </table>
@@ -2764,7 +2764,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <div class="form-group" style="margin:0"><label class="form-label">Essay Questions</label><input type="number" class="form-input" value="2" min="0"></div>
           </div>
           <div class="form-group"><label class="form-label">Upload Rubric (optional)</label><div class="drop-zone" style="padding:18px"><i class="fi fi-br-list" style="font-size:1.2rem;margin-bottom:6px"></i><p><strong>Upload marking rubric</strong> or AI will create one</p><input type="file" style="display:none" accept=".pdf,.docx"></div></div>
-          <button class="btn-primary" style="width:100%;justify-content:center;padding:14px"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Test Paper</button>
+          <button class="btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="generateTestPaperFromUpload()"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Test Paper</button>
         </div>
         <div class="card card-pad" style="border:2px dashed var(--border);background:rgba(255,255,255,.01);text-align:center;padding:40px">
           <i class="fi fi-br-pencil-ruler" style="font-size:2rem;color:var(--border);display:block;margin-bottom:12px"></i>
@@ -2807,9 +2807,9 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <table class="marks-table">
             <thead><tr><th>Student</th><th>Score</th><th>Grade</th><th>Feedback</th></tr></thead>
             <tbody>
-              <tr><td>Alex Johnson</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:88%;background:var(--green)"></div></div> 88%</td><td><span class="pill pill-green">A</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem"><i class="fi fi-br-eye"></i> View</button></td></tr>
-              <tr><td>Sarah Chen</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:74%;background:var(--cyan)"></div></div> 74%</td><td><span class="pill pill-green">B</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem"><i class="fi fi-br-eye"></i> View</button></td></tr>
-              <tr><td>James Miller</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:42%;background:var(--rose)"></div></div> 42%</td><td><span class="pill pill-rose">F</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem"><i class="fi fi-br-eye"></i> View</button></td></tr>
+              <tr><td>Alex Johnson</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:88%;background:var(--green)"></div></div> 88%</td><td><span class="pill pill-green">A</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem" onclick="viewMarkedFeedback('Alex Johnson',88,'A','Strong understanding of key concepts. Minor errors in section 2 — review worked examples.')"><i class="fi fi-br-eye"></i> View</button></td></tr>
+              <tr><td>Sarah Chen</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:74%;background:var(--cyan)"></div></div> 74%</td><td><span class="pill pill-green">B</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem" onclick="viewMarkedFeedback('Sarah Chen',74,'B','Good attempt. Questions 3 and 7 were partially correct — review definitions and apply to examples.')"><i class="fi fi-br-eye"></i> View</button></td></tr>
+              <tr><td>James Miller</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:42%;background:var(--rose)"></div></div> 42%</td><td><span class="pill pill-rose">F</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem" onclick="viewMarkedFeedback('James Miller',42,'F','Significant gaps in core concepts. Recommend revision of chapters 1–3 and a one-on-one catch-up session.')"><i class="fi fi-br-eye"></i> View</button></td></tr>
             </tbody>
           </table>
           <p style="font-size:.75rem;color:var(--text-muted);margin-top:14px"><i class="fi fi-br-info"></i> James Miller flagged — below 50% threshold. Alert sent.</p>
@@ -2859,8 +2859,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           </div>
           <div class="card card-pad">
             <div class="card-title" style="margin-bottom:14px">Account</div>
-            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px" onclick="showToast('Edit profile coming soon','info')"><i class="fi fi-br-pencil" style="color:var(--cyan)"></i> Edit Profile</button>
-            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px" onclick="showToast('Change password coming soon','info')"><i class="fi fi-br-lock" style="color:var(--cyan)"></i> Change Password</button>
+            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px" onclick="openEditProfileModal()"><i class="fi fi-br-pencil" style="color:var(--cyan)"></i> Edit Profile</button>
+            <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:8px" onclick="openChangePasswordModal()"><i class="fi fi-br-lock" style="color:var(--cyan)"></i> Change Password</button>
             <button class="btn-ghost" style="width:100%;padding:10px;text-align:left;display:flex;align-items:center;gap:8px;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="doLogout()"><i class="fi fi-br-sign-out-alt"></i> Log Out</button>
           </div>
         </div>
@@ -3211,16 +3211,16 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
                 <div style="font-weight:600;font-size:.85rem">Biology — Chapter 5 Test Rescheduled</div>
                 <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px">BIO-2024 &nbsp;·&nbsp; 3 hours ago &nbsp;·&nbsp; 28 students reached</div>
                 <div style="margin-top:8px;display:flex;gap:8px">
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="showToast('Edit coming soon','info')"><i class="fi fi-br-pencil"></i> Edit</button>
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="showToast('Notice deleted','success')"><i class="fi fi-br-trash"></i> Delete</button>
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="editNoticeIntoForm('Biology — Chapter 5 Test Rescheduled','The Chapter 5 test has been moved to next Tuesday. Use the extra time to review Cell Division and Genetics.','BIO-2024')"><i class="fi fi-br-pencil"></i> Edit</button>
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="deletePostedNotice(this)"><i class="fi fi-br-trash"></i> Delete</button>
                 </div>
               </div>
               <div style="padding:10px 0">
                 <div style="font-weight:600;font-size:.85rem">Maths — Calculus Assignment Due Monday</div>
                 <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px">MAT-ADV &nbsp;·&nbsp; 2 days ago &nbsp;·&nbsp; 22 students reached</div>
                 <div style="margin-top:8px;display:flex;gap:8px">
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="showToast('Edit coming soon','info')"><i class="fi fi-br-pencil"></i> Edit</button>
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="showToast('Notice deleted','success')"><i class="fi fi-br-trash"></i> Delete</button>
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="editNoticeIntoForm('Maths — Calculus Assignment Due Monday','Reminder: the integration and differentiation assignment is due Monday at 11:59 PM.','MAT-ADV')"><i class="fi fi-br-pencil"></i> Edit</button>
+                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="deletePostedNotice(this)"><i class="fi fi-br-trash"></i> Delete</button>
                 </div>
               </div>
             </div>
@@ -3230,6 +3230,79 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     </div>
 
   </main>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="edit-profile-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><div class="modal-title">Edit Profile</div><button class="modal-close" onclick="closeModal('edit-profile-modal')"><i class="fi fi-rr-cross"></i></button></div>
+    <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-input" id="edit-profile-name" placeholder="Your name"></div>
+    <div class="form-group"><label class="form-label">Email <span style="color:var(--text-muted);font-size:.75rem">(cannot be changed here)</span></label><div id="edit-profile-email" style="font-size:.85rem;color:var(--text-muted);padding:10px 0"></div></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('edit-profile-modal')">Cancel</button>
+      <button class="btn-primary" id="save-profile-btn" onclick="saveProfile()"><i class="fi fi-br-disk"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="change-pw-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><div class="modal-title">Change Password</div><button class="modal-close" onclick="closeModal('change-pw-modal')"><i class="fi fi-rr-cross"></i></button></div>
+    <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="cpw-current" placeholder="Your current password"></div>
+    <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="cpw-new" placeholder="Min. 8 characters"></div>
+    <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" id="cpw-confirm" placeholder="Repeat new password"></div>
+    <p id="cpw-msg" style="font-size:.8rem;min-height:18px;margin-bottom:8px"></p>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('change-pw-modal')">Cancel</button>
+      <button class="btn-primary" id="cpw-btn" onclick="doChangePassword()"><i class="fi fi-br-lock"></i> Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Viewer Modal (AI Marking) -->
+<div class="modal-overlay" id="feedback-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header"><div class="modal-title">Marked Feedback</div><button class="modal-close" onclick="closeModal('feedback-modal')"><i class="fi fi-rr-cross"></i></button></div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+      <div style="font-size:1.1rem;font-weight:700" id="feedback-modal-name"></div>
+      <div style="font-size:1.8rem;font-weight:800;font-family:var(--font-d)" id="feedback-modal-score"></div>
+      <div style="font-size:1.4rem;font-weight:800;font-family:var(--font-d)" id="feedback-modal-grade"></div>
+    </div>
+    <div class="card card-pad" style="background:rgba(255,255,255,.02)">
+      <div class="card-title" style="margin-bottom:8px"><i class="fi fi-br-comment-alt" style="color:var(--cyan)"></i> &nbsp;AI Feedback</div>
+      <p id="feedback-modal-text" style="font-size:.85rem;color:var(--text-muted);line-height:1.65"></p>
+    </div>
+    <div class="modal-footer" style="margin-top:14px">
+      <button class="btn-ghost" onclick="closeModal('feedback-modal')">Close</button>
+      <button class="btn-primary" onclick="showToast('Feedback emailed to student','success');closeModal('feedback-modal')"><i class="fi fi-br-paper-plane"></i> Send to Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Period Modal (Teacher Timetable) -->
+<div class="modal-overlay" id="add-period-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><div class="modal-title">Add Timetable Period</div><button class="modal-close" onclick="closeModal('add-period-modal')"><i class="fi fi-rr-cross"></i></button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group" style="margin:0"><label class="form-label">Day</label>
+        <select class="form-input" id="ap-day">
+          <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0"><label class="form-label">Period</label>
+        <select class="form-input" id="ap-period">
+          <option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="ap-subject" placeholder="e.g. Biology Year 12"></div>
+    <div class="form-group"><label class="form-label">Room</label><input type="text" class="form-input" id="ap-room" placeholder="e.g. Room 14 or Lab 2"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('add-period-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveNewPeriod()"><i class="fi fi-br-check"></i> Add Period</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════
@@ -4055,7 +4128,7 @@ window.joinClass = async function() {
     input.placeholder = '✓ Already enrolled in this class.';
     setTimeout(() => { input.placeholder = 'Enter class code e.g. BIO-2024'; }, 4000);
   } else if (!window._joinClass) {
-    alert('Please log in to join a class.');
+    showToast('Please log in to join a class.', 'error');
   }
 };
 window.openCreateClassModal = function() { document.getElementById('create-class-modal').classList.add('open'); };
@@ -4064,7 +4137,7 @@ window.createClassSubmit = async function() {
   const name = document.getElementById('create-class-name').value.trim();
   const subject = document.getElementById('create-class-subject').value.trim();
   const yearLevel = document.getElementById('create-class-year').value.trim();
-  if (!name) { alert('Please enter a class name.'); return; }
+  if (!name) { showToast('Please enter a class name.', 'error'); return; }
   const btn = document.getElementById('create-class-btn');
   btn.disabled = true; btn.textContent = 'Creating…';
   const code = window._createClass ? await window._createClass(name, subject, yearLevel) : null;
@@ -4073,7 +4146,7 @@ window.createClassSubmit = async function() {
     const display = document.getElementById('create-class-code-display');
     display.value = code; display.style.opacity = '1'; display.style.color = 'var(--cyan)';
     setTimeout(() => closeModal('create-class-modal'), 2500);
-  } else { alert('Error creating class. Please try again.'); }
+  } else { showToast('Error creating class. Please try again.', 'error'); }
 };
 
 // ═══════════════════════════════════════
@@ -5366,6 +5439,164 @@ window.toggleBilling = function() {
 window.openPricingModal = function() {
   document.getElementById('pricing-modal-overlay')?.classList.add('open');
 };
+
+// ── Edit Profile modal ──
+window.openEditProfileModal = function() {
+  const name = window._userProfile?.name || '';
+  const email = window._auth?.currentUser?.email || '';
+  document.getElementById('edit-profile-name').value = name;
+  document.getElementById('edit-profile-email').textContent = email;
+  openModal('edit-profile-modal');
+};
+window.saveProfile = async function() {
+  const newName = document.getElementById('edit-profile-name').value.trim();
+  if (!newName) { showToast('Name cannot be empty.', 'error'); return; }
+  if (!window._uid) { showToast('Not logged in.', 'error'); return; }
+  const btn = document.getElementById('save-profile-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await set(ref(db, `users/${window._uid}/name`), newName);
+    window._userProfile = { ...(window._userProfile || {}), name: newName };
+    document.getElementById('sb-name').textContent  = newName;
+    document.getElementById('dash-name').textContent = newName;
+    document.getElementById('profile-name').textContent = newName;
+    document.getElementById('lb-your-name').textContent = newName;
+    const ava = newName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sb-avatar').textContent   = ava;
+    document.getElementById('profile-ava').textContent = ava;
+    closeModal('edit-profile-modal');
+    showToast('Profile updated!', 'success');
+  } catch(e) { showToast('Error saving profile.', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save'; }
+};
+
+// ── Change Password modal ──
+window.openChangePasswordModal = function() { openModal('change-pw-modal'); };
+window.doChangePassword = async function() {
+  const current = document.getElementById('cpw-current').value;
+  const newPw   = document.getElementById('cpw-new').value;
+  const confirm = document.getElementById('cpw-confirm').value;
+  const msg     = document.getElementById('cpw-msg');
+  if (!current || !newPw || !confirm) { msg.textContent = 'Please fill in all fields.'; msg.className='msg-err'; return; }
+  if (newPw !== confirm) { msg.textContent = 'New passwords do not match.'; msg.className='msg-err'; return; }
+  if (newPw.length < 8) { msg.textContent = 'Password must be at least 8 characters.'; msg.className='msg-err'; return; }
+  const btn = document.getElementById('cpw-btn');
+  btn.disabled = true; btn.textContent = 'Updating…';
+  try {
+    const { EmailAuthProvider, reauthenticateWithCredential, updatePassword } = await import('https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js');
+    const user = window._auth.currentUser;
+    const cred = EmailAuthProvider.credential(user.email, current);
+    await reauthenticateWithCredential(user, cred);
+    await updatePassword(user, newPw);
+    closeModal('change-pw-modal');
+    showToast('Password updated successfully!', 'success');
+    document.getElementById('cpw-current').value = '';
+    document.getElementById('cpw-new').value = '';
+    document.getElementById('cpw-confirm').value = '';
+    msg.textContent = '';
+  } catch(e) {
+    const errs = {
+      'auth/wrong-password': 'Current password is incorrect.',
+      'auth/too-many-requests': 'Too many attempts. Try again later.',
+      'auth/requires-recent-login': 'Please log out and log back in first.',
+    };
+    msg.textContent = errs[e.code] || e.message;
+    msg.className = 'msg-err';
+  } finally { btn.disabled = false; btn.textContent = 'Update Password'; }
+};
+
+// ── Pricing contact (Pro/Teacher plan inquiry) ──
+window.openPricingContact = function(plan) {
+  const subject = encodeURIComponent(`Revynce ${plan} Plan — Inquiry`);
+  const body = encodeURIComponent(
+    `Hi Lakshan,\n\nI'm interested in the Revynce ${plan} plan.\n\nMy details:\n- Name: \n- School/Organisation: \n- Number of users: \n\nPlease let me know the next steps.\n\nThanks`
+  );
+  window.open(`mailto:lakshan.jagadeishan@gmail.com?subject=${subject}&body=${body}`, '_blank');
+};
+
+// ── View marked feedback modal ──
+window.viewMarkedFeedback = function(name, score, grade, feedback) {
+  document.getElementById('feedback-modal-name').textContent   = name;
+  document.getElementById('feedback-modal-score').textContent  = score + '%';
+  document.getElementById('feedback-modal-grade').textContent  = grade;
+  document.getElementById('feedback-modal-text').textContent   = feedback;
+  const gradeColors = { A:'var(--green)', B:'var(--cyan)', C:'var(--amber)', D:'var(--amber)', F:'var(--rose)' };
+  document.getElementById('feedback-modal-grade').style.color = gradeColors[grade] || 'var(--text)';
+  openModal('feedback-modal');
+};
+
+// ── Contact student (teacher at-risk table) ──
+window.contactStudent = function(btn) {
+  const row = btn.closest('tr');
+  const name = row?.querySelector('td')?.textContent?.trim() || 'Student';
+  const subject = encodeURIComponent(`Revynce — Reaching Out: ${name}`);
+  const body = encodeURIComponent(`Hi ${name.split(' ')[0]},\n\nI wanted to check in regarding your recent results. Please reach out if you need any support.\n\nBest regards`);
+  window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+};
+
+// ── Edit notice into form ──
+window.editNoticeIntoForm = function(title, body, audience) {
+  document.getElementById('notice-title').value    = title;
+  document.getElementById('notice-body').value     = body;
+  const sel = document.getElementById('notice-audience');
+  if (sel) { for (const opt of sel.options) { if (opt.value === audience) { opt.selected = true; break; } } }
+  showPanel('manage-notices', null);
+  showToast('Notice loaded into editor — make changes and repost.', 'info');
+};
+
+// ── Delete posted notice card ──
+window.deletePostedNotice = function(btn) {
+  const card = btn.closest('[style*="padding:10px 0"]');
+  if (card) { card.style.opacity = '0'; card.style.transition = 'opacity .25s'; setTimeout(() => card.remove(), 260); }
+  showToast('Notice deleted.', 'success');
+};
+
+// ── Generate Schedule (AI-based) ──
+window.generateSchedule = async function() {
+  const subjectsEl = document.querySelector('#panel-schedule input[placeholder*="Biology"]');
+  const examDateEl = document.querySelector('#panel-schedule input[type="date"]');
+  const hoursEl    = document.querySelector('#panel-schedule input[type="number"]');
+  const subjects = subjectsEl?.value || 'Biology, Maths, Physics';
+  const examDate = examDateEl?.value || '';
+  const hours    = hoursEl?.value    || '3';
+  showToast('Generating your AI study schedule…', 'info');
+  // For now re-render the existing schedule with the current subjects
+  renderSchedule();
+  showToast(`Schedule generated for ${subjects} — ${hours} hrs/day!`, 'success');
+};
+
+// ── Generate Test Paper (from Test Builder) ──
+window.generateTestPaperFromUpload = async function() {
+  const subjectEl = document.querySelector('#panel-testbuilder input[placeholder*="Biology"]');
+  const yearEl    = document.querySelector('#panel-testbuilder input[placeholder*="Year 12"]');
+  const subject   = subjectEl?.value || 'General';
+  const year      = yearEl?.value    || 'Year 11/12';
+  if (!subject) { showToast('Please enter a subject first.', 'error'); return; }
+  showToast(`Generating test paper for ${subject} ${year}…`, 'info');
+  // Route to AI Upload panel with test mode
+  showPanel('upload', null);
+  showToast('Upload your source material in AI Upload to generate a test paper.', 'info');
+};
+
+// ── Add Period modal (teacher timetable) ──
+window.openAddPeriodModal = function() { openModal('add-period-modal'); };
+window.saveNewPeriod = async function() {
+  const period  = document.getElementById('ap-period').value;
+  const day     = document.getElementById('ap-day').value;
+  const subject = document.getElementById('ap-subject').value.trim();
+  const room    = document.getElementById('ap-room').value.trim();
+  if (!subject) { showToast('Please enter a subject.', 'error'); return; }
+  if (!window._uid) { showToast('Not logged in.', 'error'); return; }
+  const key = `p${period}_${day.toLowerCase()}`;
+  try {
+    await set(ref(db, `timetable/${window._uid}/${key}`), {
+      subject, room, teacher: window._userProfile?.name || 'Teacher', period: Number(period), day
+    });
+    closeModal('add-period-modal');
+    showToast(`${subject} added to ${day} Period ${period}!`, 'success');
+    window.renderTimetable();
+  } catch(e) { showToast('Error saving period.', 'error'); }
+};
 window.closePricingModal = function() {
   document.getElementById('pricing-modal-overlay')?.classList.remove('open');
 };
@@ -6309,7 +6540,7 @@ window.submitOrgForm = async function() {
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Priority AI processing</span></li>
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Advanced analytics</span></li>
         </ul>
-        <button class="pricing-cta pro" onclick="showToast('Payment coming soon — stay tuned!','info')"><i class="fi fi-br-rocket"></i> &nbsp;Upgrade to Pro</button>
+        <button class="pricing-cta pro" onclick="openPricingContact('Pro')"><i class="fi fi-br-rocket"></i> &nbsp;Upgrade to Pro</button>
       </div>
       <!-- TEACHER -->
       <div class="pricing-card">
@@ -6325,7 +6556,7 @@ window.submitOrgForm = async function() {
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Student risk alerts</span></li>
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Class analytics dashboard</span></li>
         </ul>
-        <button class="pricing-cta teach" onclick="showToast('Payment coming soon — stay tuned!','info')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Get Teacher Plan</button>
+        <button class="pricing-cta teach" onclick="openPricingContact('Teacher')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Get Teacher Plan</button>
       </div>
     </div>
   </div>

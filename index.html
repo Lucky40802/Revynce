@@ -575,6 +575,17 @@ body::before {
 .prog-bar-fill { height:100%; border-radius:3px; }
 .risk-badge { display:inline-flex; align-items:center; gap:4px; font-size:.7rem; font-weight:700; padding:3px 9px; border-radius:100px; }
 
+/* ── Voice room private code display ── */
+.voice-code-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--bg-card2); border:1px solid var(--border-active);
+  border-radius:10px; padding:8px 14px; font-family:monospace;
+  font-size:1.3rem; letter-spacing:.22em; color:var(--cyan);
+  font-weight:700; cursor:pointer; transition:background .15s;
+}
+.voice-code-badge:hover { background:var(--cyan-dim); }
+.voice-code-badge .copy-hint { font-size:.62rem; color:var(--text-muted); font-family:var(--font-b); letter-spacing:0; font-weight:400; }
+
 /* ── Toggle switch ── */
 .toggle-switch { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; }
 .toggle-switch input { opacity:0; width:0; height:0; }
@@ -2200,8 +2211,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <h2 class="section-head">My Classes</h2>
       <p class="section-sub" id="classes-sub">Join a class with a code from your teacher, or browse your enrolled classes.</p>
       <div class="join-class-form" id="join-class-form">
-        <input type="text" class="form-input" id="class-code-input" placeholder="Enter class code e.g. BIO-2024" style="text-transform:uppercase;letter-spacing:.08em">
+        <input type="text" class="form-input" id="class-code-input" placeholder="Enter class code e.g. BIO-2024" style="text-transform:uppercase;letter-spacing:.08em" oninput="document.getElementById('join-lb-optin').style.display=this.value.trim()?'':'none'">
         <button class="btn-primary" onclick="joinClass()"><i class="fi fi-br-plus"></i> Join</button>
+      </div>
+      <div id="join-lb-optin" style="display:none;margin-bottom:14px;font-size:.83rem">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="join-lb-optin-check" checked style="accent-color:var(--cyan);width:15px;height:15px">
+          Show my test scores on the class leaderboard (you can change this later)
+        </label>
       </div>
       <div id="teacher-class-actions" style="display:none;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn-primary" onclick="openCreateClassModal()"><i class="fi fi-br-plus"></i> Create New Class</button>
@@ -2342,58 +2359,95 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <!-- ── LEADERBOARD ── -->
     <div class="app-panel" id="panel-leaderboard">
       <h2 class="section-head">Leaderboard</h2>
-      <p class="section-sub">Top learners this week, ranked by XP earned.</p>
-      <div class="lb-header">
-        <div class="lb-filter">
-          <button class="lb-filter-btn active" onclick="setLbFilter(this,'weekly')">Weekly</button>
-          <button class="lb-filter-btn" onclick="setLbFilter(this,'monthly')">Monthly</button>
-          <button class="lb-filter-btn" onclick="setLbFilter(this,'alltime')">All Time</button>
+      <p class="section-sub">Class rankings based on average test & quiz scores.</p>
+
+      <!-- Class selector + opt-in row -->
+      <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+        <div class="form-group" style="margin:0;flex:1;min-width:200px;max-width:320px">
+          <label class="form-label">Select class</label>
+          <select class="form-input" id="lb-class-select" onchange="loadClassLeaderboard()">
+            <option value="">— Choose a class —</option>
+          </select>
         </div>
-        <div class="lb-filter" style="margin-left:auto">
-          <button class="lb-filter-btn active" onclick="setLbScope(this,'global')">Global</button>
-          <button class="lb-filter-btn" onclick="setLbScope(this,'class')">My Class</button>
-          <button class="lb-filter-btn" id="lb-subject-btn" onclick="setLbScope(this,'subject')" style="display:none">Subject</button>
+        <div id="lb-optin-wrap" style="display:none;padding-bottom:2px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.83rem">
+            <input type="checkbox" id="lb-optin-check" onchange="saveLeaderboardOptIn()" style="accent-color:var(--cyan);width:16px;height:16px">
+            Show my ranking to classmates
+          </label>
         </div>
-      </div>
-      <div id="lb-subject-selector" style="display:none;margin-bottom:14px">
-        <select class="form-input" id="lb-subject-select" style="max-width:260px;font-size:.83rem" onchange="loadSubjectLeaderboard()">
-          <option value="">— Select a subject —</option>
-        </select>
-        <p id="lb-subject-note" style="font-size:.75rem;color:var(--text-muted);margin-top:6px"><i class="fi fi-br-info"></i> Subject rankings are enabled by your teacher per class.</p>
-      </div>
-      <div class="lb-podium">
-        <div class="podium-item silver">
-          <div class="podium-name">Sarah C.</div>
-          <div class="podium-ava">SC</div>
-          <div class="podium-stand"><div class="podium-stand-n">450</div><div class="podium-stand-l">XP</div></div>
-        </div>
-        <div class="podium-item gold">
-          <div class="podium-name">🥇 Alex J.</div>
-          <div class="podium-ava">AJ</div>
-          <div class="podium-stand" style="padding:14px 24px"><div class="podium-stand-n">500</div><div class="podium-stand-l">XP</div></div>
-        </div>
-        <div class="podium-item bronze">
-          <div class="podium-name">James M.</div>
-          <div class="podium-ava">JM</div>
-          <div class="podium-stand"><div class="podium-stand-n">400</div><div class="podium-stand-l">XP</div></div>
+        <div id="lb-force-badge" style="display:none;font-size:.73rem;color:var(--amber);padding:5px 12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:100px">
+          <i class="fi fi-br-lock"></i> Rankings set to public by teacher
         </div>
       </div>
-      <ul class="lb-list">
-        <li class="lb-item"><div class="lb-rank">4</div><div class="lb-ava">PL</div><div class="lb-info"><div class="lb-name">Priya Lal</div><div class="lb-sub">Chemistry · Yr 10</div></div><div class="lb-xp">360 XP <span class="lb-delta">↑2</span></div></li>
-        <li class="lb-item"><div class="lb-rank">5</div><div class="lb-ava" style="background:rgba(245,158,11,.1);color:var(--amber)">TW</div><div class="lb-info"><div class="lb-name">Tom Wu</div><div class="lb-sub">History · Yr 11</div></div><div class="lb-xp">310 XP</div></li>
-        <li class="lb-item" id="your-lb-row" style="border-color:var(--cyan)"><div class="lb-rank" style="color:var(--cyan)">—</div><div class="lb-ava" style="border:2px solid var(--cyan)">ME</div><div class="lb-info"><div class="lb-name" id="lb-your-name">You</div><div class="lb-sub">Your position</div></div><div class="lb-xp" id="lb-your-xp">0 XP</div></li>
-      </ul>
+
+      <!-- No class / not enabled state -->
+      <div id="lb-disabled-msg" style="text-align:center;padding:48px 20px;color:var(--text-muted)">
+        <i class="fi fi-br-trophy" style="font-size:2.2rem;display:block;margin-bottom:12px;opacity:.25"></i>
+        <div style="font-weight:600;margin-bottom:6px">Select a class to view rankings</div>
+        <div style="font-size:.8rem">Rankings are based on average test and quiz scores.<br>Your teacher must enable rankings for a class.</div>
+      </div>
+
+      <!-- Leaderboard content (shown when a class is selected + enabled) -->
+      <div id="lb-content" style="display:none">
+        <div id="lb-private-note" style="display:none;font-size:.78rem;color:var(--text-muted);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px">
+          <i class="fi fi-br-eye-crossed"></i> &nbsp;Your ranking is hidden from classmates. Tick "Show my ranking" above to appear on the board.
+        </div>
+        <div class="lb-podium" id="lb-podium"></div>
+        <ul class="lb-list" id="lb-list-el"></ul>
+        <div id="lb-your-row" style="display:none;margin-top:12px;border:1px solid var(--cyan);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:14px;background:rgba(0,240,212,.04)">
+          <div class="lb-rank" style="color:var(--cyan)" id="lb-your-rank">—</div>
+          <div class="lb-ava" style="border:2px solid var(--cyan)" id="lb-your-ava">ME</div>
+          <div class="lb-info"><div class="lb-name" id="lb-your-name">You</div><div class="lb-sub" id="lb-your-sub">Your position</div></div>
+          <div class="lb-xp" id="lb-your-score" style="margin-left:auto">—</div>
+        </div>
+      </div>
     </div>
 
     <!-- ── VOICE ROOMS ── -->
     <div class="app-panel" id="panel-voice">
-      <h2 class="section-head">Voice Study Rooms</h2>
-      <p class="section-sub">Join live focus sessions with classmates. AI-mediated Q&amp;A available.</p>
-      <div class="voice-grid">
-        <div class="voice-card"><div class="room-top"><div class="room-live-dot"></div><span class="room-name">Maths Revision</span><span class="room-count">3/8</span></div><div class="room-participants"><div class="participant-chip">AJ</div><div class="participant-chip">SC</div><div class="participant-chip">PL</div></div><button class="join-room-btn"><i class="fi fi-br-microphone"></i> Join Room</button></div>
-        <div class="voice-card"><div class="room-top"><div class="room-live-dot"></div><span class="room-name">Physics Deep Dive</span><span class="room-count">1/8</span></div><div class="room-participants"><div class="participant-chip">JM</div></div><button class="join-room-btn"><i class="fi fi-br-microphone"></i> Join Room</button></div>
-        <div class="voice-card"><div class="room-top"><div class="room-idle-dot"></div><span class="room-name">English Literature</span><span class="room-count">0/8</span></div><div class="room-participants"><div class="participant-chip" style="background:rgba(255,255,255,.04);color:var(--text-muted)">—</div></div><button class="join-room-btn"><i class="fi fi-br-plus"></i> Start Session</button></div>
-        <div class="new-room-card" onclick="alert('Creating a new study room...')"><i class="fi fi-br-plus"></i><span>Create New Room</span></div>
+      <h2 class="section-head">Voice Rooms</h2>
+      <p class="section-sub">Live voice study sessions. Class rooms are open to your classmates. Private rooms need a code.</p>
+
+      <!-- ── Active call overlay ── -->
+      <div id="voice-call-wrap" style="display:none;margin-bottom:24px">
+        <div class="card card-pad" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:.95rem" id="call-room-name">Room</div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin-top:2px" id="call-participants-label">Connecting…</div>
+            </div>
+            <div id="call-timer-wrap" style="display:none;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:6px 14px;text-align:center">
+              <div style="font-size:.65rem;color:var(--rose);font-weight:700;letter-spacing:.06em;text-transform:uppercase">Free limit</div>
+              <div style="font-size:1.1rem;font-weight:800;color:var(--rose);font-family:var(--font-d)" id="call-timer">30:00</div>
+            </div>
+            <button class="btn-ghost" id="call-mute-btn" onclick="toggleMuteVoice()" style="padding:8px 16px;font-size:.82rem"><i class="fi fi-br-microphone" id="call-mute-icon"></i> Muted</button>
+            <button onclick="leaveVoiceRoom()" style="padding:8px 18px;font-size:.82rem;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:var(--rose);border-radius:10px;cursor:pointer;font-family:var(--font-b);font-weight:700"><i class="fi fi-br-phone-slash"></i> Leave</button>
+          </div>
+          <div id="jitsi-container" style="width:100%;height:420px;border-radius:10px;overflow:hidden;margin-top:14px;background:#000"></div>
+        </div>
+      </div>
+
+      <!-- ── Class rooms ── -->
+      <div style="margin-bottom:8px;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em">Your Class Rooms</div>
+      <div class="voice-grid" id="class-voice-grid">
+        <div style="color:var(--text-muted);font-size:.84rem;padding:20px 0">Loading your classes…</div>
+      </div>
+
+      <!-- ── Private rooms ── -->
+      <div style="margin:24px 0 8px;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em">Private Rooms</div>
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px">Connect with anyone — share a 6-character code to let them in. <span id="voice-free-note" style="color:var(--amber)">Free plan: 30-minute limit per session.</span><span id="voice-pro-note" style="display:none;color:var(--green)">Pro plan: unlimited session time.</span></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+        <button class="btn-primary" onclick="createPrivateRoom()" style="padding:9px 18px;font-size:.84rem"><i class="fi fi-br-plus"></i> &nbsp;Create Private Room</button>
+        <button class="btn-ghost" onclick="document.getElementById('join-private-wrap').style.display=''" style="padding:9px 18px;font-size:.84rem"><i class="fi fi-br-key"></i> &nbsp;Join with Code</button>
+      </div>
+      <div id="join-private-wrap" style="display:none;margin-bottom:18px;max-width:360px">
+        <div style="display:flex;gap:8px">
+          <input type="text" class="form-input" id="private-code-input" maxlength="6" placeholder="6-digit code" style="text-transform:uppercase;letter-spacing:.18em;font-size:1.1rem;text-align:center">
+          <button class="btn-primary" onclick="joinPrivateRoom()" style="padding:9px 18px;white-space:nowrap"><i class="fi fi-br-sign-in-alt"></i> Join</button>
+        </div>
+      </div>
+      <div class="voice-grid" id="private-voice-grid">
+        <div style="color:var(--text-muted);font-size:.82rem;padding:10px 0">No private rooms active.</div>
       </div>
     </div>
 
@@ -3019,7 +3073,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 import { getDatabase, ref, set, get, child, remove, push, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 import { getStorage, ref as sRef, uploadBytes } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
@@ -3040,6 +3094,9 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 window._auth = auth; window._db = db; window._storage = storage;
 window._fbRef = ref; window._fbSet = set; window._fbGet = get; window._fbChild = child; window._fbRemove = remove;
@@ -3526,6 +3583,21 @@ window.doAuth = async function() {
 window.doLogout = async function(){ await signOut(auth); showPage('landing'); };
 
 // ── Google Sign-In ──
+// Handle redirect result on page load (fallback path)
+getRedirectResult(auth).then(result => {
+  if (!result) return;
+  const user = result.user;
+  get(child(ref(db), `users/${user.uid}`)).then(snap => {
+    if (!snap.exists()) {
+      set(ref(db, `users/${user.uid}`), {
+        name: user.displayName || user.email, email: user.email,
+        role: 'student', xp: 0, streak: 0,
+        photoURL: user.photoURL || '', createdAt: new Date().toISOString(),
+      });
+    }
+  });
+}).catch(() => {});
+
 window.doGoogleSignIn = async function() {
   const msgEl = document.getElementById('auth-msg');
   const btn   = document.getElementById('google-btn');
@@ -3537,25 +3609,31 @@ window.doGoogleSignIn = async function() {
     const snap   = await get(child(ref(db), `users/${user.uid}`));
     if (!snap.exists()) {
       await set(ref(db, `users/${user.uid}`), {
-        name:      user.displayName || user.email,
-        email:     user.email,
-        role:      currentRole,
-        xp:        0,
-        streak:    0,
-        photoURL:  user.photoURL || '',
-        createdAt: new Date().toISOString(),
+        name: user.displayName || user.email, email: user.email,
+        role: currentRole || 'student', xp: 0, streak: 0,
+        photoURL: user.photoURL || '', createdAt: new Date().toISOString(),
       });
     }
-    // onAuthStateChanged handles redirect to app
+    // onAuthStateChanged handles the rest
   } catch(e) {
     btn.disabled = false;
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+      // Popup blocked — fall back to redirect
+      if (e.code === 'auth/popup-blocked') {
+        msgEl.textContent = 'Pop-up blocked — redirecting…'; msgEl.className = '';
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+      msgEl.textContent = 'Sign-in cancelled.'; msgEl.className = 'msg-err';
+      return;
+    }
     const msgs = {
-      'auth/popup-closed-by-user':    'Sign-in cancelled.',
-      'auth/cancelled-popup-request': 'Sign-in cancelled.',
-      'auth/popup-blocked':           'Pop-up blocked — please allow pop-ups for this site.',
-      'auth/account-exists-with-different-credential': 'An account already exists with this email using a different sign-in method.',
+      'auth/internal-error':      'Google sign-in failed. Make sure this domain is listed under Firebase Console → Authentication → Settings → Authorized domains.',
+      'auth/unauthorized-domain': 'This domain is not authorised for Google sign-in. Add it to Firebase Console → Authentication → Settings → Authorized domains.',
+      'auth/account-exists-with-different-credential': 'An account already exists with this email — try signing in with your password instead.',
+      'auth/network-request-failed': 'Network error. Check your internet connection and try again.',
     };
-    msgEl.textContent = msgs[e.code] || e.message;
+    msgEl.textContent = msgs[e.code] || ('Google sign-in error: ' + (e.message || e.code));
     msgEl.className = 'msg-err';
   }
 };
@@ -5404,6 +5482,441 @@ window.showPanel = function(name, navEl) {
   const el = document.getElementById('roll-date');
   if (el) el.value = new Date().toISOString().slice(0,10);
 })();
+
+// ═══════════════════════════════════════
+// VOICE ROOMS
+// Firebase: voiceRooms/{roomId} = { name, classCode, isPrivate, code,
+//   createdBy, createdAt, expiresAt, participants:{uid:{name,joinedAt}} }
+// ═══════════════════════════════════════
+let _jitsiApi      = null;   // active JitsiMeetExternalAPI instance
+let _callTimerInt  = null;   // countdown interval handle
+let _currentRoomId = null;   // Firebase room key we're currently in
+let _voiceUnsub    = null;   // onValue unsubscribe handle
+
+// ── Load Jitsi External API lazily ──
+function _loadJitsi() {
+  return new Promise(resolve => {
+    if (window.JitsiMeetExternalAPI) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://meet.jit.si/external_api.js';
+    s.onload = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+// ── Render class rooms for enrolled classes ──
+window.loadClassVoiceRooms = async function() {
+  const grid = document.getElementById('class-voice-grid');
+  if (!grid || !window._uid) return;
+  try {
+    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    if (!snap.exists()) {
+      grid.innerHTML = '<div style="color:var(--text-muted);font-size:.84rem;padding:20px 0">No classes found. Join a class first.</div>';
+      return;
+    }
+    const classes = Object.entries(snap.val());
+    grid.innerHTML = '';
+    for (const [code, cls] of classes) {
+      const roomRef  = ref(db, `voiceRooms/class-${code}`);
+      const roomSnap = await get(roomRef);
+      const room     = roomSnap.exists() ? roomSnap.val() : {};
+      const count    = room.participants ? Object.keys(room.participants).length : 0;
+      const live     = count > 0;
+      const card     = document.createElement('div');
+      card.className = 'voice-card';
+      card.innerHTML = `
+        <div class="room-top">
+          <div class="${live ? 'room-live-dot' : 'room-idle-dot'}"></div>
+          <span class="room-name">${cls.name || code}</span>
+          <span class="room-count">${count}/30</span>
+        </div>
+        <div class="room-participants" id="vp-class-${code}" style="margin-bottom:12px;min-height:28px">
+          ${count ? Object.values(room.participants).slice(0,5).map(p=>`<div class="participant-chip">${(p.name||'?').slice(0,2).toUpperCase()}</div>`).join('') : '<span style="font-size:.75rem;color:var(--text-muted)">No one here yet</span>'}
+        </div>
+        <button class="join-room-btn" onclick="joinClassRoom('${code}','${cls.name || code}')">
+          <i class="fi fi-br-microphone"></i> ${live ? 'Join Session' : 'Start Session'}
+        </button>`;
+      grid.appendChild(card);
+    }
+  } catch(e) { console.error('loadClassVoiceRooms', e); }
+};
+
+// ── Join a class room ──
+window.joinClassRoom = async function(classCode, className) {
+  const roomId = `class-${classCode}`;
+  await _enterRoom(roomId, `${className} — Class Room`, false);
+};
+
+// ── Create a private room ──
+window.createPrivateRoom = async function() {
+  if (!window._uid) return;
+  const code      = Math.random().toString(36).slice(2, 8).toUpperCase();
+  const roomId    = 'priv-' + code;
+  const isPro     = window._userProfile?.plan === 'pro' || window._userProfile?.role === 'teacher';
+  const expiresAt = isPro ? null : new Date(Date.now() + 30 * 60 * 1000).toISOString();
+  const name      = (window._userProfile?.name || 'User') + "'s Room";
+  await set(ref(db, `voiceRooms/${roomId}`), {
+    name, classCode: null, isPrivate: true, code,
+    createdBy: window._uid, createdAt: new Date().toISOString(),
+    expiresAt, participants: {},
+  });
+  // Show the code to the creator
+  showToast(`Room created! Code: ${code}  (tap to copy)`, 'success');
+  navigator.clipboard?.writeText(code).catch(()=>{});
+  _refreshPrivateGrid();
+  await _enterRoom(roomId, name, !isPro);
+};
+
+// ── Join a private room by code ──
+window.joinPrivateRoom = async function() {
+  const code = document.getElementById('private-code-input').value.trim().toUpperCase();
+  if (code.length !== 6) { showToast('Enter a 6-character room code', 'error'); return; }
+  const roomId   = 'priv-' + code;
+  const roomSnap = await get(ref(db, `voiceRooms/${roomId}`));
+  if (!roomSnap.exists()) { showToast('Room not found — check the code and try again', 'error'); return; }
+  const room = roomSnap.val();
+  if (room.expiresAt && new Date(room.expiresAt) < new Date()) {
+    showToast('This room has expired', 'error'); return;
+  }
+  const isPro = window._userProfile?.plan === 'pro' || window._userProfile?.role === 'teacher';
+  await _enterRoom(roomId, room.name, !isPro && !!room.expiresAt);
+};
+
+// ── Core: enter a room (class or private) ──
+async function _enterRoom(roomId, displayName, startTimer) {
+  if (_jitsiApi) { showToast('Already in a room — leave first', 'error'); return; }
+  await _loadJitsi();
+  if (!window.JitsiMeetExternalAPI) { showToast('Could not load Jitsi — check your connection', 'error'); return; }
+
+  _currentRoomId = roomId;
+  const jitsiRoom = 'revynce-' + roomId.replace(/[^a-z0-9]/gi, '-');
+  const userName  = window._userProfile?.name || 'Student';
+
+  // Register presence in Firebase
+  const presenceRef = ref(db, `voiceRooms/${roomId}/participants/${window._uid}`);
+  await set(presenceRef, { name: userName, joinedAt: new Date().toISOString() });
+
+  // Show call UI
+  document.getElementById('voice-call-wrap').style.display = '';
+  document.getElementById('call-room-name').textContent    = displayName;
+  document.getElementById('call-participants-label').textContent = 'Connecting…';
+
+  // Embed Jitsi
+  const container = document.getElementById('jitsi-container');
+  container.innerHTML = '';
+  _jitsiApi = new window.JitsiMeetExternalAPI('meet.jit.si', {
+    roomName: jitsiRoom,
+    parentNode: container,
+    width: '100%', height: 420,
+    configOverwrite: {
+      startWithAudioMuted: false,
+      startWithVideoMuted: true,
+      prejoinPageEnabled: false,
+      disableDeepLinking: true,
+    },
+    interfaceConfigOverwrite: {
+      TOOLBAR_BUTTONS: ['microphone', 'hangup', 'chat', 'raisehand'],
+      SHOW_JITSI_WATERMARK: false,
+      DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
+    },
+    userInfo: { displayName: userName },
+  });
+
+  _jitsiApi.addEventListeners({
+    videoConferenceJoined: () => {
+      document.getElementById('call-participants-label').textContent = 'Connected — 1 participant';
+    },
+    participantJoined: () => _updateCallParticipantCount(),
+    participantLeft:   () => _updateCallParticipantCount(),
+    videoConferenceLeft: () => leaveVoiceRoom(),
+  });
+
+  // 30-min countdown for free users
+  if (startTimer) {
+    let secs = 30 * 60;
+    document.getElementById('call-timer-wrap').style.display = '';
+    _callTimerInt = setInterval(() => {
+      secs--;
+      const m = String(Math.floor(secs / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      document.getElementById('call-timer').textContent = `${m}:${s}`;
+      if (secs <= 0) {
+        clearInterval(_callTimerInt);
+        showToast('30-minute free limit reached. Upgrade to Pro for unlimited time.', 'warn');
+        leaveVoiceRoom();
+      }
+    }, 1000);
+  }
+
+  // Scroll to call bar
+  document.getElementById('voice-call-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function _updateCallParticipantCount() {
+  if (!_jitsiApi) return;
+  try {
+    const count = _jitsiApi.getNumberOfParticipants();
+    document.getElementById('call-participants-label').textContent = `${count} participant${count !== 1 ? 's' : ''}`;
+  } catch(e) {}
+}
+
+// ── Leave room ──
+window.leaveVoiceRoom = async function() {
+  if (_callTimerInt) { clearInterval(_callTimerInt); _callTimerInt = null; }
+  if (_jitsiApi) { try { _jitsiApi.dispose(); } catch(e){} _jitsiApi = null; }
+  document.getElementById('voice-call-wrap').style.display = 'none';
+  document.getElementById('call-timer-wrap').style.display = 'none';
+  document.getElementById('jitsi-container').innerHTML = '';
+  if (_currentRoomId && window._uid) {
+    try { await remove(ref(db, `voiceRooms/${_currentRoomId}/participants/${window._uid}`)); } catch(e) {}
+  }
+  _currentRoomId = null;
+};
+
+// ── Toggle mute ──
+window.toggleMuteVoice = function() {
+  if (!_jitsiApi) return;
+  _jitsiApi.executeCommand('toggleAudio');
+  const icon = document.getElementById('call-mute-icon');
+  const btn  = document.getElementById('call-mute-btn');
+  const muted = icon.classList.toggle('fi-br-microphone-slash');
+  icon.classList.toggle('fi-br-microphone', !muted);
+  btn.innerHTML = `<i class="fi ${muted ? 'fi-br-microphone-slash' : 'fi-br-microphone'}" id="call-mute-icon"></i> ${muted ? 'Unmute' : 'Muted'}`;
+};
+
+// ── Refresh private rooms grid ──
+async function _refreshPrivateGrid() {
+  const grid = document.getElementById('private-voice-grid');
+  if (!grid || !window._uid) return;
+  try {
+    const snap = await get(ref(db, 'voiceRooms'));
+    if (!snap.exists()) { grid.innerHTML = '<div style="color:var(--text-muted);font-size:.82rem;padding:10px 0">No private rooms active.</div>'; return; }
+    const privRooms = Object.entries(snap.val()).filter(([id, r]) =>
+      r.isPrivate && r.createdBy === window._uid && (!r.expiresAt || new Date(r.expiresAt) > new Date())
+    );
+    if (!privRooms.length) { grid.innerHTML = '<div style="color:var(--text-muted);font-size:.82rem;padding:10px 0">No private rooms active.</div>'; return; }
+    grid.innerHTML = '';
+    privRooms.forEach(([id, room]) => {
+      const card = document.createElement('div');
+      card.className = 'voice-card';
+      const count = room.participants ? Object.keys(room.participants).length : 0;
+      card.innerHTML = `
+        <div class="room-top">
+          <div class="${count>0?'room-live-dot':'room-idle-dot'}"></div>
+          <span class="room-name">${room.name}</span>
+          <span class="room-count">${count}/8</span>
+        </div>
+        <div style="margin:8px 0 12px">
+          <div class="voice-code-badge" onclick="navigator.clipboard?.writeText('${room.code}');showToast('Code copied!','success')">
+            ${room.code} <span class="copy-hint">tap to copy</span>
+          </div>
+          ${room.expiresAt ? `<div style="font-size:.72rem;color:var(--text-muted);margin-top:6px"><i class="fi fi-rr-clock"></i> Expires ${new Date(room.expiresAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+        </div>
+        <button class="join-room-btn" onclick="_enterRoom('${id}','${room.name}',${!!room.expiresAt})">
+          <i class="fi fi-br-microphone"></i> Rejoin
+        </button>`;
+      grid.appendChild(card);
+    });
+  } catch(e) {}
+}
+
+// ── Show pro/free note based on plan ──
+function _updateVoicePlanNote() {
+  const isPro = window._userProfile?.plan === 'pro' || window._userProfile?.role === 'teacher';
+  document.getElementById('voice-free-note').style.display = isPro ? 'none' : '';
+  document.getElementById('voice-pro-note').style.display  = isPro ? '' : 'none';
+}
+
+// ═══════════════════════════════════════
+// LEADERBOARD — subject/class, test scores
+// Firebase: classScores/{classCode}/{uid} = { displayName, avgScore, testCount, showOnLeaderboard }
+// Firebase: classes/{classCode}/leaderboardEnabled, /leaderboardForcePublic
+// ═══════════════════════════════════════
+
+// ── Populate class selector with enabled classes ──
+async function _populateLbClassSelector() {
+  const sel = document.getElementById('lb-class-select');
+  if (!sel || !window._uid) return;
+  try {
+    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    if (!snap.exists()) return;
+    sel.innerHTML = '<option value="">— Choose a class —</option>';
+    for (const [code, cls] of Object.entries(snap.val())) {
+      // Check if teacher has enabled leaderboard for this class
+      const settSnap = await get(child(ref(db), `classes/${code}/leaderboardEnabled`));
+      if (settSnap.exists() && settSnap.val() === true) {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = `${cls.name || code} (${code})`;
+        sel.appendChild(opt);
+      }
+    }
+    if (sel.options.length <= 1) {
+      sel.innerHTML = '<option value="">No ranking-enabled classes yet</option>';
+    }
+  } catch(e) {}
+}
+
+// ── Load leaderboard for selected class ──
+window.loadClassLeaderboard = async function() {
+  const code = document.getElementById('lb-class-select').value;
+  const content    = document.getElementById('lb-content');
+  const disabledMsg = document.getElementById('lb-disabled-msg');
+  const optinWrap  = document.getElementById('lb-optin-wrap');
+  const forceBadge = document.getElementById('lb-force-badge');
+
+  if (!code) {
+    content.style.display = 'none';
+    disabledMsg.style.display = '';
+    optinWrap.style.display = 'none';
+    return;
+  }
+
+  // Check force-public setting
+  const forceSnap = await get(child(ref(db), `classes/${code}/leaderboardForcePublic`));
+  const forcePublic = forceSnap.exists() && forceSnap.val() === true;
+
+  // Load student's own opt-in for this class
+  let myOptIn = true;
+  if (window._uid) {
+    const optSnap = await get(child(ref(db), `classScores/${code}/${window._uid}/showOnLeaderboard`));
+    myOptIn = forcePublic || (optSnap.exists() ? optSnap.val() : true);
+  }
+
+  optinWrap.style.display = forcePublic ? 'none' : '';
+  forceBadge.style.display = forcePublic ? '' : 'none';
+  document.getElementById('lb-optin-check').checked = myOptIn;
+  document.getElementById('lb-private-note').style.display = (!forcePublic && !myOptIn) ? '' : 'none';
+
+  // Load scores
+  const scoresSnap = await get(child(ref(db), `classScores/${code}`));
+  let entries = [];
+  if (scoresSnap.exists()) {
+    entries = Object.entries(scoresSnap.val())
+      .filter(([uid, s]) => forcePublic || s.showOnLeaderboard !== false)
+      .map(([uid, s]) => ({ uid, name: s.displayName || 'Student', avg: Math.round(s.avgScore || 0), tests: s.testCount || 0 }))
+      .sort((a, b) => b.avg - a.avg);
+  }
+
+  // Seed demo data if empty
+  if (!entries.length) {
+    entries = [
+      { uid: 'demo1', name: 'Alex Johnson',  avg: 88, tests: 5 },
+      { uid: 'demo2', name: 'Sarah Chen',    avg: 82, tests: 4 },
+      { uid: 'demo3', name: 'Priya Lal',     avg: 76, tests: 5 },
+      { uid: 'demo4', name: 'Tom Wu',        avg: 71, tests: 3 },
+      { uid: 'demo5', name: 'Emma Walsh',    avg: 65, tests: 4 },
+    ];
+  }
+
+  disabledMsg.style.display = 'none';
+  content.style.display = '';
+
+  // Render podium (top 3)
+  const podium = document.getElementById('lb-podium');
+  const top3 = entries.slice(0, 3);
+  const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
+  const medals = ['silver','gold','bronze'];
+  podium.innerHTML = podiumOrder.map((e, i) => {
+    const rank = top3.indexOf(e);
+    const cls  = medals[rank] || 'silver';
+    const init = e.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="podium-item ${cls}">
+      <div class="podium-name">${rank===0?'🥇 ':rank===1?'🥈 ':'🥉 '}${e.name.split(' ')[0]}</div>
+      <div class="podium-ava">${init}</div>
+      <div class="podium-stand${rank===0?' style="padding:14px 24px"':''}">
+        <div class="podium-stand-n">${e.avg}%</div>
+        <div class="podium-stand-l">${e.tests} test${e.tests!==1?'s':''}</div>
+      </div></div>`;
+  }).join('');
+
+  // Render rest of list
+  const list = document.getElementById('lb-list-el');
+  list.innerHTML = entries.slice(3).map((e, i) => {
+    const init = e.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<li class="lb-item">
+      <div class="lb-rank">${i+4}</div>
+      <div class="lb-ava">${init}</div>
+      <div class="lb-info"><div class="lb-name">${e.name}</div><div class="lb-sub">${e.tests} test${e.tests!==1?'s':''}</div></div>
+      <div class="lb-xp">${e.avg}%</div>
+    </li>`;
+  }).join('');
+
+  // Your row
+  const yourRow  = document.getElementById('lb-your-row');
+  const yourEntry = window._uid ? entries.find(e => e.uid === window._uid) : null;
+  if (yourEntry) {
+    const yourRank = entries.indexOf(yourEntry) + 1;
+    const yourInit = (window._userProfile?.name || 'Me').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    yourRow.style.display = 'flex';
+    document.getElementById('lb-your-rank').textContent  = `#${yourRank}`;
+    document.getElementById('lb-your-ava').textContent   = yourInit;
+    document.getElementById('lb-your-name').textContent  = window._userProfile?.name || 'You';
+    document.getElementById('lb-your-sub').textContent   = `${yourEntry.tests} test${yourEntry.tests!==1?'s':''}`;
+    document.getElementById('lb-your-score').textContent = `${yourEntry.avg}%`;
+  } else {
+    yourRow.style.display = 'none';
+  }
+};
+
+// ── Save student opt-in preference ──
+window.saveLeaderboardOptIn = async function() {
+  const code = document.getElementById('lb-class-select').value;
+  const show = document.getElementById('lb-optin-check').checked;
+  if (!code || !window._uid) return;
+  try {
+    await set(ref(db, `classScores/${code}/${window._uid}/showOnLeaderboard`), show);
+    document.getElementById('lb-private-note').style.display = show ? 'none' : '';
+    showToast(show ? 'Your ranking is now visible to classmates' : 'Your ranking is now hidden', 'success');
+    loadClassLeaderboard();
+  } catch(e) { showToast('Error saving preference', 'error'); }
+};
+
+// ── Write a quiz/test score for the current user ──
+window._recordTestScore = async function(classCode, score) {
+  if (!window._uid || !classCode) return;
+  try {
+    const path = `classScores/${classCode}/${window._uid}`;
+    const snap = await get(child(ref(db), path));
+    const existing = snap.exists() ? snap.val() : { avgScore: 0, testCount: 0, showOnLeaderboard: true };
+    const newCount = (existing.testCount || 0) + 1;
+    const newAvg   = ((existing.avgScore || 0) * (existing.testCount || 0) + score) / newCount;
+    await set(ref(db, path), {
+      ...existing,
+      displayName: window._userProfile?.name || 'Student',
+      avgScore:    Math.round(newAvg * 10) / 10,
+      testCount:   newCount,
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch(e) {}
+};
+
+// ── Hook joinClass to save leaderboard opt-in preference ──
+const _origJoinClass = window.joinClass;
+window.joinClass = async function() {
+  if (_origJoinClass) await _origJoinClass();
+  // After join, save opt-in preference
+  const code   = document.getElementById('class-code-input')?.value.trim().toUpperCase();
+  const optIn  = document.getElementById('join-lb-optin-check')?.checked ?? true;
+  if (code && window._uid) {
+    try {
+      await set(ref(db, `classScores/${code}/${window._uid}/showOnLeaderboard`), optIn);
+    } catch(e) {}
+  }
+  document.getElementById('join-lb-optin').style.display = 'none';
+};
+
+// ── Hook showPanel to load voice/leaderboard on open ──
+const _origShowPanelVL = window.showPanel;
+window.showPanel = function(name, navEl) {
+  if (_origShowPanelVL) _origShowPanelVL(name, navEl);
+  if (name === 'voice') {
+    _updateVoicePlanNote();
+    loadClassVoiceRooms();
+    _refreshPrivateGrid();
+  }
+  if (name === 'leaderboard') _populateLbClassSelector();
+};
 
 // ── Organisation enquiry form ──
 window.submitOrgForm = async function() {

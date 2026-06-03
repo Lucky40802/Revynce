@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Revynce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<style>
+  :root {
+    --cyan: #00f0d4;
+    --cyan-dim: rgba(0,240,212,0.08);
+    --violet: #7c3aed;
+    --rose: #f43f5e;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --bg: #05070f;
+    --bg-2: #0a0d18;
+    --bg-card: #0d1120;
+    --text: #e8eaf0;
+    --text-muted: #5a6a8a;
+    --border: rgba(255,255,255,0.07);
+    --font-d: 'Syne', system-ui, sans-serif;
+    --font-b: 'Inter', system-ui, sans-serif;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-b);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(5,7,15,0.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .logo {
+    font-family: var(--font-d); font-size: 1.3rem; font-weight: 800;
+    color: var(--cyan); text-decoration: none; letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 8px; align-items: center; }
+  .nav-btn {
+    padding: 7px 16px; border-radius: 9px; font-family: var(--font-b);
+    font-size: .84rem; font-weight: 600; cursor: pointer;
+    transition: all .18s; border: 1px solid var(--border);
+    background: none; color: var(--text-muted); text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .nav-btn.primary {
+    background: var(--cyan); color: #05070f;
+    border-color: var(--cyan); font-weight: 700;
+  }
+  .nav-btn.primary:hover { opacity: .88; }
+
+  /* ── Hero banner ── */
+  .page-hero {
+    background: linear-gradient(135deg, rgba(0,240,212,0.06) 0%, rgba(124,58,237,0.06) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+  }
+  .page-hero .eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--cyan-dim); border: 1px solid rgba(0,240,212,0.2);
+    color: var(--cyan); font-size: .72rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 100px; margin-bottom: 18px;
+  }
+  .page-hero h1 {
+    font-family: var(--font-d); font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800; letter-spacing: -.03em; margin-bottom: 12px;
+  }
+  .page-hero p {
+    color: var(--text-muted); font-size: .95rem; max-width: 480px; margin: 0 auto;
+  }
+
+  /* ── Layout ── */
+  .content-wrap {
+    max-width: 800px; margin: 0 auto;
+    padding: 60px 40px 80px;
+    display: grid; grid-template-columns: 200px 1fr; gap: 48px; align-items: start;
+  }
+
+  /* ── Sidebar TOC ── */
+  .toc {
+    position: sticky; top: 80px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+  }
+  .toc-title {
+    font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+  }
+  .toc a {
+    display: block; font-size: .8rem; color: var(--text-muted);
+    text-decoration: none; padding: 5px 0; border-left: 2px solid var(--border);
+    padding-left: 10px; transition: all .15s;
+  }
+  .toc a:hover { color: var(--cyan); border-left-color: var(--cyan); }
+
+  /* ── Article ── */
+  .article { min-width: 0; }
+  .last-updated {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 14px; font-size: .78rem;
+    color: var(--text-muted); margin-bottom: 36px;
+  }
+  .last-updated i { color: var(--cyan); }
+
+  .section { margin-bottom: 44px; scroll-margin-top: 80px; }
+  .section h2 {
+    font-family: var(--font-d); font-size: 1.15rem; font-weight: 700;
+    color: var(--cyan); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section h2 .num {
+    width: 26px; height: 26px; background: var(--cyan-dim);
+    border: 1px solid rgba(0,240,212,0.2); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 800; flex-shrink: 0;
+  }
+  .section p {
+    color: var(--text-muted); font-size: .9rem; line-height: 1.75;
+    margin-bottom: 10px;
+  }
+  .section p strong { color: var(--text); }
+  .section ul {
+    padding-left: 18px; color: var(--text-muted); font-size: .9rem; line-height: 1.75;
+  }
+  .section ul li { margin-bottom: 5px; }
+  .section a { color: var(--cyan); text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .highlight-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan); border-radius: 10px;
+    padding: 16px 18px; margin: 16px 0;
+    font-size: .87rem; color: var(--text-muted); line-height: 1.65;
+  }
+  .highlight-box strong { color: var(--cyan); }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    font-size: .78rem; color: var(--text-muted);
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .footer-links { display: flex; gap: 20px; }
+
+  @media (max-width: 720px) {
+    nav { padding: 0 20px; }
+    .page-hero { padding: 40px 20px 36px; }
+    .content-wrap { grid-template-columns: 1fr; padding: 36px 20px 60px; }
+    .toc { display: none; }
+    footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">Revynce</a>
+  <div class="nav-links">
+    <a href="terms.html" class="nav-btn">Terms &amp; Conditions</a>
+    <a href="index.html" class="nav-btn primary">Back to App</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="eyebrow"><i class="fi fi-br-shield-check"></i> Legal</div>
+  <h1>Privacy Policy</h1>
+  <p>How Revynce collects, uses, and protects your personal information.</p>
+</div>
+
+<!-- CONTENT -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#overview">Overview</a>
+    <a href="#data-collected">Data We Collect</a>
+    <a href="#how-used">How We Use It</a>
+    <a href="#storage">Storage &amp; Security</a>
+    <a href="#third-party">Third Parties</a>
+    <a href="#children">Children's Privacy</a>
+    <a href="#your-rights">Your Rights</a>
+    <a href="#cookies">Cookies</a>
+    <a href="#changes">Policy Changes</a>
+    <a href="#contact">Contact</a>
+  </aside>
+
+  <!-- ARTICLE -->
+  <article class="article">
+
+    <div class="last-updated">
+      <i class="fi fi-rr-calendar"></i> Last updated: 1 June 2026 &nbsp;·&nbsp; Effective: 1 June 2026
+    </div>
+
+    <div class="section" id="overview">
+      <h2><span class="num">0</span> Overview</h2>
+      <p>Revynce ("we", "us", "our") is an AI-powered education platform built by Lakshan Jagadeishan, a Year 10 accelerated student at Baulkham Hills High School. This Privacy Policy explains what personal data we collect when you use Revynce, how we use it, and the rights you have over your data.</p>
+      <div class="highlight-box"><strong>Plain English summary:</strong> We collect only what's needed to run the app. We don't sell your data. Student academic data is only visible to you and your enrolled teachers. You can delete your account and all data at any time.</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="data-collected">
+      <h2><span class="num">1</span> Data We Collect</h2>
+      <p><strong>Account data:</strong> When you create an account, we store your name, email address, role (student or teacher), account creation date, and profile preferences in Firebase Realtime Database.</p>
+      <p><strong>Study data:</strong> Uploaded file metadata (filename, file size, subject, upload date), AI-generated content (notes, flashcards, quizzes, palm cards), quiz scores, XP points, streak count, and flashcard decks.</p>
+      <p><strong>Class data:</strong> Enrolled class codes, attendance records (if marked by a teacher), test scores submitted to the class leaderboard, and your leaderboard visibility preference.</p>
+      <p><strong>Voice room data:</strong> When you join a voice room, your display name and join timestamp are stored temporarily in Firebase to show the participant list. This data is removed when you leave the room.</p>
+      <p><strong>Usage analytics:</strong> Firebase Analytics collects anonymised, aggregated usage data — pages visited, features used, session duration. This data cannot be linked back to an individual.</p>
+      <p><strong>Data we do NOT collect:</strong></p>
+      <ul>
+        <li>Payment card details (handled entirely by Stripe — we never see your card number)</li>
+        <li>The content of uploaded files (files are processed by the Groq AI API and not stored on our servers)</li>
+        <li>Location data, device identifiers, or browser fingerprints</li>
+        <li>Messages sent in voice rooms (audio is peer-to-peer via Jitsi Meet)</li>
+      </ul>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="how-used">
+      <h2><span class="num">2</span> How We Use Your Data</h2>
+      <p>Your data is used exclusively to provide and improve the Revynce platform:</p>
+      <ul>
+        <li>Authenticating your identity and maintaining your session</li>
+        <li>Displaying your personal dashboard, study history, and progress</li>
+        <li>Enabling class features — joining classes, viewing timetables, receiving notices</li>
+        <li>Generating AI study materials from content you upload</li>
+        <li>Showing your position on class leaderboards (only if you opt in)</li>
+        <li>Sending in-app notifications about your classes and badges</li>
+        <li>Diagnosing technical issues and improving platform performance</li>
+      </ul>
+      <p>We do <strong>not</strong> use your data for advertising, profiling, or sale to third parties.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="storage">
+      <h2><span class="num">3</span> Storage &amp; Security</h2>
+      <p>All user data is stored in <strong>Google Firebase</strong> (Realtime Database and Storage) hosted in the <strong>Asia-Southeast1 region</strong>. Firebase enforces industry-standard encryption at rest (AES-256) and in transit (TLS 1.2+).</p>
+      <p>Access to your data is governed by Firebase Security Rules:</p>
+      <ul>
+        <li>You can only read and write your own user profile and study data</li>
+        <li>Teachers can only read data for students enrolled in their classes</li>
+        <li>No other user can access your personal data</li>
+        <li>Admin access to Firebase is restricted to the platform developer</li>
+      </ul>
+      <p>File uploads are processed via a <strong>Firebase Cloud Function</strong> which forwards content to the Groq AI API for processing. Uploaded content is not stored on Groq's servers beyond the duration of the API request.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="third-party">
+      <h2><span class="num">4</span> Third-Party Services</h2>
+      <p>Revynce integrates with the following third-party services. Each has its own privacy policy:</p>
+      <ul>
+        <li><strong>Google Firebase</strong> — authentication, database, storage, analytics. <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Firebase Privacy Policy</a></li>
+        <li><strong>Groq AI</strong> — processes uploaded document content to generate study materials. Content is not retained. <a href="https://groq.com/privacy-policy" target="_blank" rel="noopener">Groq Privacy Policy</a></li>
+        <li><strong>Jitsi Meet</strong> — powers voice study rooms. Audio is peer-to-peer and not recorded by Revynce. <a href="https://jitsi.org/security/" target="_blank" rel="noopener">Jitsi Security</a></li>
+        <li><strong>Google Sign-In / Classroom / Drive / Calendar</strong> — OAuth access with the minimum permissions required. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
+        <li><strong>Microsoft OneDrive</strong> — read-only file access, only for files you select. <a href="https://privacy.microsoft.com" target="_blank" rel="noopener">Microsoft Privacy Policy</a></li>
+        <li><strong>Stripe</strong> — processes subscription payments. Card data never touches Revynce servers. <a href="https://stripe.com/au/privacy" target="_blank" rel="noopener">Stripe Privacy Policy</a></li>
+        <li><strong>Formsubmit</strong> — routes organisation enquiry emails. <a href="https://formsubmit.co/privacy" target="_blank" rel="noopener">Formsubmit Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="children">
+      <h2><span class="num">5</span> Children's Privacy</h2>
+      <p>Revynce is designed for use by students aged 13 and above. Users under 13 may only use the platform with verified parental or guardian consent. We do not knowingly collect personal data from children under 13 without parental consent.</p>
+      <p>If you believe a child under 13 has provided personal information without consent, please contact us at <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a> and we will delete it promptly.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="your-rights">
+      <h2><span class="num">6</span> Your Rights</h2>
+      <p>You have the following rights over your personal data:</p>
+      <ul>
+        <li><strong>Access:</strong> You can view all your stored data at any time in the app (Profile &amp; Settings).</li>
+        <li><strong>Correction:</strong> You can update your name and preferences in Profile &amp; Settings.</li>
+        <li><strong>Deletion:</strong> You can request deletion of your account and all associated data by emailing <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a>. All data will be removed from Firebase within 30 days.</li>
+        <li><strong>Leaderboard opt-out:</strong> You can hide your ranking from classmates at any time via the Leaderboard panel in the app.</li>
+        <li><strong>Portability:</strong> Request an export of your study data (notes, flashcard decks, quiz history) by emailing us.</li>
+      </ul>
+      <div class="highlight-box"><strong>Australian Privacy Act 1988:</strong> Revynce is operated in Australia and is committed to compliance with the Australian Privacy Principles (APPs) under the Privacy Act 1988 (Cth).</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="cookies">
+      <h2><span class="num">7</span> Cookies &amp; Local Storage</h2>
+      <p>Revynce uses <strong>localStorage</strong> (not cookies) to save your theme and accent colour preferences on your device. No personal data is stored in localStorage.</p>
+      <p>Firebase Authentication may use a session cookie to maintain your login. This is a strictly necessary technical cookie and cannot be disabled without logging out.</p>
+      <p>We do not use any advertising cookies, tracking pixels, or third-party analytics cookies.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="changes">
+      <h2><span class="num">8</span> Policy Changes</h2>
+      <p>We may update this Privacy Policy from time to time. When we make material changes, we will notify you via the in-app notification system. The "Last updated" date at the top of this page will always reflect the most recent version.</p>
+      <p>Continued use of Revynce after changes are posted constitutes acceptance of the updated policy.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="contact">
+      <h2><span class="num">9</span> Contact</h2>
+      <p>For any privacy questions, data requests, or concerns, contact:</p>
+      <div class="highlight-box">
+        <strong>Lakshan Jagadeishan</strong><br>
+        Year 10 Accelerated Student — Baulkham Hills High School<br>
+        Email: <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a><br>
+        Platform: <a href="https://revynce-740d1.web.app">revynce-740d1.web.app</a>
+      </div>
+    </div>
+
+  </article>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Revynce · Built by <a href="https://lakshan-tcj.my.canva.site" target="_blank" rel="noopener">Lakshan Jagadeishan</a></span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="terms.html">Terms &amp; Conditions</a>
+    <a href="mailto:lakshan.jagadeishan@gmail.com">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>

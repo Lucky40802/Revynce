@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms &amp; Conditions — Revynce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<style>
+  :root {
+    --cyan: #00f0d4;
+    --cyan-dim: rgba(0,240,212,0.08);
+    --violet: #7c3aed;
+    --violet-dim: rgba(124,58,237,0.10);
+    --rose: #f43f5e;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --bg: #05070f;
+    --bg-card: #0d1120;
+    --text: #e8eaf0;
+    --text-muted: #5a6a8a;
+    --border: rgba(255,255,255,0.07);
+    --font-d: 'Syne', system-ui, sans-serif;
+    --font-b: 'Inter', system-ui, sans-serif;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-b);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(5,7,15,0.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .logo {
+    font-family: var(--font-d); font-size: 1.3rem; font-weight: 800;
+    color: var(--cyan); text-decoration: none; letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 8px; align-items: center; }
+  .nav-btn {
+    padding: 7px 16px; border-radius: 9px; font-family: var(--font-b);
+    font-size: .84rem; font-weight: 600; cursor: pointer;
+    transition: all .18s; border: 1px solid var(--border);
+    background: none; color: var(--text-muted); text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .nav-btn.primary {
+    background: var(--cyan); color: #05070f;
+    border-color: var(--cyan); font-weight: 700;
+  }
+  .nav-btn.primary:hover { opacity: .88; }
+
+  /* ── Hero banner ── */
+  .page-hero {
+    background: linear-gradient(135deg, rgba(124,58,237,0.07) 0%, rgba(0,240,212,0.05) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+  }
+  .page-hero .eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--violet-dim); border: 1px solid rgba(124,58,237,0.25);
+    color: #a78bfa; font-size: .72rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 100px; margin-bottom: 18px;
+  }
+  .page-hero h1 {
+    font-family: var(--font-d); font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800; letter-spacing: -.03em; margin-bottom: 12px;
+  }
+  .page-hero p {
+    color: var(--text-muted); font-size: .95rem; max-width: 480px; margin: 0 auto;
+  }
+
+  /* ── Layout ── */
+  .content-wrap {
+    max-width: 800px; margin: 0 auto;
+    padding: 60px 40px 80px;
+    display: grid; grid-template-columns: 200px 1fr; gap: 48px; align-items: start;
+  }
+
+  /* ── Sidebar TOC ── */
+  .toc {
+    position: sticky; top: 80px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+  }
+  .toc-title {
+    font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+  }
+  .toc a {
+    display: block; font-size: .8rem; color: var(--text-muted);
+    text-decoration: none; padding: 5px 0; border-left: 2px solid var(--border);
+    padding-left: 10px; transition: all .15s;
+  }
+  .toc a:hover { color: #a78bfa; border-left-color: #a78bfa; }
+
+  /* ── Article ── */
+  .article { min-width: 0; }
+  .last-updated {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 14px; font-size: .78rem;
+    color: var(--text-muted); margin-bottom: 36px;
+  }
+  .last-updated i { color: #a78bfa; }
+
+  .section { margin-bottom: 44px; scroll-margin-top: 80px; }
+  .section h2 {
+    font-family: var(--font-d); font-size: 1.15rem; font-weight: 700;
+    color: #a78bfa; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section h2 .num {
+    width: 26px; height: 26px; background: var(--violet-dim);
+    border: 1px solid rgba(124,58,237,0.25); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 800; flex-shrink: 0; color: #a78bfa;
+  }
+  .section p {
+    color: var(--text-muted); font-size: .9rem; line-height: 1.75; margin-bottom: 10px;
+  }
+  .section p strong { color: var(--text); }
+  .section ul, .section ol {
+    padding-left: 18px; color: var(--text-muted); font-size: .9rem; line-height: 1.75;
+  }
+  .section ul li, .section ol li { margin-bottom: 5px; }
+  .section a { color: #a78bfa; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .highlight-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid #a78bfa; border-radius: 10px;
+    padding: 16px 18px; margin: 16px 0;
+    font-size: .87rem; color: var(--text-muted); line-height: 1.65;
+  }
+  .highlight-box strong { color: #a78bfa; }
+
+  .warn-box {
+    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
+    border-left: 3px solid var(--amber); border-radius: 10px;
+    padding: 16px 18px; margin: 16px 0;
+    font-size: .87rem; color: var(--text-muted); line-height: 1.65;
+  }
+  .warn-box strong { color: var(--amber); }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    font-size: .78rem; color: var(--text-muted);
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .footer-links { display: flex; gap: 20px; }
+
+  @media (max-width: 720px) {
+    nav { padding: 0 20px; }
+    .page-hero { padding: 40px 20px 36px; }
+    .content-wrap { grid-template-columns: 1fr; padding: 36px 20px 60px; }
+    .toc { display: none; }
+    footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">Revynce</a>
+  <div class="nav-links">
+    <a href="privacy.html" class="nav-btn">Privacy Policy</a>
+    <a href="index.html" class="nav-btn primary">Back to App</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="eyebrow"><i class="fi fi-br-document-signed"></i> Legal</div>
+  <h1>Terms &amp; Conditions</h1>
+  <p>The rules and responsibilities for using the Revynce platform.</p>
+</div>
+
+<!-- CONTENT -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#agreement">Agreement</a>
+    <a href="#eligibility">Eligibility</a>
+    <a href="#accounts">Account Responsibilities</a>
+    <a href="#acceptable-use">Acceptable Use</a>
+    <a href="#ai-content">AI-Generated Content</a>
+    <a href="#ip">Intellectual Property</a>
+    <a href="#voice">Voice Rooms</a>
+    <a href="#data">Data &amp; Privacy</a>
+    <a href="#leaderboard">Leaderboard</a>
+    <a href="#payments">Payments</a>
+    <a href="#liability">Liability</a>
+    <a href="#termination">Termination</a>
+    <a href="#changes">Changes</a>
+    <a href="#contact">Contact</a>
+  </aside>
+
+  <!-- ARTICLE -->
+  <article class="article">
+
+    <div class="last-updated">
+      <i class="fi fi-rr-calendar"></i> Last updated: 1 June 2026 &nbsp;·&nbsp; Effective: 1 June 2026
+    </div>
+
+    <div class="section" id="agreement">
+      <h2><span class="num">0</span> Agreement to Terms</h2>
+      <p>Welcome to Revynce. By accessing or using the Revynce platform ("the Service", "Revynce"), you agree to be legally bound by these Terms &amp; Conditions. If you do not agree to these Terms, you must not use the Service.</p>
+      <div class="highlight-box"><strong>Plain English summary:</strong> Using Revynce means you agree to these rules. They're designed to keep the platform safe, fair, and useful for everyone — students, teachers, and schools.</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="eligibility">
+      <h2><span class="num">1</span> Eligibility</h2>
+      <p>Revynce is intended for use by students aged 13 and above, teachers, and educational institutions. Users under 13 may only use the Service with verified parental or guardian consent.</p>
+      <p>By creating an account, you confirm that:</p>
+      <ul>
+        <li>All information you provide is accurate and up to date</li>
+        <li>You have the legal capacity to enter into this agreement (or have parental/guardian consent)</li>
+        <li>Your use of the Service does not violate any applicable law in your jurisdiction</li>
+      </ul>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="accounts">
+      <h2><span class="num">2</span> Account Responsibilities</h2>
+      <p>You are solely responsible for maintaining the confidentiality of your account credentials (email and password). You must not share your account with others or allow others to access the Service using your account.</p>
+      <p>You agree to notify Revynce immediately at <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a> if you suspect any unauthorised access to your account. Revynce is not liable for any loss or damage arising from unauthorised use of your account.</p>
+      <p>You may only create one account per person. Multiple accounts for the same individual may be removed without notice.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="acceptable-use">
+      <h2><span class="num">3</span> Acceptable Use</h2>
+      <p>You agree not to use Revynce to:</p>
+      <ol>
+        <li>Upload, share, or generate content that is illegal, harmful, abusive, threatening, defamatory, obscene, or that violates any applicable law or regulation</li>
+        <li>Attempt to hack, reverse-engineer, disrupt, or gain unauthorised access to any part of the Service or its underlying systems</li>
+        <li>Use automated tools, bots, or scripts to access or scrape the Service</li>
+        <li>Use the platform for commercial purposes without express written permission from Revynce</li>
+        <li>Impersonate any person or entity, or misrepresent your affiliation with any school or organisation</li>
+        <li>Upload content that infringes third-party intellectual property rights, including copyrighted textbooks or exam papers without permission</li>
+        <li>Harass, bully, or intimidate other users, including in voice rooms</li>
+        <li>Circumvent or interfere with any security features, authentication systems, or access controls</li>
+      </ol>
+      <p>Revynce reserves the right to suspend or permanently ban accounts that violate this Acceptable Use Policy without notice.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="ai-content">
+      <h2><span class="num">4</span> AI-Generated Content</h2>
+      <p>Revynce uses third-party AI services (including Groq) to generate study materials — including notes, flashcards, quizzes, and summaries — from content you upload.</p>
+      <div class="warn-box"><strong>Important:</strong> AI-generated content is provided for educational assistance only. It may contain errors, omissions, or inaccuracies. You are responsible for verifying the accuracy of all AI-generated content before using it in formal assessments, exams, or academic submissions.</div>
+      <p>Revynce does not guarantee the accuracy, completeness, or suitability of AI-generated content for any specific purpose. Use of AI-generated materials in academic assessments is subject to your school's academic integrity policy — it is your responsibility to ensure compliance.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="ip">
+      <h2><span class="num">5</span> Intellectual Property</h2>
+      <p><strong>Your content:</strong> All content you upload to Revynce (documents, images, files) remains your property. By uploading content, you grant Revynce a limited, non-exclusive, royalty-free licence to process, store, and transmit that content solely for the purpose of providing the Service to you. This licence ends when you delete your account.</p>
+      <p><strong>Revynce platform:</strong> The Revynce platform — including its source code, user interface design, branding, logo, and all AI-generated output templates — is the intellectual property of Lakshan Jagadeishan. You may not reproduce, distribute, modify, or create derivative works from any part of the platform without prior written consent.</p>
+      <p><strong>Third-party content:</strong> Revynce does not claim ownership of any third-party content processed by the AI system. Responsibility for ensuring you have the right to upload and process any document rests with you.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="voice">
+      <h2><span class="num">6</span> Voice Rooms</h2>
+      <p>Voice Rooms are powered by <strong>Jitsi Meet</strong>, a third-party open-source platform operated by 8x8, Inc. By using Voice Rooms you also agree to <a href="https://jitsi.org/security/" target="_blank" rel="noopener">Jitsi's terms of service</a>.</p>
+      <ul>
+        <li><strong>Free plan users</strong> are subject to a 30-minute session limit per private room per session</li>
+        <li><strong>Pro and Teacher plan users</strong> have no time limit on private rooms</li>
+        <li>Class rooms are open to all students enrolled in that class and have no time limit</li>
+        <li>Audio in voice rooms is transmitted peer-to-peer and is not recorded or stored by Revynce</li>
+      </ul>
+      <p>Revynce is not responsible for the conduct of other participants in voice rooms. Any abuse, harassment, or inappropriate behaviour must be reported to <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a> and may result in account suspension.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="data">
+      <h2><span class="num">7</span> Data &amp; Privacy</h2>
+      <p>Your use of Revynce is also governed by our <a href="privacy.html">Privacy Policy</a>, which is incorporated into these Terms by reference. By using Revynce, you consent to the data practices described in the Privacy Policy.</p>
+      <p>Key points:</p>
+      <ul>
+        <li>Your data is stored in Google Firebase (Asia-Southeast1 region)</li>
+        <li>We do not sell your personal data to third parties</li>
+        <li>Student academic data is only accessible to the student and their enrolled teachers</li>
+        <li>You can request deletion of your account and all data at any time</li>
+      </ul>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="leaderboard">
+      <h2><span class="num">8</span> Leaderboard &amp; Student Data Visibility</h2>
+      <p>The class leaderboard ranks students by their average test and quiz scores within a class. Participation in the leaderboard is <strong>opt-in by default</strong> — students choose whether their ranking is visible to classmates when joining a class, and can change this at any time.</p>
+      <p>Teachers may enable a <strong>force-public</strong> setting for their class, which overrides individual student preferences and makes all students' rankings visible to enrolled classmates. This is disclosed to students via a clearly visible notice in the app when the setting is active.</p>
+      <p>Leaderboard data (average scores and ranking position) is only visible to students enrolled in the same class — it is never publicly accessible outside the class.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="payments">
+      <h2><span class="num">9</span> Payments &amp; Subscriptions</h2>
+      <p>Revynce offers a free tier and paid subscription plans (Pro and Teacher). Paid plans are billed monthly or annually as selected at the time of purchase.</p>
+      <ul>
+        <li>All payments are processed securely by <strong>Stripe</strong>. Revynce never stores your payment card details.</li>
+        <li>Subscriptions automatically renew unless cancelled before the renewal date.</li>
+        <li>You may cancel your subscription at any time. Access to paid features continues until the end of the current billing period.</li>
+        <li>Revynce does not offer refunds for partially used subscription periods except where required by applicable Australian consumer law.</li>
+      </ul>
+      <div class="highlight-box"><strong>Australian Consumer Law:</strong> Nothing in these Terms limits your rights under the Australian Consumer Law (Schedule 2 of the Competition and Consumer Act 2010), including rights to remedies for services not provided with due care and skill.</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="liability">
+      <h2><span class="num">10</span> Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, Revynce and its creator (Lakshan Jagadeishan) shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:</p>
+      <ul>
+        <li>Loss of data, study materials, or account access</li>
+        <li>Academic results, exam performance, or assessment outcomes</li>
+        <li>Inaccuracies in AI-generated content used in academic submissions</li>
+        <li>Service interruptions, downtime, or technical failures</li>
+        <li>Conduct of other users in voice rooms or class interactions</li>
+      </ul>
+      <p>The Service is provided "as is" and "as available" without any warranty of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="termination">
+      <h2><span class="num">11</span> Termination</h2>
+      <p>Revynce reserves the right to suspend or terminate your account and access to the Service at any time, with or without notice, for conduct that we believe:</p>
+      <ul>
+        <li>Violates these Terms &amp; Conditions</li>
+        <li>Is harmful to other users, third parties, or the platform</li>
+        <li>Is contrary to the interests of educational institutions using the platform</li>
+      </ul>
+      <p>You may terminate your account at any time by emailing <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a>. Upon termination, your data will be deleted within 30 days in accordance with our Privacy Policy.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="changes">
+      <h2><span class="num">12</span> Changes to Terms</h2>
+      <p>Revynce reserves the right to update these Terms &amp; Conditions at any time. When material changes are made, we will notify users via the in-app notification system at least 7 days before the changes take effect.</p>
+      <p>Continued use of the Service after changes take effect constitutes acceptance of the revised Terms. If you do not agree to the revised Terms, you must stop using the Service and may request account deletion.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section" id="contact">
+      <h2><span class="num">13</span> Governing Law &amp; Contact</h2>
+      <p>These Terms are governed by and construed in accordance with the laws of New South Wales, Australia. Any disputes shall be subject to the exclusive jurisdiction of the courts of New South Wales.</p>
+      <p>For any questions about these Terms, contact:</p>
+      <div class="highlight-box">
+        <strong>Lakshan Jagadeishan</strong><br>
+        Year 10 Accelerated Student — Baulkham Hills High School, NSW Australia<br>
+        Email: <a href="mailto:lakshan.jagadeishan@gmail.com">lakshan.jagadeishan@gmail.com</a><br>
+        Platform: <a href="https://revynce-740d1.web.app">revynce-740d1.web.app</a>
+      </div>
+    </div>
+
+  </article>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Revynce · Built by <a href="https://lakshan-tcj.my.canva.site" target="_blank" rel="noopener">Lakshan Jagadeishan</a></span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="mailto:lakshan.jagadeishan@gmail.com">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>

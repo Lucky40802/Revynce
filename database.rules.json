@@ -1,0 +1,72 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "classes": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "classMembers": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "enrollments": {
+      "$uid": {
+        ".read": "$uid === auth.uid || auth !== null",
+        ".write": "$uid === auth.uid || auth !== null"
+      }
+    },
+    "flashcardDecks": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "quizScores": {
+      "$uid": {
+        ".read": "auth !== null",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "uploads": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "attendance": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "notices": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "notifications": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "auth !== null"
+      }
+    },
+    "timetable": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "voiceRooms": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "schedule": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    }
+  }
+}

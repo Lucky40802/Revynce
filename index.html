@@ -3646,32 +3646,33 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function populateApp(profile) {
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
   const init = (profile.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  ['sb-avatar','profile-ava'].forEach(id=>document.getElementById(id).textContent=init);
-  document.getElementById('sb-name').textContent = profile.name||'User';
-  document.getElementById('sb-role').textContent = profile.role||'student';
+  ['sb-avatar','profile-ava'].forEach(id => setText(id, init));
+  setText('sb-name', profile.name||'User');
+  setText('sb-role', profile.role||'student');
   window._updateUpgradeBanner?.(profile.plan || profile.role);
-  document.getElementById('dash-name').textContent = (profile.name||'').split(' ')[0]||'Student';
-  document.getElementById('d-xp').textContent = profile.xp||0;
-  document.getElementById('topbar-xp').textContent = (profile.xp||0)+' XP';
-  document.getElementById('profile-name').textContent = profile.name||'User';
-  document.getElementById('profile-email').textContent = profile.email||'—';
-  document.getElementById('profile-xp').textContent = profile.xp||0;
-  document.getElementById('lb-your-name').textContent = (profile.name||'You').split(' ')[0];
-  document.getElementById('lb-your-xp').textContent = (profile.xp||0)+' XP';
-  document.getElementById('reward-xp-text').textContent = (profile.xp||0)+' / 500 XP';
-  const fillPct = Math.min(100, ((profile.xp||0)/500)*100);
-  document.getElementById('xp-bar-fill').style.width = fillPct+'%';
-  if (profile.streak) document.getElementById('d-streak').textContent = '🔥 ' + profile.streak;
+  setText('dash-name', (profile.name||'').split(' ')[0]||'Student');
+  setText('d-xp', profile.xp||0);
+  setText('topbar-xp', (profile.xp||0)+' XP');
+  setText('profile-name', profile.name||'User');
+  setText('profile-email', profile.email||'—');
+  setText('profile-xp', profile.xp||0);
+  setText('lb-your-name', (profile.name||'You').split(' ')[0]);
+  setText('lb-your-xp', (profile.xp||0)+' XP');
+  setText('reward-xp-text', (profile.xp||0)+' / 500 XP');
+  setStyle('xp-bar-fill', 'width', Math.min(100, ((profile.xp||0)/500)*100)+'%');
+  if (profile.streak) setText('d-streak', '🔥 ' + profile.streak);
   const role = profile.role||'student';
   if (role==='teacher') {
     ['teach-section','teach-nav','testbuilder-nav','marking-nav'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
-    document.getElementById('teacher-class-actions').style.display='';
-    document.getElementById('join-class-form').style.display='none';
-    document.getElementById('classes-sub').textContent='Manage your classes and track student progress.';
-    document.getElementById('perf-sub').textContent='Class performance analytics and student risk alerts.';
-    document.getElementById('profile-role-badge').textContent='Teacher';
-    if(document.getElementById('teacher-upload-mode')) document.getElementById('teacher-upload-mode').style.display='';
+    setStyle('teacher-class-actions', 'display', '');
+    setStyle('join-class-form', 'display', 'none');
+    setText('classes-sub', 'Manage your classes and track student progress.');
+    setText('perf-sub', 'Class performance analytics and student risk alerts.');
+    setText('profile-role-badge', 'Teacher');
+    setStyle('teacher-upload-mode', 'display', '');
   }
 }
 

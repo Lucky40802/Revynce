@@ -3619,23 +3619,21 @@ onAuthStateChanged(auth, async (user) => {
       loadDashboardStats();
       loadFlashcards();
       window._initNotifications(user.uid, profile.role || 'student');
-      if (firstLoad) {
-        window._openDoor(() => {
-          if (isNewUser || !localStorage.getItem('revynce-tutorial-done')) {
-            setTimeout(() => window.startTutorial?.(true), 300);
-          }
-        });
-      }
+      window._openDoor(() => {
+        if (isNewUser || !localStorage.getItem('revynce-tutorial-done')) {
+          setTimeout(() => window.startTutorial?.(true), 300);
+        }
+      });
     } catch(e) {
       populateApp({ name: user.email, role:'student', xp:0 });
       showPage('app');
       window._initNotifications(user.uid, 'student');
-      if (firstLoad) window._openDoor();
+      window._openDoor();
     }
   } else {
     // No user — open door to reveal landing page
     showPage('landing');
-    if (firstLoad) window._openDoor();
+    window._openDoor();
   }
 });
 

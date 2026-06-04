@@ -4194,7 +4194,7 @@ window.doForgotPassword = async function() {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           // Slide panels open — logo halves ride along with their panels
-          const t = 'transform 0.88s ' + EASE;
+          const t = 'transform 0.44s ' + EASE;
           if (leftPanel)  { leftPanel.style.transition  = t; leftPanel.style.transform  = 'translateX(-101%)'; }
           if (rightPanel) { rightPanel.style.transition = t; rightPanel.style.transform = 'translateX(101%)';  }
 
@@ -4202,14 +4202,14 @@ window.doForgotPassword = async function() {
           setTimeout(() => {
             overlay.style.display = 'none';
             afterFn?.();
-          }, 920);
+          }, 460);
         });
       });
-    }, 1800);
+    }, 900);
   };
 
-  // Fallback: if auth state never fires within 5.5 s, open on landing anyway
-  setTimeout(() => { window._authResolved = true; window._openDoor(); }, 5500);
+  // Fallback: if auth state never fires within 2.75 s, open on landing anyway
+  setTimeout(() => { window._authResolved = true; window._openDoor(); }, 2750);
 })();
 
 // ── Show / hide password toggle ──

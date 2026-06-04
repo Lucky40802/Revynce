@@ -3605,7 +3605,7 @@ window._sRef = sRef; window._uploadBytes = uploadBytes;
 
 // ── Auth state ──
 onAuthStateChanged(auth, async (user) => {
-  if (window._authResolved) return; // only handle first resolution
+  const firstLoad = !window._authResolved;
   window._authResolved = true;
   if (user) {
     try {
@@ -3619,22 +3619,23 @@ onAuthStateChanged(auth, async (user) => {
       loadDashboardStats();
       loadFlashcards();
       window._initNotifications(user.uid, profile.role || 'student');
-      // Open door, then show tutorial for new users after doors finish
-      window._openDoor(() => {
-        if (isNewUser || !localStorage.getItem('revynce-tutorial-done')) {
-          setTimeout(() => window.startTutorial?.(true), 300);
-        }
-      });
+      if (firstLoad) {
+        window._openDoor(() => {
+          if (isNewUser || !localStorage.getItem('revynce-tutorial-done')) {
+            setTimeout(() => window.startTutorial?.(true), 300);
+          }
+        });
+      }
     } catch(e) {
       populateApp({ name: user.email, role:'student', xp:0 });
       showPage('app');
       window._initNotifications(user.uid, 'student');
-      window._openDoor();
+      if (firstLoad) window._openDoor();
     }
   } else {
     // No user — open door to reveal landing page
     showPage('landing');
-    window._openDoor();
+    if (firstLoad) window._openDoor();
   }
 });
 

@@ -3578,7 +3578,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 import { getDatabase, ref, set, get, child, remove, push, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 import { getStorage, ref as sRef, uploadBytes } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
@@ -3598,10 +3598,6 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
-const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('email');
-googleProvider.addScope('profile');
-googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 window._auth = auth; window._db = db; window._storage = storage;
 window._fbRef = ref; window._fbSet = set; window._fbGet = get; window._fbChild = child; window._fbRemove = remove;
@@ -4141,61 +4137,6 @@ window.doAuth = async function() {
 };
 window.doLogout = async function(){ await signOut(auth); showPage('landing'); };
 
-// ── Google Sign-In ──
-// Handle redirect result on page load (fallback path)
-getRedirectResult(auth).then(result => {
-  if (!result) return;
-  const user = result.user;
-  get(child(ref(db), `users/${user.uid}`)).then(snap => {
-    if (!snap.exists()) {
-      set(ref(db, `users/${user.uid}`), {
-        name: user.displayName || user.email, email: user.email,
-        role: 'student', xp: 0, streak: 0,
-        photoURL: user.photoURL || '', createdAt: new Date().toISOString(),
-      });
-    }
-  });
-}).catch(() => {});
-
-window.doGoogleSignIn = async function() {
-  const msgEl = document.getElementById('auth-msg');
-  const btn   = document.getElementById('google-btn');
-  btn.disabled = true;
-  msgEl.textContent = 'Opening Google sign-in…'; msgEl.className = '';
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user   = result.user;
-    const snap   = await get(child(ref(db), `users/${user.uid}`));
-    if (!snap.exists()) {
-      await set(ref(db, `users/${user.uid}`), {
-        name: user.displayName || user.email, email: user.email,
-        role: currentRole || 'student', xp: 0, streak: 0,
-        photoURL: user.photoURL || '', createdAt: new Date().toISOString(),
-      });
-    }
-    // onAuthStateChanged handles the rest
-  } catch(e) {
-    btn.disabled = false;
-    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
-      // Popup blocked — fall back to redirect
-      if (e.code === 'auth/popup-blocked') {
-        msgEl.textContent = 'Pop-up blocked — redirecting…'; msgEl.className = '';
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
-      msgEl.textContent = 'Sign-in cancelled.'; msgEl.className = 'msg-err';
-      return;
-    }
-    const msgs = {
-      'auth/internal-error':      'Google sign-in failed. Make sure this domain is listed under Firebase Console → Authentication → Settings → Authorized domains.',
-      'auth/unauthorized-domain': 'This domain is not authorised for Google sign-in. Add it to Firebase Console → Authentication → Settings → Authorized domains.',
-      'auth/account-exists-with-different-credential': 'An account already exists with this email — try signing in with your password instead.',
-      'auth/network-request-failed': 'Network error. Check your internet connection and try again.',
-    };
-    msgEl.textContent = msgs[e.code] || ('Google sign-in error: ' + (e.message || e.code));
-    msgEl.className = 'msg-err';
-  }
-};
 
 // ── Forgot Password ──
 window.doForgotPassword = async function() {

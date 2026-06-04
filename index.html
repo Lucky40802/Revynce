@@ -4,15 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Revynce — AI Student Platform</title>
+
+<!-- SEO -->
+<meta name="description" content="Revynce is the all-in-one AI education platform for students and teachers — AI notes, flashcards, quizzes, and classroom management in one place.">
+<meta name="keywords" content="AI study platform, student notes generator, AI flashcards, education platform, replace Quizlet, replace Sentral, HSC study tool">
+<meta name="author" content="Lakshan Jagadeishan">
+<link rel="canonical" href="https://lucky40802.github.io/Revynce/">
+
+<!-- Open Graph (Discord, iMessage, WhatsApp, LinkedIn previews) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lucky40802.github.io/Revynce/">
+<meta property="og:title" content="Revynce — AI Student Platform">
+<meta property="og:description" content="Upload a PDF, get AI notes, flashcards, quizzes, and a study plan in seconds. Replaces Quizlet, Education Perfect, Sentral, and Google Classroom.">
+<meta property="og:image" content="https://lucky40802.github.io/Revynce/og-image.svg">
+<meta property="og:site_name" content="Revynce">
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Revynce — AI Student Platform">
+<meta name="twitter:description" content="The all-in-one AI education platform for students and teachers.">
+<meta name="twitter:image" content="https://lucky40802.github.io/Revynce/og-image.svg">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="favicon.png" sizes="32x32">
+<link rel="apple-touch-icon" href="favicon.png">
 <!-- Apply saved theme before paint to prevent flash -->
 <script>(function(){var t=localStorage.getItem('revynce-theme'),a=localStorage.getItem('revynce-accent');if(t)document.documentElement.setAttribute('data-theme',t);if(a)document.documentElement.setAttribute('data-accent',a);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap" rel="stylesheet">
-<!-- Flaticon Uicons -->
-<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
-<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
-<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<!-- Flaticon Uicons — deferred to unblock first paint -->
+<link rel="preload" as="style" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css" onload="this.rel='stylesheet'">
+<link rel="preload" as="style" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css" onload="this.rel='stylesheet'">
+<link rel="preload" as="style" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css" onload="this.rel='stylesheet'">
+<noscript>
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+</noscript>
 <!-- Iconify — 200k+ icons from 100+ sets (Phosphor, Tabler, Lucide, Material Symbols, etc.)
      Usage: <iconify-icon icon="ph:rocket-bold"></iconify-icon>
             <iconify-icon icon="tabler:brand-google"></iconify-icon>
@@ -1356,6 +1386,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 </style>
 </head>
 <body>
+<noscript>
+  <div style="font-family:sans-serif;text-align:center;padding:60px 20px;background:#05070f;color:#e8eaf0;min-height:100vh">
+    <h1 style="color:#00f0d4;font-size:2rem;margin-bottom:12px">Revynce</h1>
+    <p style="color:#5a6a8a;margin-bottom:24px">AI-powered study platform for students and teachers.</p>
+    <p>JavaScript is required to run Revynce.</p>
+    <p style="margin-top:8px;color:#5a6a8a;font-size:.875rem">Please enable JavaScript in your browser settings and refresh the page.</p>
+  </div>
+</noscript>
 <!-- ═══════════════════════════════════════
      DOOR OPEN TRANSITION
 ═══════════════════════════════════════ -->
@@ -1727,11 +1765,10 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   </section>
 
   <div class="stats-section">
-    <div class="stat-item"><div class="stat-n">50K+</div><div class="stat-l">Students</div></div>
-    <div class="stat-item"><div class="stat-n">2M+</div><div class="stat-l">Notes Generated</div></div>
-    <div class="stat-item"><div class="stat-n">98%</div><div class="stat-l">Pass Rate</div></div>
-    <div class="stat-item"><div class="stat-n">140+</div><div class="stat-l">Schools</div></div>
-    <div class="stat-item"><div class="stat-n">4.9★</div><div class="stat-l">App Rating</div></div>
+    <div class="stat-item"><div class="stat-n">Free</div><div class="stat-l">To get started</div></div>
+    <div class="stat-item"><div class="stat-n">AI</div><div class="stat-l">Powered notes &amp; quizzes</div></div>
+    <div class="stat-item"><div class="stat-n">4</div><div class="stat-l">Apps replaced</div></div>
+    <div class="stat-item"><div class="stat-n">HSC</div><div class="stat-l">Major project</div></div>
   </div>
 
   <!-- ── PRICING ── -->
@@ -3837,16 +3874,70 @@ window._saveQuizScore = async function(score, total, subject) {
   } catch(e) { console.error('_saveQuizScore:', e); }
 };
 
+// ═══════════════════════════════════════
+// REVYNCE CONFIG — edit these values to reconfigure without searching the file
+// ═══════════════════════════════════════
+const REVYNCE_CONFIG = {
+  proxyUrl: 'https://us-central1-revynce-740d1.cloudfunctions.net/chat',
+  version:  '1.0.0',
+};
+window._PROXY_URL = REVYNCE_CONFIG.proxyUrl;
+
 // ── AI generation helpers ──
 async function readFileAsText(file) {
   if (!file) return null;
-  if (!file.type.startsWith('text/') && !file.name.match(/\.(txt|md|csv)$/i)) return null;
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result.slice(0, 8000));
-    reader.onerror = () => resolve(null);
-    reader.readAsText(file);
-  });
+  const name = file.name.toLowerCase();
+
+  // Plain text files
+  if (file.type.startsWith('text/') || name.match(/\.(txt|md|csv)$/i)) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result.slice(0, 12000));
+      reader.onerror = () => resolve(null);
+      reader.readAsText(file);
+    });
+  }
+
+  // PDF extraction via pdf.js
+  if (name.endsWith('.pdf')) {
+    try {
+      const { getDocument, GlobalWorkerOptions } = await import(
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs'
+      );
+      GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(s => s.str).join(' ') + '\n';
+      }
+      return text.slice(0, 12000) || null;
+    } catch(e) {
+      console.warn('PDF extraction failed:', e);
+      return null;
+    }
+  }
+
+  // DOCX extraction via mammoth
+  if (name.endsWith('.docx')) {
+    try {
+      const mammoth = await import(
+        'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js'
+      );
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      return (result.value || '').slice(0, 12000) || null;
+    } catch(e) {
+      console.warn('DOCX extraction failed:', e);
+      return null;
+    }
+  }
+
+  // PPTX and other formats — AI uses filename + subject only
+  return null;
 }
 
 async function generateContentWithAI(fileText, fileName, subject, instructions, mode, proxyUrl) {
@@ -4147,8 +4238,7 @@ window.doForgotPassword = async function() {
 <script>
 // ── Groq proxy URL (via Firebase Cloud Function) ──
 // Uses llama-3.3-70b-versatile — Groq's fastest versatile model
-const PROXY_URL = 'https://us-central1-revynce-740d1.cloudfunctions.net/chat';
-window._PROXY_URL = PROXY_URL;
+// PROXY_URL is defined in REVYNCE_CONFIG above — window._PROXY_URL is already set
 
 // ═══════════════════════════════════════
 //  DOOR OPEN TRANSITION
@@ -5580,6 +5670,7 @@ window.toggleBilling = function() {
   tog?.classList.toggle('annual', _billingAnnual);
   document.getElementById('ptog-monthly').style.color = _billingAnnual ? 'var(--text-muted)' : 'var(--text)';
   document.getElementById('ptog-annual').style.color  = _billingAnnual ? 'var(--text)' : 'var(--text-muted)';
+  // Update all pricing cards — landing page + in-app pricing modal
   document.querySelectorAll('.p-amount').forEach(el => {
     el.textContent = _billingAnnual ? el.dataset.y : el.dataset.m;
   });

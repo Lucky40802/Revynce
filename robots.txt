@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /functions/
+Disallow: /seed/
+
+Sitemap: https://lucky40802.github.io/Revynce/sitemap.xml

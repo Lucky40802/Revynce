@@ -37,11 +37,12 @@ exports.chat = onRequest(
 
     // ── CORS headers — restrict to your domain in production ──
     const allowedOrigins = [
+      "https://lucky40802.github.io",          // GitHub Pages (primary live URL)
       "https://revynce-740d1.web.app",
       "https://revynce-740d1.firebaseapp.com",
-      "http://localhost",          // for local testing
+      "http://localhost",
       "http://127.0.0.1",
-      "null",                      // file:// in browser during dev
+      "null",                                   // file:// in browser during dev
     ];
 
     const origin = req.headers.origin || "";

@@ -3608,8 +3608,14 @@ onAuthStateChanged(auth, async (user) => {
   const firstLoad = !window._authResolved;
   window._authResolved = true;
   if (user) {
+    // Re-enable login button in case it's still in loading state
+    const authBtn = document.getElementById('auth-btn');
+    if (authBtn) authBtn.disabled = false;
     try {
-      const snap = await get(child(ref(db), `users/${user.uid}`));
+      const snap = await Promise.race([
+        get(child(ref(db), `users/${user.uid}`)),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+      ]);
       const profile = snap.exists() ? snap.val() : { name: user.email, role: 'student', xp: 0, streak: 0 };
       const isNewUser = !snap.exists();
       window._userProfile = profile; window._uid = user.uid;
@@ -3625,7 +3631,9 @@ onAuthStateChanged(auth, async (user) => {
         }
       });
     } catch(e) {
-      populateApp({ name: user.email, role:'student', xp:0 });
+      const fallback = { name: user.displayName || user.email, role:'student', xp:0, streak:0 };
+      window._userProfile = fallback; window._uid = user.uid;
+      populateApp(fallback);
       showPage('app');
       window._initNotifications(user.uid, 'student');
       window._openDoor();

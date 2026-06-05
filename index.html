@@ -3403,6 +3403,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   <div class="modal" style="max-width:420px">
     <div class="modal-header"><div class="modal-title">Edit Profile</div><button class="modal-close" onclick="closeModal('edit-profile-modal')"><i class="fi fi-rr-cross"></i></button></div>
     <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-input" id="edit-profile-name" placeholder="Your name"></div>
+    <div class="form-group"><label class="form-label">Leaderboard Alias <span style="color:var(--text-muted);font-size:.75rem">(shown instead of real name)</span></label><input type="text" class="form-input" id="edit-profile-alias" placeholder="e.g. StarStudent42" maxlength="20"></div>
     <div class="form-group"><label class="form-label">Email <span style="color:var(--text-muted);font-size:.75rem">(cannot be changed here)</span></label><div id="edit-profile-email" style="font-size:.85rem;color:var(--text-muted);padding:10px 0"></div></div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('edit-profile-modal')">Cancel</button>
@@ -3659,7 +3660,7 @@ function populateApp(profile) {
   setText('profile-name', profile.name||'User');
   setText('profile-email', profile.email||'—');
   setText('profile-xp', profile.xp||0);
-  setText('lb-your-name', (profile.name||'You').split(' ')[0]);
+  setText('lb-your-name', profile.lbAlias || (profile.name||'You').split(' ')[0]);
   setText('lb-your-xp', (profile.xp||0)+' XP');
   setText('reward-xp-text', (profile.xp||0)+' / 500 XP');
   setStyle('xp-bar-fill', 'width', Math.min(100, ((profile.xp||0)/500)*100)+'%');
@@ -3949,22 +3950,31 @@ async function generateContentWithAI(fileText, fileName, subject, instructions, 
 - "test": a complete practice test in plain text with three sections: "MULTIPLE CHOICE" (10 questions A/B/C/D), "SHORT ANSWER" (4 questions with 3-5 sentence expected responses), and "ANSWER KEY" listing all correct answers with brief explanations
 Return only the raw JSON object.`;
 
-  const res = await fetch(proxyUrl, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
-      max_tokens: 4096,
-      temperature: 0.25
-    })
-  });
-  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error||'Proxy error '+res.status); }
+  let res;
+  try {
+    res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
+        max_tokens: 4096,
+        temperature: 0.25,
+        uid: window._uid || null,
+        plan: window._userProfile?.plan || 'free'
+      })
+    });
+  } catch(networkErr) {
+    throw new Error('Network error — check your connection and try again.');
+  }
+  if (res.status === 429) throw new Error('AI rate limit reached. Please wait a moment and try again.');
+  if (res.status === 503) throw new Error('AI service temporarily unavailable. Please try again in a minute.');
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error||'AI error ('+res.status+')'); }
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
-  if (!raw) throw new Error('Empty response from AI');
+  if (!raw) throw new Error('Empty response from AI — please try again.');
   const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('AI response was not valid JSON');
+  if (!match) throw new Error('AI returned unexpected format — please try again.');
   return JSON.parse(match[0]);
 }
 
@@ -3979,9 +3989,20 @@ appDrop.addEventListener('dragover', e => { e.preventDefault(); appDrop.classLis
 appDrop.addEventListener('dragleave', () => appDrop.classList.remove('drag-over'));
 appDrop.addEventListener('drop', e => { e.preventDefault(); appDrop.classList.remove('drag-over'); handleAppFile(e.dataTransfer.files[0]); });
 function handleAppFile(file) {
-  if (!file) return; appUploadedFile = file;
+  if (!file) return;
+  const MAX_MB = 20;
+  const allowedTypes = ['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','text/plain','application/vnd.openxmlformats-officedocument.presentationml.presentation','image/png','image/jpeg','image/gif','image/webp'];
+  const allowedExts = /\.(pdf|docx|txt|pptx|png|jpg|jpeg|gif|webp|md|csv)$/i;
+  if (file.size > MAX_MB * 1024 * 1024) {
+    appDrop.innerHTML = `<i class="fi fi-br-triangle-warning" style="color:var(--rose)"></i><p style="color:var(--rose)"><strong>File too large</strong></p><p style="font-size:.75rem;margin-top:5px">Max size is ${MAX_MB} MB. Your file is ${(file.size/1024/1024).toFixed(1)} MB.</p>`;
+    showToast(`File too large — max ${MAX_MB} MB.`, 'error'); return;
+  }
+  if (!allowedTypes.includes(file.type) && !allowedExts.test(file.name)) {
+    appDrop.innerHTML = `<i class="fi fi-br-triangle-warning" style="color:var(--rose)"></i><p style="color:var(--rose)"><strong>Unsupported file type</strong></p><p style="font-size:.75rem;margin-top:5px">Accepted: PDF, DOCX, PPTX, TXT, PNG, JPG</p>`;
+    showToast('Unsupported file type.', 'error'); return;
+  }
+  appUploadedFile = file;
   appDrop.innerHTML = `<i class="fi fi-br-file-check"></i><p><strong style="color:var(--cyan)">${file.name}</strong></p><p style="font-size:.75rem;margin-top:5px">${(file.size/1024).toFixed(1)} KB · Ready to generate</p>`;
-  // Reset deck name hint when a new file is picked
   const hint = document.getElementById('deck-name-hint');
   if (hint) hint.classList.remove('show');
 }
@@ -4058,7 +4079,10 @@ window.appGenerate = async function() {
     document.getElementById('upload-placeholder').style.display = 'none';
     document.getElementById('result-content').textContent = resultContent.notes;
     if (window._userProfile?.role==='teacher') document.getElementById('test-tab').style.display = '';
-  } catch(e) { status.textContent = '✗ ' + e.message; status.style.color = 'var(--rose)'; }
+  } catch(e) {
+    status.innerHTML = `✗ ${e.message} &nbsp;<button onclick="appGenerate()" style="font-size:.75rem;padding:3px 10px;border-radius:6px;background:var(--bg-card2);border:1px solid var(--border-active);color:var(--cyan);cursor:pointer">↺ Retry</button>`;
+    status.style.color = 'var(--rose)';
+  }
   btn.disabled = false;
 };
 
@@ -4625,7 +4649,7 @@ window.sendMsg = async function() {
     const res = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: chatHistory, max_tokens: 1024, temperature: 0.7 })
+      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: chatHistory, max_tokens: 1024, temperature: 0.7, uid: window._uid || null, plan: window._userProfile?.plan || 'free' })
     });
     if (!res.ok) { const err = await res.json().catch(()=>{}); throw new Error((err?.error) || 'Server error ' + res.status); }
     const data = await res.json();
@@ -5627,29 +5651,34 @@ window.openEditProfileModal = function() {
   const name = window._userProfile?.name || '';
   const email = window._auth?.currentUser?.email || '';
   document.getElementById('edit-profile-name').value = name;
+  document.getElementById('edit-profile-alias').value = window._userProfile?.lbAlias || '';
   document.getElementById('edit-profile-email').textContent = email;
   openModal('edit-profile-modal');
 };
 window.saveProfile = async function() {
-  const newName = document.getElementById('edit-profile-name').value.trim();
+  const newName  = document.getElementById('edit-profile-name').value.trim();
+  const newAlias = document.getElementById('edit-profile-alias').value.trim().slice(0, 20);
   if (!newName) { showToast('Name cannot be empty.', 'error'); return; }
   if (!window._uid) { showToast('Not logged in.', 'error'); return; }
   const btn = document.getElementById('save-profile-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
     await set(ref(db, `users/${window._uid}/name`), newName);
-    window._userProfile = { ...(window._userProfile || {}), name: newName };
+    if (newAlias) await set(ref(db, `users/${window._uid}/lbAlias`), newAlias);
+    else await set(ref(db, `users/${window._uid}/lbAlias`), null);
+    window._userProfile = { ...(window._userProfile || {}), name: newName, lbAlias: newAlias };
     document.getElementById('sb-name').textContent  = newName;
     document.getElementById('dash-name').textContent = newName;
     document.getElementById('profile-name').textContent = newName;
-    document.getElementById('lb-your-name').textContent = newName;
+    const lbDisplay = newAlias || newName.split(' ')[0];
+    document.getElementById('lb-your-name').textContent = lbDisplay;
     const ava = newName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
     document.getElementById('sb-avatar').textContent   = ava;
     document.getElementById('profile-ava').textContent = ava;
     closeModal('edit-profile-modal');
     showToast('Profile updated!', 'success');
   } catch(e) { showToast('Error saving profile.', 'error'); }
-  finally { btn.disabled = false; btn.textContent = 'Save'; }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-disk"></i> Save'; }
 };
 
 // ── Change Password modal ──
@@ -5689,11 +5718,19 @@ window.doChangePassword = async function() {
 
 // ── Pricing contact (Pro/Teacher plan inquiry) ──
 window.openPricingContact = function(plan) {
-  const subject = encodeURIComponent(`Revynce ${plan} Plan — Inquiry`);
-  const body = encodeURIComponent(
-    `Hi Lakshan,\n\nI'm interested in the Revynce ${plan} plan.\n\nMy details:\n- Name: \n- School/Organisation: \n- Number of users: \n\nPlease let me know the next steps.\n\nThanks`
-  );
-  window.open(`mailto:lakshan.jagadeishan@gmail.com?subject=${subject}&body=${body}`, '_blank');
+  // If already logged in, open mailto inquiry
+  if (window._uid) {
+    const subject = encodeURIComponent(`Revynce ${plan} Plan — Inquiry`);
+    const body = encodeURIComponent(
+      `Hi Lakshan,\n\nI'm interested in the Revynce ${plan} plan.\n\nMy details:\n- Name: \n- School/Organisation: \n- Number of users: \n\nPlease let me know the next steps.\n\nThanks`
+    );
+    window.open(`mailto:lakshan.jagadeishan@gmail.com?subject=${subject}&body=${body}`, '_blank');
+    return;
+  }
+  // Not logged in — navigate to signup with plan pre-noted
+  window._pendingPlan = plan;
+  showAuth('signup', plan === 'Teacher' ? 'teacher' : 'student');
+  showToast(`Sign up to get started with the ${plan} plan.`, 'info');
 };
 
 // ── View marked feedback modal ──
@@ -5728,6 +5765,7 @@ window.editNoticeIntoForm = function(title, body, audience) {
 
 // ── Delete posted notice card ──
 window.deletePostedNotice = function(btn) {
+  if (!confirm('Delete this notice? This cannot be undone.')) return;
   const card = btn.closest('[style*="padding:10px 0"]');
   if (card) { card.style.opacity = '0'; card.style.transition = 'opacity .25s'; setTimeout(() => card.remove(), 260); }
   showToast('Notice deleted.', 'success');

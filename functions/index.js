@@ -21,6 +21,12 @@
 
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
+const { initializeApp, getApps } = require("firebase-admin/app");
+const { getDatabase } = require("firebase-admin/database");
+
+if (!getApps().length) initializeApp();
+
+const FREE_DAILY_LIMIT = 50;
 
 // This references the secret stored in Google Secret Manager via Firebase
 const groqKey = defineSecret("GROQ_API_KEY");
@@ -67,6 +73,22 @@ exports.chat = onRequest(
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
+    }
+
+    // ── Rate limiting (50 req/day for free users) ──
+    const uid  = req.body?.uid;
+    const plan = req.body?.plan;
+    if (uid && plan !== 'pro' && plan !== 'teacher') {
+      const db      = getDatabase();
+      const today   = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const limRef  = db.ref(`rateLimits/${uid}/${today}`);
+      const snap    = await limRef.once('value');
+      const count   = snap.val() || 0;
+      if (count >= FREE_DAILY_LIMIT) {
+        res.status(429).json({ error: `Daily AI limit of ${FREE_DAILY_LIMIT} requests reached. Upgrade to Pro for unlimited access.` });
+        return;
+      }
+      await limRef.set(count + 1);
     }
 
     // Validate request body

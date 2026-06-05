@@ -3,4 +3,4 @@ Allow: /
 Disallow: /functions/
 Disallow: /seed/
 
-Sitemap: https://lucky40802.github.io/Revynce/sitemap.xml
+Sitemap: https://revynce-740d1.web.app/sitemap.xml

@@ -980,6 +980,31 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 @keyframes xpPop { 0%{transform:scale(1)} 55%{transform:scale(1.35)} 100%{transform:scale(1)} }
 
 /* ═══════════════════════════════════════
+   CLASSROOM VIEW
+═══════════════════════════════════════ */
+.assignment-card {
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px;
+  transition:border-color .18s;
+}
+.assignment-card:hover { border-color:var(--border-active); }
+.assignment-icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;background:rgba(0,240,212,.1);color:var(--cyan); }
+.assignment-body { flex:1;min-width:0; }
+.assignment-title { font-weight:700;font-size:.9rem;margin-bottom:3px; }
+.assignment-meta { font-size:.75rem;color:var(--text-muted);margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap; }
+.assignment-actions { display:flex;gap:8px;flex-wrap:wrap; }
+.assignment-status { font-size:.72rem;padding:3px 9px;border-radius:20px;font-weight:600; }
+.status-due { background:rgba(245,158,11,.12);color:var(--amber); }
+.status-done { background:rgba(34,197,94,.12);color:var(--green); }
+.status-overdue { background:rgba(244,63,94,.12);color:var(--rose); }
+.resource-card {
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;
+}
+.member-row { display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border); }
+.member-ava { width:34px;height:34px;border-radius:50%;background:var(--cyan-dim);color:var(--cyan);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0; }
+
+/* ═══════════════════════════════════════
    TUTORIAL OVERLAY
 ═══════════════════════════════════════ */
 .tutorial-overlay {
@@ -2493,7 +2518,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <button class="btn-ghost" onclick="connectGoogleClassroom()" style="font-size:.82rem;padding:8px 14px"><iconify-icon icon="mdi:google-classroom" style="font-size:1rem"></iconify-icon> &nbsp;Import classes from Google Classroom</button>
       </div>
       <div class="classes-grid" id="classes-grid">
-        <div class="class-card">
+        <div class="class-card" style="cursor:pointer" onclick="openClassroom('BIO-2024','Biology Year 12')">
           <div class="class-header">
             <div class="class-icon" style="background:rgba(0,240,212,0.1);color:var(--cyan)"><i class="fi fi-br-flask"></i></div>
             <span class="class-code-chip">BIO-2024</span>
@@ -2506,7 +2531,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <div class="class-stat"><div class="class-stat-n">3</div><div class="class-stat-l">Resources</div></div>
           </div>
         </div>
-        <div class="class-card">
+        <div class="class-card" style="cursor:pointer" onclick="openClassroom('MAT-ADV','Advanced Mathematics')">
           <div class="class-header">
             <div class="class-icon" style="background:rgba(124,58,237,0.1);color:#a78bfa"><i class="fi fi-br-calculator"></i></div>
             <span class="class-code-chip">MAT-ADV</span>
@@ -2853,10 +2878,23 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="form-group"><label class="form-label">Upload Rubric (optional)</label><div class="drop-zone" style="padding:18px"><i class="fi fi-br-list" style="font-size:1.2rem;margin-bottom:6px"></i><p><strong>Upload marking rubric</strong> or AI will create one</p><input type="file" style="display:none" accept=".pdf,.docx"></div></div>
           <button class="btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="generateTestPaperFromUpload()"><i class="fi fi-br-magic-wand"></i> &nbsp;Generate Test Paper</button>
         </div>
-        <div class="card card-pad" style="border:2px dashed var(--border);background:rgba(255,255,255,.01);text-align:center;padding:40px">
+        <div id="testbuilder-result" style="display:none">
+          <div class="card card-pad" style="margin-bottom:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+              <div class="card-title" style="margin:0"><i class="fi fi-br-check-circle" style="color:var(--green)"></i> &nbsp;Test Paper Ready</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn-primary" onclick="openAssignModal()"><i class="fi fi-br-paper-plane"></i> Assign to Class</button>
+                <button class="btn-ghost" onclick="copyTestToClipboard()"><i class="fi fi-br-copy"></i> Copy</button>
+              </div>
+            </div>
+            <div id="testbuilder-output" style="background:var(--bg-card2);border-radius:10px;padding:18px;font-size:.83rem;line-height:1.8;white-space:pre-wrap;max-height:500px;overflow-y:auto;font-family:var(--font-b)"></div>
+          </div>
+        </div>
+        <div id="testbuilder-placeholder" class="card card-pad" style="border:2px dashed var(--border);background:rgba(255,255,255,.01);text-align:center;padding:40px">
           <i class="fi fi-br-pencil-ruler" style="font-size:2rem;color:var(--border);display:block;margin-bottom:12px"></i>
           <p style="color:var(--text-muted);font-size:.875rem">Your generated test paper will appear here</p>
         </div>
+        <div id="testbuilder-status" style="font-size:.83rem;color:var(--cyan);margin-top:10px;text-align:center"></div>
       </div>
     </div>
 
@@ -3316,6 +3354,41 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       </div>
     </div>
 
+    <!-- ── CLASSROOM VIEW ── -->
+    <div class="app-panel" id="panel-classroom">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <button class="btn-ghost" style="padding:6px 12px;font-size:.8rem" onclick="showPanel('classes',document.querySelector('.nav-item[onclick*=classes]'))"><i class="fi fi-rr-angle-left"></i> My Classes</button>
+      </div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+        <div>
+          <h2 class="section-head" id="classroom-title" style="margin-bottom:4px">Classroom</h2>
+          <div style="font-size:.82rem;color:var(--text-muted)"><span id="classroom-code-badge" class="class-code-chip"></span> &nbsp;<span id="classroom-meta"></span></div>
+        </div>
+        <div id="classroom-teacher-actions" style="display:none;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="openAssignModal()"><i class="fi fi-br-plus"></i> Create Assignment</button>
+          <button class="btn-ghost" onclick="openUploadResourceModal()"><i class="fi fi-br-cloud-upload-alt"></i> Upload Resource</button>
+        </div>
+      </div>
+      <!-- Tabs -->
+      <div class="result-tabs" style="margin-bottom:20px">
+        <button class="result-tab active" onclick="switchClassroomTab('assignments',this)"><i class="fi fi-br-clipboard-list"></i> Assignments</button>
+        <button class="result-tab" onclick="switchClassroomTab('resources',this)"><i class="fi fi-br-folder"></i> Resources</button>
+        <button class="result-tab" onclick="switchClassroomTab('members',this)"><i class="fi fi-br-users"></i> Members</button>
+      </div>
+      <!-- Assignments tab -->
+      <div id="cr-tab-assignments">
+        <div id="assignments-list"><div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-clipboard-list" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>No assignments yet.</div></div>
+      </div>
+      <!-- Resources tab -->
+      <div id="cr-tab-resources" style="display:none">
+        <div id="resources-list"><div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-folder" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>No resources posted yet.</div></div>
+      </div>
+      <!-- Members tab -->
+      <div id="cr-tab-members" style="display:none">
+        <div id="members-list"><div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-users" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>Loading members…</div></div>
+      </div>
+    </div>
+
     <!-- ── IN-APP FOOTER ── -->
     <footer class="app-footer">
       <span>© 2026 Revynce · Built by <a href="https://lakshan-tcj.my.canva.site" target="_blank" rel="noopener">Lakshan Jagadeishan</a></span>
@@ -3748,6 +3821,8 @@ async function loadClasses() {
       const c = colorSets[i % colorSets.length]; i++;
       const div = document.createElement('div');
       div.className = 'class-card';
+      div.style.cursor = 'pointer';
+      div.onclick = () => openClassroom(code, cls.name||code);
       div.innerHTML = `
         <div class="class-header">
           <div class="class-icon" style="background:${c.bg};color:${c.color}"><i class="fi ${c.icon}"></i></div>
@@ -3758,7 +3833,8 @@ async function loadClasses() {
         <div class="class-stats">
           <div class="class-stat"><div class="class-stat-n">${cls.yearLevel||'—'}</div><div class="class-stat-l">Year Level</div></div>
           <div class="class-stat"><div class="class-stat-n">${cls.role==='teacher'?'Teacher':'Student'}</div><div class="class-stat-l">Role</div></div>
-        </div>`;
+        </div>
+        <div style="margin-top:10px;font-size:.75rem;color:var(--cyan)"><i class="fi fi-rr-arrow-right"></i> Open Classroom</div>`;
       grid.appendChild(div);
     }
     const addEl = document.createElement('div');
@@ -4297,7 +4373,7 @@ window.showPanel = function(name, navEl) {
   if (panel) panel.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (navEl) navEl.classList.add('active');
-  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',archive:'Archive',classes:'My Classes',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
+  const titles = {dashboard:'Dashboard',upload:'AI Upload',chatbot:'AI Tutor',archive:'Archive',classes:'My Classes',classroom:'Classroom',schedule:'Study Schedule',performance:'Performance',pomodoro:'Pomodoro Timer',leaderboard:'Leaderboard',voice:'Voice Rooms',rewards:'Rewards & Badges',teacher:'Teacher Dashboard',testbuilder:'AI Test Builder',marking:'AI Marking',notifications:'Notifications',profile:'Profile & Settings'};
   document.getElementById('topbar-title').textContent = titles[name] || name;
   if (name === 'schedule') renderSchedule();
   if (name === 'archive') { window.arGoHome?.(); window.loadArchive?.(); }
@@ -5786,16 +5862,312 @@ window.generateSchedule = async function() {
 };
 
 // ── Generate Test Paper (from Test Builder) ──
+// ── Test Builder — generate from uploaded file ──
+let _lastGeneratedTest = null;
 window.generateTestPaperFromUpload = async function() {
-  const subjectEl = document.querySelector('#panel-testbuilder input[placeholder*="Biology"]');
-  const yearEl    = document.querySelector('#panel-testbuilder input[placeholder*="Year 12"]');
-  const subject   = subjectEl?.value || 'General';
-  const year      = yearEl?.value    || 'Year 11/12';
-  if (!subject) { showToast('Please enter a subject first.', 'error'); return; }
-  showToast(`Generating test paper for ${subject} ${year}…`, 'info');
-  // Route to AI Upload panel with test mode
-  showPanel('upload', null);
-  showToast('Upload your source material in AI Upload to generate a test paper.', 'info');
+  const panel     = document.getElementById('panel-testbuilder');
+  const subjectEl = panel.querySelector('input[placeholder*="Biology"]');
+  const yearEl    = panel.querySelector('input[placeholder*="Year 12"]');
+  const mcqEl     = panel.querySelectorAll('input[type=number]')[0];
+  const saEl      = panel.querySelectorAll('input[type=number]')[1];
+  const essayEl   = panel.querySelectorAll('input[type=number]')[2];
+  const subject   = subjectEl?.value.trim() || 'General';
+  const year      = yearEl?.value.trim()    || 'Year 11/12';
+  const mcq       = mcqEl?.value  || 10;
+  const sa        = saEl?.value   || 5;
+  const essay     = essayEl?.value|| 2;
+  const fileInput = document.getElementById('testFile');
+  const file      = fileInput?.files?.[0];
+  const statusEl  = document.getElementById('testbuilder-status');
+  const btn       = panel.querySelector('button[onclick*="generateTestPaperFromUpload"]');
+  const proxyUrl  = window._PROXY_URL;
+  if (!proxyUrl) { showToast('AI proxy not configured.', 'error'); return; }
+  statusEl.textContent = '⏳ Generating test paper…';
+  if (btn) btn.disabled = true;
+  try {
+    let fileText = '';
+    if (file) fileText = await readFileAsText(file);
+    const context = fileText ? `Study material:\n"""\n${fileText.slice(0,8000)}\n"""\n\n` : '';
+    const prompt  = `${context}Generate a complete ${subject} ${year} test paper with exactly ${mcq} multiple-choice questions (A/B/C/D), ${sa} short-answer questions, and ${essay} essay question(s). Include an answer key at the end. Format clearly with section headings. Return only the plain text test paper.`;
+    const res = await fetch(proxyUrl, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'system',content:'You are an expert teacher. Generate a well-structured test paper.'},{role:'user',content:prompt}], max_tokens:4096, temperature:0.3, uid:window._uid||null, plan:window._userProfile?.plan||'free' })
+    });
+    if (!res.ok) throw new Error('AI error ' + res.status);
+    const data  = await res.json();
+    const paper = data.choices?.[0]?.message?.content;
+    if (!paper) throw new Error('Empty response from AI');
+    _lastGeneratedTest = { content: paper, title: `${subject} Test — ${year}` };
+    document.getElementById('testbuilder-output').textContent = paper;
+    document.getElementById('testbuilder-placeholder').style.display = 'none';
+    document.getElementById('testbuilder-result').style.display = '';
+    document.getElementById('assign-title').value = _lastGeneratedTest.title;
+    statusEl.textContent = '✓ Test paper generated!';
+    statusEl.style.color = 'var(--green)';
+  } catch(e) {
+    statusEl.innerHTML = `✗ ${e.message} <button onclick="generateTestPaperFromUpload()" style="font-size:.75rem;padding:3px 10px;border-radius:6px;background:var(--bg-card2);border:1px solid var(--border-active);color:var(--cyan);cursor:pointer">↺ Retry</button>`;
+    statusEl.style.color = 'var(--rose)';
+  }
+  if (btn) btn.disabled = false;
+};
+
+window.copyTestToClipboard = function() {
+  const text = document.getElementById('testbuilder-output').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!', 'success'));
+};
+
+// ── Classroom feature ──
+let _currentClassCode = null;
+let _currentClassroomTab = 'assignments';
+let _currentAssignmentId = null;
+
+window.openClassroom = async function(code, name) {
+  _currentClassCode = code;
+  document.getElementById('classroom-title').textContent   = name;
+  document.getElementById('classroom-code-badge').textContent = code;
+  document.getElementById('classroom-meta').textContent = 'Loading…';
+  const isTeacher = window._userProfile?.role === 'teacher';
+  const teacherActions = document.getElementById('classroom-teacher-actions');
+  if (teacherActions) teacherActions.style.display = isTeacher ? 'flex' : 'none';
+  switchClassroomTab('assignments', document.querySelector('#panel-classroom .result-tab'));
+  showPanel('classroom', null);
+  // Count members
+  try {
+    const membersSnap = await get(child(ref(db), `classMembers/${code}`));
+    const count = membersSnap.exists() ? Object.keys(membersSnap.val()).length : 0;
+    document.getElementById('classroom-meta').textContent = `${count} member${count !== 1 ? 's' : ''}`;
+  } catch(e) { document.getElementById('classroom-meta').textContent = ''; }
+  loadAssignments(code);
+  loadResources(code);
+  loadMembers(code);
+};
+
+window.switchClassroomTab = function(tab, btn) {
+  _currentClassroomTab = tab;
+  ['assignments','resources','members'].forEach(t => {
+    const el = document.getElementById('cr-tab-' + t);
+    if (el) el.style.display = t === tab ? '' : 'none';
+  });
+  document.querySelectorAll('#panel-classroom .result-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+};
+
+async function loadAssignments(code) {
+  const list = document.getElementById('assignments-list');
+  list.innerHTML = '<div style="color:var(--text-muted);font-size:.83rem;padding:10px">Loading…</div>';
+  try {
+    const snap = await get(child(ref(db), `assignments/${code}`));
+    if (!snap.exists()) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-clipboard-list" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>No assignments yet.</div>'; return; }
+    const items = snap.val();
+    const isTeacher = window._userProfile?.role === 'teacher';
+    list.innerHTML = '';
+    for (const [id, a] of Object.entries(items).sort((x,y) => (y[1].createdAt||'').localeCompare(x[1].createdAt||''))) {
+      // Check if student completed it
+      let statusHtml = '<span class="assignment-status status-due">Due</span>';
+      if (a.dueDate && new Date(a.dueDate) < new Date()) statusHtml = '<span class="assignment-status status-overdue">Overdue</span>';
+      if (!isTeacher) {
+        const subSnap = await get(child(ref(db), `submissions/${code}/${id}/${window._uid}`)).catch(()=>null);
+        if (subSnap?.exists()) statusHtml = '<span class="assignment-status status-done"><i class="fi fi-br-check"></i> Done</span>';
+      }
+      const dueStr = a.dueDate ? `Due ${new Date(a.dueDate).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}` : 'No due date';
+      const card = document.createElement('div');
+      card.className = 'assignment-card';
+      card.innerHTML = `
+        <div class="assignment-icon"><i class="fi fi-br-pencil-ruler"></i></div>
+        <div class="assignment-body">
+          <div class="assignment-title">${a.title||'Untitled'}</div>
+          <div class="assignment-meta">
+            <span><i class="fi fi-rr-calendar"></i> ${dueStr}</span>
+            <span><i class="fi fi-rr-user"></i> ${a.teacherName||'Teacher'}</span>
+            ${statusHtml}
+          </div>
+          ${a.instructions ? `<div style="font-size:.78rem;color:var(--text-muted);margin-bottom:8px">${a.instructions}</div>` : ''}
+          <div class="assignment-actions">
+            ${isTeacher
+              ? `<button class="btn-ghost" style="padding:5px 12px;font-size:.78rem" onclick="viewAssignmentSubmissions('${code}','${id}','${(a.title||'').replace(/'/g,"\\'")}')"><i class="fi fi-br-users"></i> View Submissions</button>
+                 <button class="btn-ghost" style="padding:5px 12px;font-size:.78rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="deleteAssignment('${code}','${id}')"><i class="fi fi-br-trash"></i> Delete</button>`
+              : `<button class="btn-primary" style="padding:6px 14px;font-size:.8rem" onclick="openTakeTest('${code}','${id}','${(a.title||'').replace(/'/g,"\\'")}')"><i class="fi fi-br-play"></i> Open Assignment</button>`
+            }
+          </div>
+        </div>`;
+      list.appendChild(card);
+    }
+  } catch(e) { list.innerHTML = '<div style="color:var(--rose);font-size:.83rem;padding:10px">Error loading assignments.</div>'; }
+}
+
+async function loadResources(code) {
+  const list = document.getElementById('resources-list');
+  try {
+    const snap = await get(child(ref(db), `resources/${code}`));
+    if (!snap.exists()) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-folder" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>No resources posted yet.</div>'; return; }
+    const items = snap.val();
+    list.innerHTML = '';
+    for (const [id, r] of Object.entries(items).sort((x,y) => (y[1].createdAt||'').localeCompare(x[1].createdAt||''))) {
+      const typeIcon = {notes:'fi-br-document',worksheet:'fi-br-pencil',link:'fi-br-link',other:'fi-br-folder'}[r.type] || 'fi-br-folder';
+      const card = document.createElement('div');
+      card.className = 'resource-card';
+      card.innerHTML = `
+        <div class="assignment-icon" style="background:var(--violet-dim);color:#a78bfa"><i class="fi ${typeIcon}"></i></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:.87rem;margin-bottom:2px">${r.title||'Resource'}</div>
+          <div style="font-size:.75rem;color:var(--text-muted)">${r.type||'File'} · ${r.teacherName||'Teacher'}</div>
+          ${r.content ? `<div style="font-size:.78rem;margin-top:6px;color:var(--text-muted)">${r.content.slice(0,120)}${r.content.length>120?'…':''}</div>` : ''}
+        </div>
+        ${window._userProfile?.role==='teacher' ? `<button class="btn-ghost" style="padding:5px 10px;font-size:.75rem;color:var(--rose)" onclick="deleteResource('${code}','${id}')"><i class="fi fi-br-trash"></i></button>` : ''}`;
+      list.appendChild(card);
+    }
+  } catch(e) {}
+}
+
+async function loadMembers(code) {
+  const list = document.getElementById('members-list');
+  try {
+    const snap = await get(child(ref(db), `classMembers/${code}`));
+    if (!snap.exists()) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">No members found.</div>'; return; }
+    list.innerHTML = '';
+    for (const [uid, m] of Object.entries(snap.val())) {
+      const name = m.name || 'Student';
+      const init = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const row = document.createElement('div');
+      row.className = 'member-row';
+      row.innerHTML = `<div class="member-ava">${init}</div><div><div style="font-weight:600;font-size:.87rem">${name}</div><div style="font-size:.74rem;color:var(--text-muted)">Joined ${new Date(m.joinedAt||Date.now()).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}</div></div>`;
+      list.appendChild(row);
+    }
+  } catch(e) {}
+}
+
+// ── Assign modal ──
+window.openAssignModal = async function() {
+  const sel = document.getElementById('assign-class-select');
+  sel.innerHTML = '<option value="">— choose a class —</option>';
+  // Populate teacher's classes
+  try {
+    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    if (snap.exists()) {
+      for (const [code, cls] of Object.entries(snap.val())) {
+        sel.innerHTML += `<option value="${code}">${cls.name||code} (${code})</option>`;
+      }
+    }
+  } catch(e) {}
+  if (_currentClassCode) sel.value = _currentClassCode;
+  if (_lastGeneratedTest) document.getElementById('assign-title').value = _lastGeneratedTest.title;
+  openModal('assign-modal');
+};
+
+window.postAssignment = async function() {
+  const title       = document.getElementById('assign-title').value.trim();
+  const classCode   = document.getElementById('assign-class-select').value;
+  const dueDate     = document.getElementById('assign-due-date').value;
+  const instructions= document.getElementById('assign-instructions').value.trim();
+  if (!title)     { showToast('Please enter a title.', 'error'); return; }
+  if (!classCode) { showToast('Please select a class.', 'error'); return; }
+  const btn = document.getElementById('assign-post-btn');
+  btn.disabled = true; btn.textContent = 'Posting…';
+  try {
+    const key = Date.now().toString();
+    await set(ref(db, `assignments/${classCode}/${key}`), {
+      title, dueDate: dueDate||'', instructions,
+      content: _lastGeneratedTest?.content || '',
+      teacherName: window._userProfile?.name || 'Teacher',
+      teacherUid: window._uid,
+      createdAt: new Date().toISOString(),
+      type: 'test'
+    });
+    closeModal('assign-modal');
+    showToast(`"${title}" assigned to ${classCode}!`, 'success');
+    if (_currentClassCode === classCode) loadAssignments(classCode);
+  } catch(e) { showToast('Error posting assignment.', 'error'); }
+  btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-paper-plane"></i> Post Assignment';
+};
+
+// ── Open / take assignment (student) ──
+window.openTakeTest = async function(classCode, assignmentId, title) {
+  _currentAssignmentId = assignmentId;
+  _currentClassCode = classCode;
+  document.getElementById('take-test-title').textContent = title;
+  document.getElementById('take-test-meta').textContent = 'Loading…';
+  document.getElementById('take-test-body').textContent = 'Loading assignment…';
+  openModal('take-test-modal');
+  try {
+    const snap = await get(child(ref(db), `assignments/${classCode}/${assignmentId}`));
+    if (!snap.exists()) { document.getElementById('take-test-body').textContent = 'Assignment not found.'; return; }
+    const a = snap.val();
+    document.getElementById('take-test-meta').textContent = a.dueDate ? `Due ${new Date(a.dueDate).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})}` : '';
+    document.getElementById('take-test-body').textContent = a.content || 'No content available.';
+    // Check if already done
+    const subSnap = await get(child(ref(db), `submissions/${classCode}/${assignmentId}/${window._uid}`)).catch(()=>null);
+    if (subSnap?.exists()) {
+      document.getElementById('take-test-done-btn').textContent = '✓ Completed';
+      document.getElementById('take-test-done-btn').disabled = true;
+    } else {
+      document.getElementById('take-test-done-btn').disabled = false;
+      document.getElementById('take-test-done-btn').innerHTML = '<i class="fi fi-br-check"></i> Mark as Complete';
+    }
+  } catch(e) { document.getElementById('take-test-body').textContent = 'Error loading assignment.'; }
+};
+
+window.markAssignmentDone = async function() {
+  if (!_currentAssignmentId || !_currentClassCode || !window._uid) return;
+  try {
+    await set(ref(db, `submissions/${_currentClassCode}/${_currentAssignmentId}/${window._uid}`), {
+      completedAt: new Date().toISOString(), uid: window._uid, name: window._userProfile?.name||'Student'
+    });
+    document.getElementById('take-test-done-btn').innerHTML = '✓ Completed';
+    document.getElementById('take-test-done-btn').disabled = true;
+    showToast('Marked as complete!', 'success');
+    loadAssignments(_currentClassCode);
+  } catch(e) { showToast('Error saving progress.', 'error'); }
+};
+
+window.deleteAssignment = async function(code, id) {
+  if (!confirm('Delete this assignment? Students will lose access.')) return;
+  try { await set(ref(db, `assignments/${code}/${id}`), null); showToast('Assignment deleted.', 'success'); loadAssignments(code); }
+  catch(e) { showToast('Error deleting.', 'error'); }
+};
+
+window.viewAssignmentSubmissions = async function(code, id, title) {
+  try {
+    const snap = await get(child(ref(db), `submissions/${code}/${id}`));
+    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+    const names = snap.exists() ? Object.values(snap.val()).map(s=>s.name||'Student').join(', ') : 'None yet';
+    showToast(`"${title}": ${count} submission${count!==1?'s':''}${count>0?' — '+names:''}`, count>0?'success':'info');
+  } catch(e) { showToast('Error loading submissions.', 'error'); }
+};
+
+// ── Upload resource ──
+window.openUploadResourceModal = async function() {
+  const sel = document.getElementById('resource-class-select');
+  sel.innerHTML = '<option value="">— choose a class —</option>';
+  try {
+    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    if (snap.exists()) for (const [code, cls] of Object.entries(snap.val()))
+      sel.innerHTML += `<option value="${code}">${cls.name||code} (${code})</option>`;
+  } catch(e) {}
+  if (_currentClassCode) sel.value = _currentClassCode;
+  openModal('upload-resource-modal');
+};
+
+window.postResource = async function() {
+  const title   = document.getElementById('resource-title').value.trim();
+  const code    = document.getElementById('resource-class-select').value;
+  const type    = document.getElementById('resource-type').value;
+  const content = document.getElementById('resource-content').value.trim();
+  if (!title || !code) { showToast('Please fill in title and class.', 'error'); return; }
+  try {
+    await set(ref(db, `resources/${code}/${Date.now()}`), {
+      title, type, content, teacherName: window._userProfile?.name||'Teacher',
+      teacherUid: window._uid, createdAt: new Date().toISOString()
+    });
+    closeModal('upload-resource-modal');
+    showToast(`Resource posted to ${code}!`, 'success');
+    if (_currentClassCode === code) loadResources(code);
+  } catch(e) { showToast('Error posting resource.', 'error'); }
+};
+
+window.deleteResource = async function(code, id) {
+  if (!confirm('Delete this resource?')) return;
+  try { await set(ref(db, `resources/${code}/${id}`), null); showToast('Resource deleted.', 'success'); loadResources(code); }
+  catch(e) { showToast('Error deleting.', 'error'); }
 };
 
 // ── Add Period modal (teacher timetable) ──
@@ -7221,6 +7593,79 @@ window.submitOrgForm = async function() {
 
   </div>
 </div>
+<!-- ── ASSIGN TO CLASS MODAL ── -->
+<div class="modal-overlay" id="assign-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fi fi-br-paper-plane" style="color:var(--cyan)"></i> &nbsp;Assign to Class</div>
+      <button class="modal-close" onclick="closeModal('assign-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Assignment Title</label>
+      <input type="text" class="form-input" id="assign-title" placeholder="e.g. Biology Test 1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Select Class</label>
+      <select class="form-input" id="assign-class-select"><option value="">— choose a class —</option></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Due Date <span style="color:var(--text-muted);font-size:.75rem">(optional)</span></label>
+      <input type="date" class="form-input" id="assign-due-date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Instructions <span style="color:var(--text-muted);font-size:.75rem">(optional)</span></label>
+      <textarea class="form-input" id="assign-instructions" rows="2" placeholder="Any extra notes for students…" style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('assign-modal')">Cancel</button>
+      <button class="btn-primary" id="assign-post-btn" onclick="postAssignment()"><i class="fi fi-br-paper-plane"></i> Post Assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TAKE TEST MODAL ── -->
+<div class="modal-overlay" id="take-test-modal" style="align-items:flex-start;padding:30px 20px;overflow-y:auto">
+  <div class="modal" style="max-width:760px;max-height:88vh;overflow-y:auto">
+    <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:2;border-radius:var(--radius) var(--radius) 0 0">
+      <div>
+        <div class="modal-title" id="take-test-title">Assignment</div>
+        <div style="font-size:.78rem;color:var(--text-muted)" id="take-test-meta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('take-test-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <div id="take-test-body" style="padding:0 24px 24px;white-space:pre-wrap;font-size:.85rem;line-height:1.85;font-family:var(--font-b)"></div>
+    <div style="padding:0 24px 24px;border-top:1px solid var(--border);margin-top:16px;display:flex;gap:10px;justify-content:flex-end" id="take-test-footer">
+      <button class="btn-ghost" onclick="closeModal('take-test-modal')">Close</button>
+      <button class="btn-primary" onclick="markAssignmentDone()" id="take-test-done-btn"><i class="fi fi-br-check"></i> Mark as Complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── UPLOAD RESOURCE MODAL ── -->
+<div class="modal-overlay" id="upload-resource-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fi fi-br-cloud-upload-alt" style="color:var(--cyan)"></i> &nbsp;Upload Resource</div>
+      <button class="modal-close" onclick="closeModal('upload-resource-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <div class="form-group"><label class="form-label">Resource Title</label><input type="text" class="form-input" id="resource-title" placeholder="e.g. Chapter 5 Notes"></div>
+    <div class="form-group"><label class="form-label">Select Class</label><select class="form-input" id="resource-class-select"><option value="">— choose a class —</option></select></div>
+    <div class="form-group"><label class="form-label">Resource Type</label>
+      <select class="form-input" id="resource-type">
+        <option value="notes">Notes</option>
+        <option value="worksheet">Worksheet</option>
+        <option value="link">Link</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Content / Link</label><textarea class="form-input" id="resource-content" rows="3" placeholder="Paste notes, link, or description…" style="resize:vertical"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('upload-resource-modal')">Cancel</button>
+      <button class="btn-primary" onclick="postResource()"><i class="fi fi-br-cloud-upload-alt"></i> Post Resource</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── IN-APP PRICING MODAL ── -->
 <div class="pricing-modal-overlay" id="pricing-modal-overlay" onclick="if(event.target===this)closePricingModal()">
   <div class="pricing-modal">

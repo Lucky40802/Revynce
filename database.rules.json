@@ -85,6 +85,18 @@
         ".read": "$uid === auth.uid",
         ".write": "$uid === auth.uid"
       }
+    },
+    "assignments": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "submissions": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "resources": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
     }
   }
 }

@@ -5933,7 +5933,8 @@ window.openClassroom = async function(code, name) {
   showPanel('classroom', null);
   // Count members
   try {
-    const membersSnap = await get(child(ref(db), `classMembers/${code}`));
+    const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+    const membersSnap = await _get(_child(_ref(_db), `classMembers/${code}`));
     const count = membersSnap.exists() ? Object.keys(membersSnap.val()).length : 0;
     document.getElementById('classroom-meta').textContent = `${count} member${count !== 1 ? 's' : ''}`;
   } catch(e) { document.getElementById('classroom-meta').textContent = ''; }
@@ -5953,20 +5954,20 @@ window.switchClassroomTab = function(tab, btn) {
 };
 
 async function loadAssignments(code) {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild,_set=window._fbSet;
   const list = document.getElementById('assignments-list');
   list.innerHTML = '<div style="color:var(--text-muted);font-size:.83rem;padding:10px">Loading…</div>';
   try {
-    const snap = await get(child(ref(db), `assignments/${code}`));
+    const snap = await _get(_child(_ref(_db), `assignments/${code}`));
     if (!snap.exists()) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-clipboard-list" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>No assignments yet.</div>'; return; }
     const items = snap.val();
     const isTeacher = window._userProfile?.role === 'teacher';
     list.innerHTML = '';
     for (const [id, a] of Object.entries(items).sort((x,y) => (y[1].createdAt||'').localeCompare(x[1].createdAt||''))) {
-      // Check if student completed it
       let statusHtml = '<span class="assignment-status status-due">Due</span>';
       if (a.dueDate && new Date(a.dueDate) < new Date()) statusHtml = '<span class="assignment-status status-overdue">Overdue</span>';
       if (!isTeacher) {
-        const subSnap = await get(child(ref(db), `submissions/${code}/${id}/${window._uid}`)).catch(()=>null);
+        const subSnap = await _get(_child(_ref(_db), `submissions/${code}/${id}/${window._uid}`)).catch(()=>null);
         if (subSnap?.exists()) statusHtml = '<span class="assignment-status status-done"><i class="fi fi-br-check"></i> Done</span>';
       }
       const dueStr = a.dueDate ? `Due ${new Date(a.dueDate).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}` : 'No due date';
@@ -5996,9 +5997,10 @@ async function loadAssignments(code) {
 }
 
 async function loadResources(code) {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
   const list = document.getElementById('resources-list');
   try {
-    const snap = await get(child(ref(db), `resources/${code}`));
+    const snap = await _get(_child(_ref(_db), `resources/${code}`));
     if (!snap.exists()) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-folder" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>No resources posted yet.</div>'; return; }
     const items = snap.val();
     list.innerHTML = '';
@@ -6020,9 +6022,10 @@ async function loadResources(code) {
 }
 
 async function loadMembers(code) {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
   const list = document.getElementById('members-list');
   try {
-    const snap = await get(child(ref(db), `classMembers/${code}`));
+    const snap = await _get(_child(_ref(_db), `classMembers/${code}`));
     if (!snap.exists()) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">No members found.</div>'; return; }
     list.innerHTML = '';
     for (const [uid, m] of Object.entries(snap.val())) {
@@ -6038,11 +6041,11 @@ async function loadMembers(code) {
 
 // ── Assign modal ──
 window.openAssignModal = async function() {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
   const sel = document.getElementById('assign-class-select');
   sel.innerHTML = '<option value="">— choose a class —</option>';
-  // Populate teacher's classes
   try {
-    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    const snap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
     if (snap.exists()) {
       for (const [code, cls] of Object.entries(snap.val())) {
         sel.innerHTML += `<option value="${code}">${cls.name||code} (${code})</option>`;
@@ -6064,8 +6067,9 @@ window.postAssignment = async function() {
   const btn = document.getElementById('assign-post-btn');
   btn.disabled = true; btn.textContent = 'Posting…';
   try {
+    const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
     const key = Date.now().toString();
-    await set(ref(db, `assignments/${classCode}/${key}`), {
+    await _set(_ref(_db, `assignments/${classCode}/${key}`), {
       title, dueDate: dueDate||'', instructions,
       content: _lastGeneratedTest?.content || '',
       teacherName: window._userProfile?.name || 'Teacher',
@@ -6089,13 +6093,13 @@ window.openTakeTest = async function(classCode, assignmentId, title) {
   document.getElementById('take-test-body').textContent = 'Loading assignment…';
   openModal('take-test-modal');
   try {
-    const snap = await get(child(ref(db), `assignments/${classCode}/${assignmentId}`));
+    const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+    const snap = await _get(_child(_ref(_db), `assignments/${classCode}/${assignmentId}`));
     if (!snap.exists()) { document.getElementById('take-test-body').textContent = 'Assignment not found.'; return; }
     const a = snap.val();
     document.getElementById('take-test-meta').textContent = a.dueDate ? `Due ${new Date(a.dueDate).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})}` : '';
     document.getElementById('take-test-body').textContent = a.content || 'No content available.';
-    // Check if already done
-    const subSnap = await get(child(ref(db), `submissions/${classCode}/${assignmentId}/${window._uid}`)).catch(()=>null);
+    const subSnap = await _get(_child(_ref(_db), `submissions/${classCode}/${assignmentId}/${window._uid}`)).catch(()=>null);
     if (subSnap?.exists()) {
       document.getElementById('take-test-done-btn').textContent = '✓ Completed';
       document.getElementById('take-test-done-btn').disabled = true;
@@ -6109,7 +6113,8 @@ window.openTakeTest = async function(classCode, assignmentId, title) {
 window.markAssignmentDone = async function() {
   if (!_currentAssignmentId || !_currentClassCode || !window._uid) return;
   try {
-    await set(ref(db, `submissions/${_currentClassCode}/${_currentAssignmentId}/${window._uid}`), {
+    const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
+    await _set(_ref(_db, `submissions/${_currentClassCode}/${_currentAssignmentId}/${window._uid}`), {
       completedAt: new Date().toISOString(), uid: window._uid, name: window._userProfile?.name||'Student'
     });
     document.getElementById('take-test-done-btn').innerHTML = '✓ Completed';
@@ -6121,13 +6126,14 @@ window.markAssignmentDone = async function() {
 
 window.deleteAssignment = async function(code, id) {
   if (!confirm('Delete this assignment? Students will lose access.')) return;
-  try { await set(ref(db, `assignments/${code}/${id}`), null); showToast('Assignment deleted.', 'success'); loadAssignments(code); }
+  try { const _db=window._db,_ref=window._fbRef,_set=window._fbSet; await _set(_ref(_db, `assignments/${code}/${id}`), null); showToast('Assignment deleted.', 'success'); loadAssignments(code); }
   catch(e) { showToast('Error deleting.', 'error'); }
 };
 
 window.viewAssignmentSubmissions = async function(code, id, title) {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
   try {
-    const snap = await get(child(ref(db), `submissions/${code}/${id}`));
+    const snap = await _get(_child(_ref(_db), `submissions/${code}/${id}`));
     const count = snap.exists() ? Object.keys(snap.val()).length : 0;
     const names = snap.exists() ? Object.values(snap.val()).map(s=>s.name||'Student').join(', ') : 'None yet';
     showToast(`"${title}": ${count} submission${count!==1?'s':''}${count>0?' — '+names:''}`, count>0?'success':'info');
@@ -6136,10 +6142,11 @@ window.viewAssignmentSubmissions = async function(code, id, title) {
 
 // ── Upload resource ──
 window.openUploadResourceModal = async function() {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
   const sel = document.getElementById('resource-class-select');
   sel.innerHTML = '<option value="">— choose a class —</option>';
   try {
-    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
+    const snap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
     if (snap.exists()) for (const [code, cls] of Object.entries(snap.val()))
       sel.innerHTML += `<option value="${code}">${cls.name||code} (${code})</option>`;
   } catch(e) {}
@@ -6154,7 +6161,8 @@ window.postResource = async function() {
   const content = document.getElementById('resource-content').value.trim();
   if (!title || !code) { showToast('Please fill in title and class.', 'error'); return; }
   try {
-    await set(ref(db, `resources/${code}/${Date.now()}`), {
+    const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
+    await _set(_ref(_db, `resources/${code}/${Date.now()}`), {
       title, type, content, teacherName: window._userProfile?.name||'Teacher',
       teacherUid: window._uid, createdAt: new Date().toISOString()
     });
@@ -6166,7 +6174,7 @@ window.postResource = async function() {
 
 window.deleteResource = async function(code, id) {
   if (!confirm('Delete this resource?')) return;
-  try { await set(ref(db, `resources/${code}/${id}`), null); showToast('Resource deleted.', 'success'); loadResources(code); }
+  try { const _db=window._db,_ref=window._fbRef,_set=window._fbSet; await _set(_ref(_db,`resources/${code}/${id}`),null); showToast('Resource deleted.','success'); loadResources(code); }
   catch(e) { showToast('Error deleting.', 'error'); }
 };
 

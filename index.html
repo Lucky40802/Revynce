@@ -4716,6 +4716,7 @@ window.sendMsg = async function() {
   appendChat(text, 'user');
   chatHistory.push({ role: 'user', content: text });
   showTyping();
+  const PROXY_URL = window._PROXY_URL;
   if (!PROXY_URL || PROXY_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
     removeTyping();
     appendChatError('⚙ AI Tutor not yet connected. Deploy the Cloud Function and set PROXY_URL. See functions/index.js for instructions.');

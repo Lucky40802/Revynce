@@ -1825,9 +1825,10 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Practice Test generation</span></li>
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Archive &amp; subject folders</span></li>
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>AI Study Tutor chat</span></li>
-          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>Unlimited uploads</span></li>
-          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>PDF &amp; DOCX export</span></li>
-          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-cross"></i></div><span>Priority AI processing</span></li>
+          <li style="font-size:.72rem;color:var(--text-muted);padding:4px 0 2px;list-style:none">Upgrade to Pro to unlock:</li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-lock"></i></div><span>Unlimited uploads</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-lock"></i></div><span>PDF &amp; DOCX export</span></li>
+          <li class="pricing-feat muted"><div class="pf-ic pf-no"><i class="fi fi-br-lock"></i></div><span>Priority AI processing</span></li>
         </ul>
         <button class="pricing-cta free" onclick="showAuth('signup')">Get Started Free</button>
       </div>
@@ -1870,7 +1871,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Bulk material upload</span></li>
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Custom class codes</span></li>
           <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Priority support</span></li>
-          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>School dashboard (coming soon)</span></li>
+          <li class="pricing-feat"><div class="pf-ic pf-yes"><i class="fi fi-br-check"></i></div><span>Admin school dashboard (coming soon)</span></li>
         </ul>
         <button class="pricing-cta teach" onclick="showAuth('signup','teacher')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Get Teacher Plan</button>
       </div>
@@ -2042,7 +2043,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 
   <div class="cta-section">
     <h2>Ready to ace your exams?</h2>
-    <p>Join 50,000+ students and 3,000+ teachers already using Revynce.</p>
+    <p>Built for Australian HSC students and their teachers.</p>
     <div class="cta-grid">
       <div class="cta-type" onclick="showAuth('signup','student')"><i class="fi fi-br-graduation-cap"></i><span>Student Account</span></div>
       <div class="cta-type" onclick="showAuth('signup','org-student')"><i class="fi fi-br-school"></i><span>School Student</span></div>
@@ -2079,7 +2080,6 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <div class="footer-col-title">Legal</div>
         <a href="terms.html" target="_blank" rel="noopener" class="footer-link">Terms &amp; Conditions</a>
         <a href="privacy.html" target="_blank" rel="noopener" class="footer-link">Privacy Policy</a>
-        <a href="terms.html" target="_blank" rel="noopener" class="footer-link">Acceptable Use</a>
       </div>
     </div>
     <div class="land-footer-bottom">
@@ -2179,11 +2179,10 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <button class="nav-item" onclick="showPanel('upload',this)"><i class="fi fi-br-cloud-upload-alt"></i> AI Upload</button>
     <button class="nav-item" onclick="showPanel('chatbot',this)"><i class="fi fi-br-robot"></i> AI Tutor</button>
     <button class="nav-item" onclick="showPanel('archive',this)"><i class="fi fi-br-archive"></i> Archive</button>
-    <div class="sb-section">Organise</div>
     <button class="nav-item" onclick="showPanel('classes',this)"><i class="fi fi-br-school"></i> My Classes</button>
     <button class="nav-item" onclick="showPanel('schedule',this)"><i class="fi fi-br-calendar"></i> Study Schedule</button>
     <button class="nav-item" onclick="showPanel('performance',this)"><i class="fi fi-br-chart-histogram"></i> Performance</button>
-    <div class="sb-section">Community</div>
+    <div class="sb-section">Study Tools</div>
     <button class="nav-item" onclick="showPanel('pomodoro',this)"><i class="fi fi-br-time-forward"></i> Pomodoro</button>
     <button class="nav-item" onclick="showPanel('voice',this)"><i class="fi fi-br-microphone"></i> Voice Rooms</button>
     <button class="nav-item" onclick="showPanel('leaderboard',this)"><i class="fi fi-br-trophy"></i> Leaderboard</button>
@@ -2210,7 +2209,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <!-- Upgrade banner (hidden for Pro/Teacher users) -->
       <div class="upgrade-banner" id="upgrade-banner">
         <div class="upgrade-banner-title">⚡ Upgrade to Pro</div>
-        <div class="upgrade-banner-sub">Unlimited uploads, 20 palm cards, PDF export &amp; priority AI.</div>
+        <div class="upgrade-banner-sub">Unlimited uploads, 20 palm cards per upload, PDF export &amp; priority AI.</div>
         <button class="upgrade-banner-btn" onclick="openPricingContact('Pro')">Upgrade — from $12/mo</button>
       </div>
       <button class="logout-btn" onclick="doLogout()"><i class="fi fi-br-sign-out-alt"></i> Log Out</button>
@@ -2359,6 +2358,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
               <button class="result-tab" onclick="switchResult(this,'palmCards')"><i class="fi fi-br-layers"></i> Palm Cards</button>
               <button class="result-tab" onclick="switchResult(this,'test')"><i class="fi fi-br-pencil-ruler"></i> Test</button>
             </div>
+            <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:10px"><i class="fi fi-br-archive" style="margin-right:4px"></i>Flashcards are generated automatically and saved to your <strong style="color:var(--text)">Archive</strong>.</div>
             <div class="result-content" id="result-content"></div>
             <div class="result-actions">
               <button class="btn-primary" style="font-size:.8rem;padding:8px 16px"><i class="fi fi-br-download"></i> Download</button>
@@ -2382,7 +2382,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="ai-avatar"><i class="fi fi-br-robot"></i></div>
           <div><div class="ai-name">Revynce AI</div><div class="ai-status"><div class="status-dot"></div> Online &amp; ready</div></div>
           <div style="margin-left:auto;display:flex;gap:6px">
-            <span class="badge">Llama 3 70B</span>
+            <span class="badge">Llama 3.3 70B</span>
           </div>
         </div>
         <div class="chat-messages" id="chatMessages">
@@ -4116,7 +4116,7 @@ window.appGenerate = async function() {
       const fileRef = window._sRef(window._storage, `uploads/${window._uid}/${Date.now()}_${appUploadedFile.name}`);
       await window._uploadBytes(fileRef, appUploadedFile);
     }
-    status.textContent = '🤖 Generating AI content with Llama 3 70B — ~15 seconds…';
+    status.textContent = '🤖 Generating AI content with Llama 3.3 70B — ~15 seconds…';
     const fileText = await readFileAsText(appUploadedFile);
     const subject = document.getElementById('upload-subject').value.trim();
     const instructions = document.getElementById('upload-instructions').value.trim();

@@ -3687,6 +3687,7 @@ const storage = getStorage(app);
 
 window._auth = auth; window._db = db; window._storage = storage;
 window._fbRef = ref; window._fbSet = set; window._fbGet = get; window._fbChild = child; window._fbRemove = remove;
+window._fbPush = push; window._fbOnValue = onValue;
 window._sRef = sRef; window._uploadBytes = uploadBytes;
 
 // ── Auth state ──
@@ -4287,6 +4288,22 @@ window.doForgotPassword = async function() {
 </script>
 
 <script>
+// ── Firebase compatibility shim ──
+// The module script exposes Firebase functions as window._fb* globals.
+// These lazy getters let all regular-script code use bare names (db, ref, set…)
+// without a ReferenceError, regardless of module initialisation order.
+Object.defineProperties(window, {
+  db:      { get: () => window._db,        configurable: true },
+  ref:     { get: () => window._fbRef,     configurable: true },
+  set:     { get: () => window._fbSet,     configurable: true },
+  get:     { get: () => window._fbGet,     configurable: true },
+  child:   { get: () => window._fbChild,   configurable: true },
+  remove:  { get: () => window._fbRemove,  configurable: true },
+  push:    { get: () => window._fbPush,    configurable: true },
+  onValue: { get: () => window._fbOnValue, configurable: true },
+  auth:    { get: () => window._auth,      configurable: true },
+});
+
 // ── Groq proxy URL (via Firebase Cloud Function) ──
 // Uses llama-3.3-70b-versatile — Groq's fastest versatile model
 // PROXY_URL is defined in REVYNCE_CONFIG above — window._PROXY_URL is already set
@@ -4543,15 +4560,17 @@ function _updateNotifBadges() {
 
 // ── Mark one notification read ──
 async function _markOneRead(id) {
+  const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
   if (!window._uid || !_notifCache[id] || _notifCache[id].read) return;
   _notifCache[id].read = true;
   _renderNotifs();
   _updateNotifBadges();
-  try { await set(ref(db, `notifications/${window._uid}/${id}/read`), true); } catch(e) {}
+  try { await _set(_ref(_db, `notifications/${window._uid}/${id}/read`), true); } catch(e) {}
 }
 
 // ── Mark all read ──
 window.markAllRead = async function() {
+  const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
   if (!window._uid) return;
   const updates = {};
   Object.keys(_notifCache).forEach(id => {
@@ -4560,10 +4579,9 @@ window.markAllRead = async function() {
   });
   _renderNotifs();
   _updateNotifBadges();
-  // Write all at once
   try {
     for (const [path, val] of Object.entries(updates)) {
-      await set(ref(db, path), val);
+      await _set(_ref(_db, path), val);
     }
   } catch(e) {}
 };
@@ -4571,8 +4589,9 @@ window.markAllRead = async function() {
 // ── Public helper: push a notification to any user ──
 window._pushNotif = async function(uid, { title, desc, type = 'info', icon = 'info', category = 'system', link = null }) {
   if (!uid) return;
+  const _db=window._db,_ref=window._fbRef,_push=window._fbPush;
   try {
-    await push(ref(db, `notifications/${uid}`), {
+    await _push(_ref(_db, `notifications/${uid}`), {
       title, desc, type, icon, category,
       link: link || null,
       read: false,
@@ -4583,13 +4602,13 @@ window._pushNotif = async function(uid, { title, desc, type = 'info', icon = 'in
 
 // ── Start real-time listener for current user ──
 function _startNotifListener(uid) {
-  if (_notifUnsub) _notifUnsub();   // detach any previous listener
+  const _db=window._db,_ref=window._fbRef,_onValue=window._fbOnValue;
+  if (_notifUnsub) _notifUnsub();
   _notifCache = {};
-  const notifRef = ref(db, `notifications/${uid}`);
-  _notifUnsub = onValue(notifRef, snap => {
+  const notifRef = _ref(_db, `notifications/${uid}`);
+  _notifUnsub = _onValue(notifRef, snap => {
     _notifCache = snap.exists() ? snap.val() : {};
     _updateNotifBadges();
-    // Only re-render list if the panel is currently open
     const panel = document.getElementById('panel-notifications');
     if (panel && panel.classList.contains('active')) _renderNotifs();
   });
@@ -4605,7 +4624,8 @@ window.filterNotifTab = function(btn, filter) {
 
 // ── Seed notifications for a new/empty user ──
 async function _seedNotifications(uid, role) {
-  const snap = await get(child(ref(db), `notifications/${uid}`));
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild,_set=window._fbSet;
+  const snap = await _get(_child(_ref(_db), `notifications/${uid}`));
   if (snap.exists()) return;  // already has notifications
   const now = Date.now();
   const seeds = role === 'teacher' ? [

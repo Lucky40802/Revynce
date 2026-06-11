@@ -3264,38 +3264,50 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 
     <!-- ── MARK ROLL (Teacher) ── -->
     <div class="app-panel" id="panel-attendance-marking">
-      <h2 class="section-head">Mark Roll</h2>
-      <p class="section-sub">Record attendance for each period. Absences trigger automatic parent notifications.</p>
-      <div class="card card-pad" style="margin-bottom:18px;max-width:700px">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+        <div>
+          <h2 class="section-head" style="margin-bottom:4px">Mark Roll</h2>
+          <p class="section-sub" style="margin:0">Record attendance for each period.</p>
+        </div>
+        <button class="btn-ghost" id="roll-ai-btn" style="padding:8px 16px;font-size:.82rem;display:flex;align-items:center;gap:6px" onclick="autoFillFromTimetable()">
+          <i class="fi fi-br-magic-wand"></i> AI Timetable Assist
+        </button>
+      </div>
+      <div id="roll-ai-msg" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(0,240,212,.07);border:1px solid rgba(0,240,212,.18);border-radius:10px;font-size:.82rem;color:var(--cyan)"></div>
+      <div class="card card-pad" style="margin-bottom:18px;max-width:760px">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px;margin-bottom:8px">
           <div class="form-group" style="margin:0"><label class="form-label">Class</label>
             <select class="form-input" id="roll-class-select" onchange="loadRollStudents()">
               <option value="">Select class…</option>
-              <option value="BIO-2024">Biology Year 12 (BIO-2024)</option>
-              <option value="MAT-ADV">Advanced Maths (MAT-ADV)</option>
             </select>
           </div>
-          <div class="form-group" style="margin:0"><label class="form-label">Date</label><input type="date" class="form-input" id="roll-date"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Date</label><input type="date" class="form-input" id="roll-date" onchange="loadRollStudents()"></div>
           <div class="form-group" style="margin:0"><label class="form-label">Period</label>
-            <select class="form-input" id="roll-period">
-              <option>Period 1</option><option>Period 2</option><option>Period 3</option>
-              <option>Period 4</option><option>Period 5</option><option>Period 6</option>
+            <select class="form-input" id="roll-period" onchange="loadRollStudents()">
+              <option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option>
+              <option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option>
             </select>
           </div>
         </div>
+        <div id="roll-already-marked" style="display:none;padding:6px 10px;border-radius:8px;background:rgba(34,197,94,.08);color:var(--green);font-size:.78rem"><i class="fi fi-br-check"></i> Roll already saved for this slot — editing will overwrite it.</div>
       </div>
-      <div class="card card-pad" id="roll-card" style="display:none;overflow-x:auto">
-        <div class="card-title" id="roll-card-title"><i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;Student Roll</div>
-        <table class="marks-table" style="margin-top:12px">
+      <div class="card card-pad" id="roll-card" style="display:none;overflow-x:auto;max-width:760px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          <div class="card-title" id="roll-card-title" style="margin:0"><i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;Student Roll</div>
+          <div style="font-size:.75rem;color:var(--text-muted)" id="roll-meta"></div>
+        </div>
+        <table class="marks-table">
           <thead><tr><th>Student</th><th>Status</th><th>Note</th></tr></thead>
           <tbody id="roll-tbody"></tbody>
         </table>
-        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
           <button class="btn-ghost" style="padding:8px 16px;font-size:.82rem" onclick="markAllPresent()"><i class="fi fi-br-check"></i> Mark All Present</button>
           <button class="btn-primary" style="padding:8px 20px;font-size:.82rem" onclick="submitRoll()"><i class="fi fi-br-disk"></i> &nbsp;Save Roll</button>
+          <span id="roll-save-status" style="font-size:.78rem;color:var(--text-muted)"></span>
         </div>
       </div>
-      <div id="roll-empty" style="padding:30px;text-align:center;color:var(--text-muted);font-size:.85rem">Select a class above to load the student list.</div>
+      <div id="roll-loading" style="display:none;padding:24px;text-align:center;color:var(--text-muted);font-size:.85rem"><i class="fi fi-br-spinner" style="animation:spin 1s linear infinite"></i> Loading students…</div>
+      <div id="roll-empty" style="padding:30px;text-align:center;color:var(--text-muted);font-size:.85rem">Select a class above to load the student list, or use <strong>AI Timetable Assist</strong> to auto-fill.</div>
     </div>
 
     <!-- ── POST NOTICE (Teacher) ── -->
@@ -6360,30 +6372,168 @@ window.filterNotices = function(btn, category) {
 };
 
 // ── Mark Roll ──
-const DEMO_STUDENTS = ['Alex Johnson','Sarah Chen','James Miller','Priya Lal','Tom Wu','Lucy Park','Ben Nguyen','Emma Walsh'];
 
-window.loadRollStudents = function() {
+// Period time ranges (24h) used by AI assist
+const PERIOD_TIMES = [
+  { p:'1', start:8*60+55,  end:9*60+55  },
+  { p:'2', start:9*60+55,  end:10*60+55 },
+  { p:'3', start:11*60+25, end:12*60+25 },
+  { p:'4', start:12*60+25, end:13*60+25 },
+  { p:'5', start:14*60+5,  end:15*60+5  },
+  { p:'6', start:15*60+5,  end:16*60+5  },
+];
+const DAY_NAMES = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+
+// Populate class dropdown from teacher's Firebase enrollments
+window.initMarkRollPanel = async function() {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+  if (!window._uid) return;
+  const dateEl = document.getElementById('roll-date');
+  if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  const sel = document.getElementById('roll-class-select');
+  if (!sel) return;
+  // Only reload if still showing default (avoid wiping user selection on re-open)
+  if (sel.options.length <= 1) {
+    try {
+      const snap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
+      sel.innerHTML = '<option value="">Select class…</option>';
+      if (snap.exists()) {
+        Object.entries(snap.val()).forEach(([code, cls]) => {
+          if (!cls) return;
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.textContent = `${cls.name || code} (${code})`;
+          sel.appendChild(opt);
+        });
+      }
+    } catch(e) { /* leave default */ }
+  }
+};
+
+// Auto-fill class + period from timetable based on current time/day
+window.autoFillFromTimetable = async function() {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+  const btn = document.getElementById('roll-ai-btn');
+  const msgEl = document.getElementById('roll-ai-msg');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fi fi-br-spinner" style="animation:spin 1s linear infinite"></i> Checking…'; }
+  try {
+    const now = new Date();
+    const dayName = DAY_NAMES[now.getDay()];
+    const mins = now.getHours()*60 + now.getMinutes();
+    // Find current or next period
+    let currentPeriod = PERIOD_TIMES.find(p => mins >= p.start && mins <= p.end);
+    if (!currentPeriod) currentPeriod = PERIOD_TIMES.find(p => mins < p.start);
+    if (!currentPeriod) currentPeriod = PERIOD_TIMES[0];
+    const pNum = currentPeriod.p;
+    const key = `p${pNum}_${dayName}`;
+    // Read teacher's timetable
+    const snap = await _get(_child(_ref(_db), `timetable/${window._uid}`));
+    let matched = null;
+    if (snap.exists()) {
+      const tt = snap.val();
+      if (tt[key]) matched = { key, entry: tt[key], period: pNum };
+    }
+    // Set date to today
+    const dateEl = document.getElementById('roll-date');
+    if (dateEl) dateEl.value = now.toISOString().slice(0,10);
+    // Set period
+    const periodSel = document.getElementById('roll-period');
+    if (periodSel) periodSel.value = pNum;
+    if (matched) {
+      // Try to find class code matching this timetable subject
+      const sel = document.getElementById('roll-class-select');
+      if (sel) {
+        const subjectLower = (matched.entry.subject||'').toLowerCase();
+        let found = false;
+        for (const opt of sel.options) {
+          if (opt.value && opt.textContent.toLowerCase().includes(subjectLower.split(' ')[0])) {
+            sel.value = opt.value;
+            found = true;
+            break;
+          }
+        }
+        if (!found && sel.options.length > 1) sel.value = sel.options[1].value;
+      }
+      if (msgEl) {
+        const t = `${currentPeriod.start < mins ? 'Current' : 'Next'} period: Period ${pNum} — ${matched.entry.subject||'Unknown'} (${matched.entry.room||''}). Pre-filled from your timetable.`;
+        msgEl.textContent = t;
+        msgEl.style.display = '';
+      }
+    } else {
+      if (msgEl) {
+        msgEl.textContent = `No class found in your timetable for Period ${pNum} on ${dayName.charAt(0).toUpperCase()+dayName.slice(1)}. Select manually below.`;
+        msgEl.style.display = '';
+      }
+    }
+    loadRollStudents();
+  } catch(e) {
+    if (msgEl) { msgEl.textContent = 'Could not read timetable. Please select manually.'; msgEl.style.display = ''; }
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-magic-wand"></i> AI Timetable Assist'; }
+  }
+};
+
+window.loadRollStudents = async function() {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
   const cls = document.getElementById('roll-class-select').value;
   const card = document.getElementById('roll-card');
   const empty = document.getElementById('roll-empty');
+  const loading = document.getElementById('roll-loading');
   const title = document.getElementById('roll-card-title');
-  if (!cls) { card.style.display = 'none'; empty.style.display = ''; return; }
-  card.style.display = '';
+  const alreadyEl = document.getElementById('roll-already-marked');
+  if (!cls) {
+    card.style.display = 'none';
+    if (loading) loading.style.display = 'none';
+    empty.style.display = '';
+    if (alreadyEl) alreadyEl.style.display = 'none';
+    return;
+  }
+  card.style.display = 'none';
   empty.style.display = 'none';
-  title.innerHTML = `<i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;${cls} — ${document.getElementById('roll-period').value}`;
-  const tbody = document.getElementById('roll-tbody');
-  tbody.innerHTML = DEMO_STUDENTS.map(name => `
-    <tr>
-      <td style="font-weight:600">${name}</td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button class="roll-status-btn active" data-student="${name}" data-status="present" onclick="setRollStatus(this,'present')" style="padding:4px 10px;font-size:.72rem;background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.2);border-radius:8px;cursor:pointer">Present</button>
-          <button class="roll-status-btn" data-student="${name}" data-status="absent" onclick="setRollStatus(this,'absent')" style="padding:4px 10px;font-size:.72rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer">Absent</button>
-          <button class="roll-status-btn" data-student="${name}" data-status="late" onclick="setRollStatus(this,'late')" style="padding:4px 10px;font-size:.72rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer">Late</button>
-        </div>
-      </td>
-      <td><input type="text" placeholder="Optional note…" style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:.75rem;padding:2px 4px;width:140px;outline:none"></td>
-    </tr>`).join('');
+  if (loading) loading.style.display = '';
+  const date = document.getElementById('roll-date').value || new Date().toISOString().slice(0,10);
+  const period = document.getElementById('roll-period').value;
+  const dateKey = date.replace(/-/g,'');
+  if (title) title.innerHTML = `<i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;${document.getElementById('roll-class-select').selectedOptions[0]?.textContent || cls} — Period ${period}`;
+  const metaEl = document.getElementById('roll-meta');
+  if (metaEl) metaEl.textContent = date;
+  try {
+    // Load class members
+    const membersSnap = await _get(_child(_ref(_db), `classMembers/${cls}`));
+    // Load any existing roll for this slot
+    const existingSnap = await _get(_child(_ref(_db), `attendance/${cls}/${dateKey}/${period}`)).catch(()=>null);
+    const existing = existingSnap?.exists() ? existingSnap.val() : null;
+    if (alreadyEl) alreadyEl.style.display = existing ? '' : 'none';
+    const tbody = document.getElementById('roll-tbody');
+    if (!membersSnap.exists()) {
+      tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;padding:16px">No students enrolled in this class yet.</td></tr>';
+      if (loading) loading.style.display = 'none';
+      card.style.display = '';
+      return;
+    }
+    const members = membersSnap.val();
+    tbody.innerHTML = Object.entries(members).map(([uid, m]) => {
+      const name = m.name || uid;
+      const saved = existing?.[uid]?.status || 'present';
+      const note = existing?.[uid]?.note || '';
+      const btnHtml = ['present','absent','late'].map(s => {
+        const active = saved === s;
+        const colors = { present:['var(--green-dim)','var(--green)','rgba(34,197,94,.2)'], absent:['rgba(244,63,94,.08)','var(--rose)','rgba(244,63,94,.2)'], late:['rgba(245,158,11,.08)','var(--amber)','rgba(245,158,11,.2)'] };
+        const [bg,col,brd] = active ? colors[s] : ['transparent','var(--text-muted)','var(--border)'];
+        return `<button class="roll-status-btn" data-uid="${uid}" data-student="${name}" data-status="${s}" onclick="setRollStatus(this,'${s}')" style="padding:4px 10px;font-size:.72rem;background:${bg};color:${col};border:1px solid ${brd};border-radius:8px;cursor:pointer">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`;
+      }).join('');
+      return `<tr>
+        <td style="font-weight:600">${name}</td>
+        <td><div style="display:flex;gap:6px">${btnHtml}</div></td>
+        <td><input type="text" class="roll-note" data-uid="${uid}" value="${note}" placeholder="Optional note…" style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:.75rem;padding:2px 4px;width:140px;outline:none"></td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    const tbody = document.getElementById('roll-tbody');
+    tbody.innerHTML = '<tr><td colspan="3" style="color:var(--rose);text-align:center;padding:16px">Error loading students. Check your connection.</td></tr>';
+  }
+  if (loading) loading.style.display = 'none';
+  card.style.display = '';
 };
 
 window.setRollStatus = function(btn, status) {
@@ -6394,7 +6544,7 @@ window.setRollStatus = function(btn, status) {
     b.style.borderColor = 'var(--border)';
   });
   const colors = { present:['var(--green-dim)','var(--green)','rgba(34,197,94,.2)'], absent:['rgba(244,63,94,.08)','var(--rose)','rgba(244,63,94,.2)'], late:['rgba(245,158,11,.08)','var(--amber)','rgba(245,158,11,.2)'] };
-  const [bg, color, border] = colors[status];
+  const [bg, color, border] = colors[status] || colors.present;
   btn.style.background = bg;
   btn.style.color = color;
   btn.style.borderColor = border;
@@ -6405,20 +6555,39 @@ window.markAllPresent = function() {
 };
 
 window.submitRoll = async function() {
+  const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
   const cls = document.getElementById('roll-class-select').value;
   const date = document.getElementById('roll-date').value || new Date().toISOString().slice(0,10);
   const period = document.getElementById('roll-period').value;
+  const statusEl = document.getElementById('roll-save-status');
+  if (!cls) { showToast('Select a class first','error'); return; }
   if (!window._uid) { showToast('Sign in to save roll','error'); return; }
+  const dateKey = date.replace(/-/g,'');
   const rollData = {};
   document.querySelectorAll('#roll-tbody tr').forEach(row => {
-    const activeBtn = row.querySelector('.roll-status-btn[style*="background:var(--green-dim)"], .roll-status-btn[style*="background:rgba(244"], .roll-status-btn[style*="background:rgba(245"]');
-    const student = row.querySelector('.roll-status-btn')?.dataset.student;
-    if (student) rollData[student.replace(/ /g,'_')] = activeBtn?.dataset.status || 'present';
+    const uid = row.querySelector('.roll-status-btn')?.dataset.uid;
+    const name = row.querySelector('.roll-status-btn')?.dataset.student;
+    if (!uid) return;
+    // Find active button by checking which has a non-transparent background
+    const activeBtn = [...row.querySelectorAll('.roll-status-btn')].find(b =>
+      b.style.background && b.style.background !== 'transparent'
+    );
+    const status = activeBtn?.dataset.status || 'present';
+    const note = row.querySelector('.roll-note')?.value || '';
+    rollData[uid] = { status, note, name, markedBy: window._uid, markedAt: new Date().toISOString() };
   });
+  if (!Object.keys(rollData).length) { showToast('No students to save','error'); return; }
+  if (statusEl) statusEl.textContent = 'Saving…';
   try {
-    await set(ref(db, `attendance/${cls}/${date.replace(/-/g,'')}/${period.replace(/ /g,'')}`), rollData);
+    await _set(_ref(_db, `attendance/${cls}/${dateKey}/${period}`), rollData);
+    document.getElementById('roll-already-marked').style.display = '';
+    if (statusEl) statusEl.textContent = `Saved ${Object.keys(rollData).length} students ✓`;
     showToast('Roll saved successfully!','success');
-  } catch(e) { showToast('Error saving roll','error'); }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
+  } catch(e) {
+    if (statusEl) statusEl.textContent = '';
+    showToast('Error saving roll — check your connection','error');
+  }
 };
 
 // ── Post Notice ──
@@ -7516,6 +7685,73 @@ window.showPanel = function(name, navEl) {
     _refreshPrivateGrid();
   }
   if (name === 'leaderboard') _populateLbClassSelector();
+  if (name === 'attendance-marking') window.initMarkRollPanel();
+  if (name === 'attendance') window.loadStudentAttendance();
+};
+
+// ── Student attendance panel: load real data from Firebase ──
+window.loadStudentAttendance = async function() {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+  if (!window._uid) return;
+  try {
+    const enrollSnap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
+    if (!enrollSnap.exists()) return;
+    const classes = enrollSnap.val();
+    let totalPresent = 0, totalAbsent = 0, totalLate = 0;
+    const rows = [];
+    const bySubject = {};
+    for (const [code, cls] of Object.entries(classes)) {
+      const attSnap = await _get(_child(_ref(_db), `attendance/${code}`)).catch(()=>null);
+      if (!attSnap?.exists()) continue;
+      let subPresent = 0, subTotal = 0;
+      Object.entries(attSnap.val()).forEach(([dateKey, periods]) => {
+        if (typeof periods !== 'object') return;
+        Object.entries(periods).forEach(([period, students]) => {
+          if (typeof students !== 'object' || !students[window._uid]) return;
+          const { status, note, markedAt } = students[window._uid];
+          subTotal++;
+          const d = dateKey; // YYYYMMDD
+          const dateStr = `${d.slice(6,8)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(d.slice(4,6))-1]} ${d.slice(0,4)}`;
+          if (status === 'present') { totalPresent++; subPresent++; }
+          else if (status === 'absent') totalAbsent++;
+          else if (status === 'late') { totalLate++; subPresent += 0.5; }
+          const badge = status === 'present'
+            ? '<span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span>'
+            : status === 'absent'
+            ? '<span class="risk-badge risk-danger"><i class="fi fi-br-cross"></i> Absent</span>'
+            : '<span class="risk-badge risk-warn"><i class="fi fi-br-clock"></i> Late</span>';
+          rows.push({ dateKey, dateStr, cls: cls.name || code, period: `Period ${period}`, badge, note: note||'—' });
+        });
+      });
+      if (subTotal > 0) bySubject[cls.name || code] = Math.round((subPresent/subTotal)*100);
+    }
+    const total = totalPresent + totalAbsent + totalLate;
+    const pct = total > 0 ? Math.round((totalPresent/total)*100) : 0;
+    const setText = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+    setText('att-pct', pct+'%');
+    setText('att-present', totalPresent);
+    setText('att-absent', totalAbsent);
+    setText('att-late', totalLate);
+    // Sort rows newest first
+    rows.sort((a,b) => b.dateKey.localeCompare(a.dateKey));
+    const tbody = document.getElementById('att-tbody');
+    if (tbody) {
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:16px">No attendance records yet.</td></tr>';
+      } else {
+        tbody.innerHTML = rows.slice(0,20).map(r =>
+          `<tr><td style="color:var(--text-muted)">${r.dateStr}</td><td>${r.cls}</td><td>${r.period}</td><td>${r.badge}</td><td style="color:var(--text-muted)">${r.note}</td></tr>`
+        ).join('');
+      }
+    }
+    const subEl = document.getElementById('att-by-subject');
+    if (subEl && Object.keys(bySubject).length) {
+      subEl.innerHTML = Object.entries(bySubject).map(([name, pct]) => {
+        const col = pct >= 90 ? 'var(--green)' : pct >= 75 ? 'var(--cyan)' : 'var(--amber)';
+        return `<div class="topic-row"><div class="topic-name">${name}</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:${pct}%;background:${col}"></div></div></div><div class="topic-score" style="color:${col}">${pct}%</div></div>`;
+      }).join('');
+    }
+  } catch(e) { /* leave static fallback */ }
 };
 
 // ── Organisation enquiry form ──

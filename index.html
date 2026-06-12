@@ -4202,9 +4202,10 @@ window.appGenerate = async function() {
     }
     status.textContent = `✓ Saved to Archive as "${finalDeckName}" — Notes, Palm Cards & Test are ready.`;
     document.getElementById('upload-result').classList.add('show');
-    document.getElementById('upload-placeholder').style.display = 'none';
-    document.getElementById('result-content').textContent = resultContent.notes;
-    if (window._userProfile?.role==='teacher') document.getElementById('test-tab').style.display = '';
+    const phEl = document.getElementById('upload-placeholder');
+    if (phEl) phEl.style.display = 'none';
+    const rcEl = document.getElementById('result-content');
+    if (rcEl) rcEl.textContent = resultContent.notes;
   } catch(e) {
     status.innerHTML = `✗ ${e.message} &nbsp;<button onclick="appGenerate()" style="font-size:.75rem;padding:3px 10px;border-radius:6px;background:var(--bg-card2);border:1px solid var(--border-active);color:var(--cyan);cursor:pointer">↺ Retry</button>`;
     status.style.color = 'var(--rose)';
@@ -4900,6 +4901,55 @@ window.clearChatDoc = function() {
   showToast('Document removed from chat.', 'success');
 };
 
+// ── Crisis keyword detection ──
+const CRISIS_PATTERNS = [
+  /\b(kill|end|take)\s+(my|myself|my life|it all)\b/i,
+  /\b(want to|going to|gonna|thinking about|thinking of)\s+(die|kill myself|end my life|hurt myself|self.harm)\b/i,
+  /\b(suicid|self.harm|self harm|cut myself|cutting myself)\b/i,
+  /\b(no (point|reason) (in|to) (living|life|go on))\b/i,
+  /\b(hate (my ?self|my life|everything)|i('m| am) worthless|i('m| am) useless|nobody cares)\b/i,
+  /\b(don'?t want to (be here|exist|live|wake up))\b/i,
+  /\bkms\b/i,
+];
+
+function detectCrisis(text) {
+  return CRISIS_PATTERNS.some(p => p.test(text));
+}
+
+async function handleCrisis(studentText) {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+  const isTeacher = window._userProfile?.role === 'teacher';
+
+  // Show supportive response in chat
+  const safeMsg = isTeacher
+    ? `It sounds like you might be going through a really difficult time. As an educator, please remember that your wellbeing matters too.\n\n**Reach out to a professional:**\n• **Lifeline Australia:** 13 11 14 (24/7)\n• **Beyond Blue:** 1300 22 4636\n• **Crisis Text Line:** Text HOME to 0488 884 545\n• **Headspace:** headspace.org.au\n\nYou don't have to face this alone.`
+    : `It sounds like you're going through something really painful right now, and I want you to know that you matter.\n\n**Please talk to someone who can help:**\n• **Kids Helpline:** 1800 55 1800 (free, 24/7, for under 25s)\n• **Lifeline Australia:** 13 11 14 (24/7)\n• **Beyond Blue:** 1300 22 4636\n• **Crisis Text Line:** Text HOME to 0488 884 545\n\nYour teacher has been notified so they can check in on you. 💙`;
+
+  removeTyping();
+  appendChat(safeMsg, 'ai');
+
+  if (!isTeacher && window._uid) {
+    // Find the teacher(s) of enrolled classes and notify them
+    try {
+      const enrollSnap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
+      const notifiedTeachers = new Set();
+      if (enrollSnap.exists()) {
+        for (const [code, cls] of Object.entries(enrollSnap.val())) {
+          const teacherUid = cls.teacherUid;
+          if (teacherUid && !notifiedTeachers.has(teacherUid)) {
+            notifiedTeachers.add(teacherUid);
+            await window._pushNotif(teacherUid, {
+              title: `⚠️ Wellbeing alert — ${window._userProfile?.name || 'A student'}`,
+              desc: `${window._userProfile?.name || 'A student'} in ${cls.name || code} may need support. They sent a message that triggered a wellbeing alert. Please check in with them.`,
+              type: 'danger', icon: 'alert', category: 'class', link: 'teacher',
+            });
+          }
+        }
+      }
+    } catch(e) { /* silent — don't break the safe message flow */ }
+  }
+}
+
 window.sendMsg = async function() {
   const input = document.getElementById('chatInput');
   const sendBtn = document.getElementById('sendBtn');
@@ -4907,6 +4957,15 @@ window.sendMsg = async function() {
   if (!text) return;
   input.value = ''; sendBtn.disabled = true;
   appendChat(text, 'user');
+
+  // Crisis detection — intercept before sending to AI
+  if (detectCrisis(text)) {
+    showTyping();
+    await handleCrisis(text);
+    sendBtn.disabled = false; input.focus();
+    return;
+  }
+
   chatHistory.push({ role: 'user', content: text });
   showTyping();
   const PROXY_URL = window._PROXY_URL;

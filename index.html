@@ -4256,7 +4256,7 @@ window.appGenerate = async function() {
 window.downloadResult = function() {
   const tab = currentResultTab || 'notes';
   const text = resultContent[tab];
-  if (!text) { showToast('Nothing to download yet — generate content first.', 'warn'); return; }
+  if (!text) { showToast('Nothing to download yet — generate content first.', 'info'); return; }
   const labels = { notes: 'Notes', palmCards: 'Palm_Cards', test: 'Test' };
   const baseName = (document.getElementById('upload-deck-name')?.value.trim() || 'Revynce').replace(/[^a-z0-9_\- ]/gi, '_');
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -4312,13 +4312,14 @@ function _inlineMd(s) {
 }
 function _renderPalmCardsHtml(arr) {
   if (!arr?.length) return '<p style="color:var(--text-muted)">No palm cards generated.</p>';
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   return `<div class="palm-card-grid">${arr.map((c,i) => `
     <div class="palm-card" onclick="this.classList.toggle('revealed')">
       <div class="palm-card-num">Card ${i+1}</div>
-      <div class="palm-card-q">${c.front||''}</div>
+      <div class="palm-card-q">${esc(c.front)}</div>
       <hr class="palm-card-divider">
       <div class="palm-card-toggle"><i class="fi fi-rr-eye"></i> Tap to reveal answer</div>
-      <div class="palm-card-a">${c.back||''}</div>
+      <div class="palm-card-a">${esc(c.back)}</div>
     </div>`).join('')}</div>`;
 }
 function _renderTestHtml(text) {
@@ -4328,7 +4329,8 @@ function _renderTestHtml(text) {
   if (blocks.length > 1) {
     return blocks.map((block, i) => {
       const lines = block.trim().split('\n');
-      const qLine = lines[0].replace(/^\d+[\.\)]\s*/, '');
+      const _escQ = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const qLine = _escQ(lines[0].replace(/^\d+[\.\)]\s*/, ''));
       const rest  = lines.slice(1).join('\n').trim();
       return `<div class="test-question">
         <div class="test-q-num">Question ${i+1}</div>

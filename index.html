@@ -2361,7 +2361,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:10px"><i class="fi fi-br-archive" style="margin-right:4px"></i>Flashcards are generated automatically and saved to your <strong style="color:var(--text)">Archive</strong>.</div>
             <div class="result-content" id="result-content"></div>
             <div class="result-actions">
-              <button class="btn-primary" style="font-size:.8rem;padding:8px 16px"><i class="fi fi-br-download"></i> Download</button>
+              <button class="btn-primary" style="font-size:.8rem;padding:8px 16px" onclick="downloadResult()"><i class="fi fi-br-download"></i> Download</button>
               <button class="btn-ghost" style="font-size:.8rem;padding:8px 16px" onclick="showPanel('archive',null)"><i class="fi fi-br-archive"></i> Go to Archive</button>
             </div>
           </div>
@@ -4221,6 +4221,21 @@ window.appGenerate = async function() {
   btn.disabled = false;
 };
 
+window.downloadResult = function() {
+  const tab = currentResultTab || 'notes';
+  const text = resultContent[tab];
+  if (!text) { showToast('Nothing to download yet — generate content first.', 'warn'); return; }
+  const labels = { notes: 'Notes', palmCards: 'Palm_Cards', test: 'Test' };
+  const baseName = (document.getElementById('upload-deck-name')?.value.trim() || 'Revynce').replace(/[^a-z0-9_\- ]/gi, '_');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `${baseName}_${labels[tab] || tab}.txt`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast(`Downloaded ${labels[tab] || tab} as .txt`, 'success');
+};
+
 window.setUploadMode = function(btn, mode) {
   _currentUploadMode = mode;
   document.querySelectorAll('.upload-mode-btn').forEach(b => b.classList.remove('active'));
@@ -5392,14 +5407,14 @@ window.arGoHome = function() {
 };
 
 window.loadArchive = async function() {
-  if (!window._uid || !window._fbGet) return;
+  if (!window._uid || !window._fbGet || !window._fbRef || !window._db) return;
   const grid = document.getElementById('ar-folder-grid');
   if (grid) grid.innerHTML = '<p style="color:var(--text-muted);font-size:.84rem;padding:20px 0">Loading…</p>';
   try {
-    const snap = await window._fbGet(window._fbChild(window._fbRef(window._db), `uploads/${window._uid}`));
+    const snap = await window._fbGet(window._fbRef(window._db, `uploads/${window._uid}`));
     window._archiveData = snap.exists() ? snap.val() : {};
-    window.renderArchiveFolders();
-  } catch(e) { console.error('loadArchive:', e); }
+    window.renderArchiveFolders?.();
+  } catch(e) { console.error('loadArchive (1):', e); }
 };
 
 // ═══════════════════════════════════════
@@ -5422,14 +5437,14 @@ window.switchFcTab = function(tab) {
 window._archiveData = {};
 
 window.loadArchive = async function() {
-  if (!window._uid || !window._fbGet) return;
+  if (!window._uid || !window._fbGet || !window._fbRef || !window._db) return;
   const container = document.getElementById('archive-folders');
   if (container) container.innerHTML = '<p style="color:var(--text-muted);font-size:.84rem;padding:20px 0">Loading archive…</p>';
   try {
-    const snap = await window._fbGet(window._fbChild(window._fbRef(window._db), `uploads/${window._uid}`));
+    const snap = await window._fbGet(window._fbRef(window._db, `uploads/${window._uid}`));
     window._archiveData = snap.exists() ? snap.val() : {};
     renderArchive();
-  } catch(e) { console.error('loadArchive:', e); }
+  } catch(e) { console.error('loadArchive (2):', e); }
 };
 
 function renderArchive() {

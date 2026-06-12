@@ -2397,7 +2397,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <button class="suggestion-chip" onclick="useSuggestion(this)">How do I improve my essays?</button>
           <button class="suggestion-chip" onclick="useSuggestion(this)">Test me on World War II</button>
         </div>
+        <div id="chat-doc-banner" style="display:none;padding:8px 14px;background:rgba(0,240,212,.07);border-top:1px solid rgba(0,240,212,.18);display:none;align-items:center;gap:8px;font-size:.78rem;color:var(--cyan)">
+          <i class="fi fi-br-document"></i>
+          <span id="chat-doc-name" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+          <button onclick="clearChatDoc()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.8rem;padding:2px 4px" title="Remove document"><i class="fi fi-br-cross-small"></i></button>
+        </div>
         <div class="chat-footer">
+          <input type="file" id="chatDocInput" accept=".pdf,.docx,.txt,.md,.csv,.pptx" style="display:none" onchange="handleChatDoc(this.files[0])">
+          <button id="chatDocBtn" title="Attach a document" onclick="document.getElementById('chatDocInput').click()" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted);width:40px;height:40px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;transition:all .2s"><i class="fi fi-br-paperclip"></i></button>
           <input class="chat-inp" id="chatInput" placeholder="Ask a study question…" onkeydown="if(event.key==='Enter')sendMsg()">
           <button class="send-btn" id="sendBtn" onclick="sendMsg()"><i class="fi fi-br-paper-plane"></i></button>
         </div>
@@ -4734,10 +4741,57 @@ function renderSchedule() {
 }
 
 // ── Chatbot — Groq llama-3.3-70b-versatile via Cloud Function ──
-let chatHistory = [{
-  role: 'system',
-  content: `You are Revynce AI, an expert study tutor for high school and university students. Help with all subjects — maths, science, history, literature, languages, and more. Explain concepts clearly, set practice problems, give essay feedback, and create study strategies. Keep responses concise but thorough. Use bullet points and numbered lists where helpful. Show step-by-step solutions for worked examples. Always be encouraging and positive.`
-}];
+const TUTOR_SYSTEM_BASE = `You are Revynce AI, an expert study tutor for high school and university students. Help with all subjects — maths, science, history, literature, languages, and more. Explain concepts clearly, set practice problems, give essay feedback, and create study strategies. Keep responses concise but thorough. Use bullet points and numbered lists where helpful. Show step-by-step solutions for worked examples. Always be encouraging and positive.`;
+
+let chatHistory = [{ role: 'system', content: TUTOR_SYSTEM_BASE }];
+let _chatDocText = null;
+let _chatDocFileName = null;
+
+// ── Document attach for AI Tutor ──
+window.handleChatDoc = async function(file) {
+  if (!file) return;
+  const MAX_MB = 10;
+  const allowedExts = /\.(pdf|docx|txt|md|csv|pptx)$/i;
+  if (file.size > MAX_MB * 1024 * 1024) { showToast(`File too large — max ${MAX_MB} MB for chat.`, 'error'); return; }
+  if (!allowedExts.test(file.name)) { showToast('Unsupported file type. Use PDF, DOCX, TXT, MD, CSV or PPTX.', 'error'); return; }
+  const btn = document.getElementById('chatDocBtn');
+  if (btn) { btn.innerHTML = '<i class="fi fi-br-spinner" style="animation:spin 1s linear infinite"></i>'; btn.disabled = true; }
+  try {
+    const text = await readFileAsText(file);
+    const preview = text ? text.slice(0, 12000) : null; // cap at ~3k tokens
+    _chatDocText = preview;
+    _chatDocFileName = file.name;
+    // Rebuild system message to include document context
+    chatHistory[0] = {
+      role: 'system',
+      content: `${TUTOR_SYSTEM_BASE}\n\nThe student has attached a document for you to help with. Here is its content:\n\n"""\nFilename: ${file.name}\n\n${preview || '[Binary file — no text extracted. Ask the student to describe what they need help with.]'}\n"""\n\nAnswer questions about this document. If asked to summarise, explain, or generate questions from it, do so based on the content above.`
+    };
+    // Show banner
+    const banner = document.getElementById('chat-doc-banner');
+    const nameEl = document.getElementById('chat-doc-name');
+    if (banner) banner.style.display = 'flex';
+    if (nameEl) nameEl.textContent = file.name;
+    if (btn) { btn.innerHTML = '<i class="fi fi-br-document" style="color:var(--cyan)"></i>'; btn.style.borderColor = 'var(--cyan)'; }
+    // Add a system message in chat
+    appendChat(`📄 <strong>${file.name}</strong> attached. Ask me anything about it!`, 'ai');
+  } catch(e) {
+    showToast('Could not read file — try a TXT or DOCX instead.', 'error');
+    if (btn) { btn.innerHTML = '<i class="fi fi-br-paperclip"></i>'; btn.disabled = false; }
+  }
+  if (btn) btn.disabled = false;
+  // Reset file input so the same file can be re-attached
+  document.getElementById('chatDocInput').value = '';
+};
+
+window.clearChatDoc = function() {
+  _chatDocText = null; _chatDocFileName = null;
+  chatHistory[0] = { role: 'system', content: TUTOR_SYSTEM_BASE };
+  const banner = document.getElementById('chat-doc-banner');
+  if (banner) banner.style.display = 'none';
+  const btn = document.getElementById('chatDocBtn');
+  if (btn) { btn.innerHTML = '<i class="fi fi-br-paperclip"></i>'; btn.style.borderColor = ''; btn.style.color = ''; }
+  showToast('Document removed from chat.', 'success');
+};
 
 window.sendMsg = async function() {
   const input = document.getElementById('chatInput');

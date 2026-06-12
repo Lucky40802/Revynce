@@ -3776,12 +3776,14 @@ window._addXP = async function(amount) {
   const newXP = (window._userProfile?.xp || 0) + amount;
   window._userProfile = {...(window._userProfile||{}), xp: newXP};
   await set(ref(db, `users/${window._uid}/xp`), newXP);
-  document.getElementById('d-xp').textContent = newXP;
-  document.getElementById('topbar-xp').textContent = newXP + ' XP';
-  document.getElementById('profile-xp').textContent = newXP;
-  document.getElementById('lb-your-xp').textContent = newXP + ' XP';
-  document.getElementById('reward-xp-text').textContent = newXP + ' / 500 XP';
-  document.getElementById('xp-bar-fill').style.width = Math.min(100,(newXP/500)*100) + '%';
+  const _setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  const _setStyle = (id, prop, val) => { const e = document.getElementById(id); if (e) e.style[prop] = val; };
+  _setText('d-xp', newXP);
+  _setText('topbar-xp', newXP + ' XP');
+  _setText('profile-xp', newXP);
+  _setText('lb-your-xp', newXP + ' XP');
+  _setText('reward-xp-text', newXP + ' / 500 XP');
+  _setStyle('xp-bar-fill', 'width', Math.min(100,(newXP/500)*100) + '%');
 };
 
 // ── Dashboard stats ──

@@ -2229,7 +2229,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <span class="topbar-title" id="topbar-title">Dashboard</span>
       </div>
       <div class="topbar-right">
-        <div class="search-bar"><i class="fi fi-rr-search"></i><input placeholder="Search anything…" id="search-input"></div>
+        <div class="search-bar" style="position:relative"><i class="fi fi-rr-search"></i><input placeholder="Search anything…" id="search-input" autocomplete="off" oninput="_handleSearch(this.value)" onblur="setTimeout(()=>document.getElementById('search-results')?.remove(),150)"><div id="search-results" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;z-index:999;box-shadow:var(--shadow)"></div></div>
         <button class="notif-btn" onclick="showPanel('notifications',null)"><i class="fi fi-br-bell"></i><div class="notif-dot" id="notif-dot"></div></button>
         <span class="topbar-xp" id="topbar-xp">0 XP</span>
       </div>
@@ -4830,7 +4830,7 @@ window._addXP = async function(amount) {
 };
 
 // ── Dynamic schedule ──
-function renderSchedule() {
+async function renderSchedule() {
   const grid = document.getElementById('schedule-week-grid');
   if (!grid) return;
   const now = new Date();
@@ -4838,12 +4838,33 @@ function renderSchedule() {
   const monday = new Date(now);
   monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
   const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const subjects = [['Biology'],['Physics','Chemistry'],['Maths'],['Biology','History'],['Chemistry'],['Maths'],['Revision']];
-  const colors   = [[''],['','amber'],['violet'],['',''],['amber'],['violet'],['']];
+  const fullDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+  // Load from Firebase timetable if logged in
+  let byDay = {};
+  if (window._uid && window._db) {
+    try {
+      const _db=window._db, _ref=window._fbRef, _get=window._fbGet, _child=window._fbChild;
+      const snap = await _get(_child(_ref(_db), `timetable/${window._uid}`));
+      if (snap.exists()) {
+        Object.values(snap.val()).forEach(entry => {
+          const d = (entry.day || '').toLowerCase();
+          if (!byDay[d]) byDay[d] = [];
+          byDay[d].push(entry.subject);
+        });
+      }
+    } catch(e) {}
+  }
+
+  const accentCycle = ['','amber','violet','','amber'];
   grid.innerHTML = dayNames.map((d, i) => {
     const date = new Date(monday); date.setDate(monday.getDate() + i);
     const isToday = date.toDateString() === now.toDateString();
-    const tasks = subjects[i].map((s, j) => `<div class="sched-task ${colors[i][j]||''}">${s}</div>`).join('');
+    const dayKey = fullDays[i].toLowerCase();
+    const subs = byDay[dayKey] || [];
+    const tasks = subs.length
+      ? subs.map((s, j) => `<div class="sched-task ${accentCycle[j % accentCycle.length]}">${s}</div>`).join('')
+      : `<div class="sched-task" style="opacity:.35;font-style:italic">No class</div>`;
     return `<div class="sched-day${isToday?' today':''}"><div class="sched-day-label">${d}</div><div class="sched-day-num">${date.getDate()}</div>${tasks}</div>`;
   }).join('');
 }
@@ -5612,6 +5633,59 @@ const _toastIcons = {
   info:    '<i class="fi fi-br-info"></i>',
   xp:      '<i class="fi fi-br-star"></i>',
 };
+// ── Global search ──
+const _SEARCH_INDEX = [
+  { label:'Dashboard',        panel:'dashboard',          keywords:'home overview welcome' },
+  { label:'AI Upload',        panel:'upload',             keywords:'upload pdf notes generate ai study' },
+  { label:'AI Tutor',         panel:'chatbot',            keywords:'chat tutor ai ask help question bot' },
+  { label:'Archive',          panel:'archive',            keywords:'archive saved history notes files' },
+  { label:'My Classes',       panel:'classes',            keywords:'class join enrol subject code classroom' },
+  { label:'Study Schedule',   panel:'schedule',           keywords:'schedule week plan timetable study' },
+  { label:'Performance',      panel:'performance',        keywords:'performance score quiz analytics progress' },
+  { label:'Flashcards',       panel:'flashcards',         keywords:'flashcard flip study deck review cards' },
+  { label:'Pomodoro',         panel:'pomodoro',           keywords:'pomodoro timer focus 25 break' },
+  { label:'Voice Rooms',      panel:'voice',              keywords:'voice room speak call jitsi' },
+  { label:'Leaderboard',      panel:'leaderboard',        keywords:'leaderboard rank points xp top' },
+  { label:'Rewards',          panel:'rewards',            keywords:'rewards badges xp level achievements' },
+  { label:'Timetable',        panel:'timetable',          keywords:'timetable period day add subject room' },
+  { label:'Notices',          panel:'notices',            keywords:'notices announcements news school' },
+  { label:'Attendance',       panel:'attendance',         keywords:'attendance absent present roll' },
+  { label:'Teacher Dashboard',panel:'teacher',            keywords:'teacher dashboard analytics at-risk students' },
+  { label:'AI Test Builder',  panel:'testbuilder',        keywords:'test builder quiz generate questions exam' },
+  { label:'AI Marking',       panel:'marking',            keywords:'marking grading ai feedback assessment' },
+  { label:'Mark Roll',        panel:'attendance-marking', keywords:'mark roll attendance roll call class' },
+  { label:'Post Notice',      panel:'manage-notices',     keywords:'post notice announcement publish send' },
+  { label:'Notifications',    panel:'notifications',      keywords:'notifications alerts bell unread' },
+  { label:'Profile & Settings',panel:'profile',           keywords:'profile settings account password theme plan' },
+];
+
+window._handleSearch = function(query) {
+  const drop = document.getElementById('search-results');
+  if (!drop) return;
+  const q = query.trim().toLowerCase();
+  if (!q) { drop.style.display = 'none'; return; }
+  const matches = _SEARCH_INDEX.filter(item =>
+    item.label.toLowerCase().includes(q) || item.keywords.includes(q)
+  ).slice(0, 6);
+  if (!matches.length) { drop.style.display = 'none'; return; }
+  drop.style.display = 'block';
+  drop.innerHTML = matches.map(item => `
+    <div onclick="_searchGo('${item.panel}')" style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);transition:background .15s"
+      onmouseenter="this.style.background='var(--bg-card)'" onmouseleave="this.style.background=''">
+      <i class="fi fi-rr-search" style="opacity:.4;font-size:.8rem"></i>
+      <span style="font-size:.88rem">${item.label}</span>
+    </div>`).join('');
+};
+
+window._searchGo = function(panel) {
+  const input = document.getElementById('search-input');
+  const drop  = document.getElementById('search-results');
+  if (input) input.value = '';
+  if (drop)  drop.style.display = 'none';
+  const navBtn = document.querySelector(`.nav-item[onclick*="'${panel}'"]`);
+  showPanel(panel, navBtn || null);
+};
+
 window.showToast = function(title, type = 'info', sub = '') {
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
@@ -7220,42 +7294,52 @@ window.addSingleEventToCalendar = async function(title, startTime, durationMin, 
 window.syncScheduleToCalendar = async function() {
   try {
     showToast('Connecting to Google Calendar…', 'info');
-    // Build events from the current week schedule (Mon–Fri)
     const now    = new Date();
     const dow    = now.getDay();
     const monday = new Date(now);
     monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
-
-    const weekSubjects = [
-      ['Biology'],
-      ['Physics', 'Chemistry'],
-      ['Maths'],
-      ['Biology', 'History'],
-      ['Chemistry'],
-      ['Maths'],
-      ['Revision'],
-    ];
+    const fullDays = ['monday','tuesday','wednesday','thursday','friday'];
     const times = ['09:00', '11:00', '14:00'];
-    let count = 0;
 
-    for (let d = 0; d < 5; d++) {  // Mon–Fri only
+    // Load real timetable from Firebase
+    let byDay = {};
+    if (window._uid && window._db) {
+      try {
+        const _db=window._db, _ref=window._fbRef, _get=window._fbGet, _child=window._fbChild;
+        const snap = await _get(_child(_ref(_db), `timetable/${window._uid}`));
+        if (snap.exists()) {
+          Object.values(snap.val()).forEach(entry => {
+            const d = (entry.day || '').toLowerCase();
+            if (!byDay[d]) byDay[d] = [];
+            byDay[d].push(entry.subject);
+          });
+        }
+      } catch(e) {}
+    }
+
+    let count = 0;
+    for (let d = 0; d < 5; d++) {
       const date = new Date(monday);
       date.setDate(monday.getDate() + d);
       const dateStr = date.toISOString().slice(0, 10);
-      const subjects = weekSubjects[d] || [];
+      const subjects = byDay[fullDays[d]] || [];
       for (let s = 0; s < subjects.length; s++) {
         const event = _buildCalEvent(
           `${subjects[s]} — Study Session`,
           dateStr,
           times[s % times.length],
           60,
-          `Revynce AI-generated study session for ${subjects[s]}`
+          `Revynce study session for ${subjects[s]}`
         );
         await _postCalEvent(event);
         count++;
       }
     }
-    showToast(`${count} study sessions synced to Google Calendar! ✅`, 'success');
+    if (count === 0) {
+      showToast('No timetable entries found — add classes in Timetable first.', 'warn');
+    } else {
+      showToast(`${count} study sessions synced to Google Calendar! ✅`, 'success');
+    }
   } catch(e) {
     showToast('Calendar sync error: ' + e.message, 'error');
     _calToken = null;

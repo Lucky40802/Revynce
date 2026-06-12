@@ -8015,6 +8015,7 @@ window.showPanel = function(name, navEl) {
   if (name === 'leaderboard') _populateLbClassSelector();
   if (name === 'attendance-marking') window.initMarkRollPanel();
   if (name === 'attendance') window.loadStudentAttendance();
+  if (name === 'classes') { _loadClassesInFlight = false; loadClasses(); }
 };
 
 // ── Student attendance panel: load real data from Firebase ──

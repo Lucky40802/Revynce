@@ -4217,14 +4217,16 @@ window.setUploadMode = function(btn, mode) {
   _currentUploadMode = mode;
   document.querySelectorAll('.upload-mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('test-tab').style.display = mode === 'teacher' ? '' : 'none';
+  const testTabEl = document.getElementById('test-tab');
+  if (testTabEl) testTabEl.style.display = mode === 'teacher' ? '' : 'none';
 };
 
 window.switchResult = function(btn, tab) {
   currentResultTab = tab;
   document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('result-content').textContent = resultContent[tab] || '';
+  const rcEl = document.getElementById('result-content');
+  if (rcEl) rcEl.textContent = resultContent[tab] || '';
 };
 
 // Test drop zone

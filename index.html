@@ -3866,10 +3866,10 @@ async function loadClasses() {
             <div class="class-stat"><div class="class-stat-n">${cls.yearLevel||'—'}</div><div class="class-stat-l">Year Level</div></div>
             <div class="class-stat"><div class="class-stat-n">${isOwner?'Teacher':'Student'}</div><div class="class-stat-l">Role</div></div>
           </div>
-          <div style="margin-top:10px;font-size:.75rem;color:var(--cyan)"><i class="fi fi-rr-arrow-right"></i> Open Classroom</div>`;
+          <div class="class-open-link" style="margin-top:10px;font-size:.75rem;color:var(--cyan)"><i class="fi fi-rr-arrow-right"></i> Open Classroom</div>`;
         div.querySelector('.class-name').onclick = () => openClassroom(code, cls.name||code);
         div.querySelector('.class-teacher').onclick = () => openClassroom(code, cls.name||code);
-        div.querySelector('[style*="arrow-right"]').onclick = () => openClassroom(code, cls.name||code);
+        div.querySelector('.class-open-link').onclick = () => openClassroom(code, cls.name||code);
         div.querySelector('.class-icon').onclick = () => openClassroom(code, cls.name||code);
         div.onclick = (e) => { if (!e.target.closest('button')) openClassroom(code, cls.name||code); };
         grid.appendChild(div);

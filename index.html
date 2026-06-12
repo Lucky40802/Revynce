@@ -3840,8 +3840,9 @@ async function loadClasses() {
     {bg:'rgba(34,197,94,0.1)',color:'var(--green)',icon:'fi-br-science'},
   ];
   try {
-    const _db = window._db, _ref = window._fbRef, _get = window._fbGet, _child = window._fbChild;
-    const snap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
+    const _db = window._db, _ref = window._fbRef, _get = window._fbGet;
+    if (!_db || !_ref || !_get) throw new Error('Firebase not ready — please refresh');
+    const snap = await _get(_ref(_db, `enrollments/${window._uid}`));
     if (snap.exists()) {
       const enrollments = snap.val();
       let i = 0;
@@ -3885,7 +3886,7 @@ async function loadClasses() {
     console.error('loadClasses:', e);
     const errEl = document.createElement('div');
     errEl.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--rose);font-size:.875rem';
-    errEl.innerHTML = '<i class="fi fi-br-triangle-warning" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.6"></i>Could not load classes — check your connection and try again.';
+    errEl.innerHTML = `<i class="fi fi-br-triangle-warning" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.6"></i>Could not load classes: ${e.message}`;
     grid.appendChild(errEl);
   }
   // Add card always renders regardless of load result

@@ -454,8 +454,38 @@ body::before {
 .result-tabs { display:flex; gap:7px; margin-bottom:16px; flex-wrap:wrap; }
 .result-tab { padding:6px 14px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--text-muted); font-family:var(--font-b); font-size:.78rem; font-weight:600; cursor:pointer; transition:all .2s; }
 .result-tab.active { background:var(--cyan-dim); border-color:var(--cyan); color:var(--cyan); }
-.result-content { font-size:.875rem; color:var(--text); line-height:1.8; min-height:200px; white-space:pre-line; }
 .result-actions { display:flex; gap:8px; margin-top:16px; }
+
+/* ── Rendered result content ── */
+.result-content { font-size:.875rem; color:var(--text); line-height:1.8; min-height:200px; }
+.result-content h2 { font-family:var(--font-d); font-size:1.1rem; font-weight:700; color:var(--cyan); margin:20px 0 8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.result-content h3 { font-family:var(--font-d); font-size:.95rem; font-weight:700; color:#a78bfa; margin:16px 0 6px; }
+.result-content h4 { font-size:.875rem; font-weight:700; color:var(--amber); margin:12px 0 4px; }
+.result-content p { margin:8px 0; }
+.result-content ul,.result-content ol { padding-left:20px; margin:8px 0; }
+.result-content li { margin:4px 0; }
+.result-content strong { color:var(--text); font-weight:600; }
+.result-content em { color:var(--text-muted); font-style:italic; }
+.result-content hr { border:none; border-top:1px solid var(--border); margin:16px 0; }
+.result-content code { background:var(--bg-card); padding:2px 6px; border-radius:4px; font-family:monospace; font-size:.82rem; color:var(--cyan); }
+/* Palm card grid */
+.palm-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+.palm-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; cursor:pointer; transition:border-color .2s; position:relative; }
+.palm-card:hover { border-color:var(--cyan); }
+.palm-card-num { font-size:.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+.palm-card-q { font-size:.875rem; font-weight:600; color:var(--text); line-height:1.5; margin-bottom:10px; }
+.palm-card-divider { border:none; border-top:1px solid var(--border); margin:10px 0; }
+.palm-card-a { font-size:.825rem; color:var(--text-muted); line-height:1.6; display:none; }
+.palm-card.revealed .palm-card-a { display:block; }
+.palm-card-toggle { font-size:.7rem; color:var(--cyan); font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+/* Test question styling */
+.test-question { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; margin-bottom:12px; }
+.test-q-num { font-size:.68rem; font-weight:700; color:var(--cyan); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+.test-q-text { font-size:.875rem; font-weight:600; line-height:1.5; margin-bottom:8px; }
+.test-q-answer { font-size:.8rem; color:var(--text-muted); line-height:1.6; border-left:2px solid var(--border); padding-left:10px; margin-top:8px; display:none; }
+.test-question.show-answer .test-q-answer { display:block; }
+.test-show-btn { font-size:.72rem; color:var(--cyan); background:none; border:1px solid var(--border); border-radius:6px; padding:3px 10px; cursor:pointer; transition:all .2s; }
+.test-show-btn:hover { border-color:var(--cyan); background:var(--cyan-dim); }
 
 /* ═══════════════════════════════════════
    CHATBOT
@@ -4177,9 +4207,10 @@ window.appGenerate = async function() {
     }
 
     // Build result content
-    resultContent.notes     = generated.notes     || 'Notes could not be generated.';
-    resultContent.test      = generated.test      || 'Test could not be generated.';
-    resultContent.palmCards = generated.palmCards?.length
+    resultContent.notes         = generated.notes  || 'Notes could not be generated.';
+    resultContent.test          = generated.test   || 'Test could not be generated.';
+    resultContent._palmCardsArr = generated.palmCards || [];
+    resultContent.palmCards     = generated.palmCards?.length
       ? generated.palmCards.map((c,i) => `Card ${i+1}\nQ: ${c.front}\nA: ${c.back}`).join('\n\n')
       : 'Palm cards could not be generated.';
 
@@ -4212,8 +4243,9 @@ window.appGenerate = async function() {
     document.getElementById('upload-result').classList.add('show');
     const phEl = document.getElementById('upload-placeholder');
     if (phEl) phEl.style.display = 'none';
-    const rcEl = document.getElementById('result-content');
-    if (rcEl) rcEl.textContent = resultContent.notes;
+    currentResultTab = 'notes';
+    document.querySelectorAll('.result-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+    _renderResultTab('notes');
   } catch(e) {
     status.innerHTML = `✗ ${e.message} &nbsp;<button onclick="appGenerate()" style="font-size:.75rem;padding:3px 10px;border-radius:6px;background:var(--bg-card2);border:1px solid var(--border-active);color:var(--cyan);cursor:pointer">↺ Retry</button>`;
     status.style.color = 'var(--rose)';
@@ -4244,12 +4276,86 @@ window.setUploadMode = function(btn, mode) {
   if (testTabEl) testTabEl.style.display = mode === 'teacher' ? '' : 'none';
 };
 
+// ── Markdown → HTML renderer ──
+function _mdToHtml(text) {
+  if (!text) return '';
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = text.split('\n');
+  let html = '', inList = false, listTag = '';
+  for (let i = 0; i < lines.length; i++) {
+    let l = lines[i];
+    const isUl = /^[\-\*] /.test(l);
+    const isOl = /^\d+\. /.test(l);
+    const isBlank = l.trim() === '';
+    if (!isUl && !isOl && inList) { html += `</${listTag}>`; inList = false; listTag = ''; }
+    if (isUl || isOl) {
+      const tag = isUl ? 'ul' : 'ol';
+      if (!inList) { html += `<${tag}>`; inList = true; listTag = tag; }
+      l = l.replace(/^[\-\*] /, '').replace(/^\d+\. /, '');
+      html += `<li>${_inlineMd(esc(l))}</li>`;
+    } else if (/^### /.test(l)) { html += `<h4>${_inlineMd(esc(l.slice(4)))}</h4>`;
+    } else if (/^## /.test(l))  { html += `<h3>${_inlineMd(esc(l.slice(3)))}</h3>`;
+    } else if (/^# /.test(l))   { html += `<h2>${_inlineMd(esc(l.slice(2)))}</h2>`;
+    } else if (/^---+$/.test(l.trim())) { html += '<hr>';
+    } else if (isBlank) { html += '<br>';
+    } else { html += `<p>${_inlineMd(esc(l))}</p>`; }
+  }
+  if (inList) html += `</${listTag}>`;
+  return html;
+}
+function _inlineMd(s) {
+  return s
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+}
+function _renderPalmCardsHtml(arr) {
+  if (!arr?.length) return '<p style="color:var(--text-muted)">No palm cards generated.</p>';
+  return `<div class="palm-card-grid">${arr.map((c,i) => `
+    <div class="palm-card" onclick="this.classList.toggle('revealed')">
+      <div class="palm-card-num">Card ${i+1}</div>
+      <div class="palm-card-q">${c.front||''}</div>
+      <hr class="palm-card-divider">
+      <div class="palm-card-toggle"><i class="fi fi-rr-eye"></i> Tap to reveal answer</div>
+      <div class="palm-card-a">${c.back||''}</div>
+    </div>`).join('')}</div>`;
+}
+function _renderTestHtml(text) {
+  if (!text) return '<p style="color:var(--text-muted)">No test generated.</p>';
+  // Try to split into numbered questions
+  const blocks = text.split(/\n(?=\d+[\.\)])/);
+  if (blocks.length > 1) {
+    return blocks.map((block, i) => {
+      const lines = block.trim().split('\n');
+      const qLine = lines[0].replace(/^\d+[\.\)]\s*/, '');
+      const rest  = lines.slice(1).join('\n').trim();
+      return `<div class="test-question">
+        <div class="test-q-num">Question ${i+1}</div>
+        <div class="test-q-text">${qLine}</div>
+        ${rest ? `<div class="test-q-answer">${_mdToHtml(rest)}</div>
+        <button class="test-show-btn" onclick="event.stopPropagation();this.closest('.test-question').classList.toggle('show-answer');this.textContent=this.closest('.test-question').classList.contains('show-answer')?'Hide answer':'Show answer'">Show answer</button>` : ''}
+      </div>`;
+    }).join('');
+  }
+  return _mdToHtml(text);
+}
+function _renderResultTab(tab) {
+  const rcEl = document.getElementById('result-content');
+  if (!rcEl) return;
+  if (tab === 'palmCards') {
+    rcEl.innerHTML = _renderPalmCardsHtml(resultContent._palmCardsArr);
+  } else if (tab === 'test') {
+    rcEl.innerHTML = _renderTestHtml(resultContent.test);
+  } else {
+    rcEl.innerHTML = _mdToHtml(resultContent.notes || '');
+  }
+}
 window.switchResult = function(btn, tab) {
   currentResultTab = tab;
   document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const rcEl = document.getElementById('result-content');
-  if (rcEl) rcEl.textContent = resultContent[tab] || '';
+  _renderResultTab(tab);
 };
 
 // Test drop zone
@@ -5506,13 +5612,16 @@ window.viewArchivedNotes = function(key) {
   if (!item?.notes) return showToast('No notes saved for this file', 'info');
   showPanel('upload', null);
   resultContent.notes = item.notes;
-  resultContent.quiz = ''; resultContent.flashcards = ''; resultContent.schedule = '';
+  resultContent.test  = item.test || '';
+  resultContent._palmCardsArr = item.palmCards || [];
+  resultContent.palmCards = '';
   document.getElementById('upload-result').classList.add('show');
-  document.getElementById('upload-placeholder').style.display = 'none';
-  document.getElementById('result-content').textContent = item.notes;
-  document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
-  document.querySelector('.result-tab')?.classList.add('active');
-  showToast(`Viewing notes: ${item.deckTitle || item.fileName || 'Untitled'}`, 'info');
+  const _ph = document.getElementById('upload-placeholder');
+  if (_ph) _ph.style.display = 'none';
+  currentResultTab = 'notes';
+  document.querySelectorAll('.result-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+  _renderResultTab('notes');
+  showToast(`Viewing: ${item.deckTitle || item.fileName || 'Untitled'}`, 'info');
 };
 
 window._deckEditMode = false;

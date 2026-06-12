@@ -3826,21 +3826,22 @@ window._loadDashboardStats = loadDashboardStats;
 let _loadClassesInFlight = false;
 async function loadClasses() {
   if (!window._uid) return;
-  if (_loadClassesInFlight) return; // prevent concurrent duplicate renders
+  if (_loadClassesInFlight) return;
   _loadClassesInFlight = true;
   const grid = document.getElementById('classes-grid');
   if (!grid) { _loadClassesInFlight = false; return; }
-  grid.innerHTML = ''; // always clear first — removes any stale/hardcoded content
+  grid.innerHTML = '';
+  const isTeacher = window._userProfile?.role === 'teacher';
+  const colorSets = [
+    {bg:'rgba(0,240,212,0.1)',color:'var(--cyan)',icon:'fi-br-flask'},
+    {bg:'rgba(124,58,237,0.1)',color:'#a78bfa',icon:'fi-br-calculator'},
+    {bg:'rgba(245,158,11,0.1)',color:'var(--amber)',icon:'fi-br-book-open-cover'},
+    {bg:'rgba(244,63,94,0.1)',color:'var(--rose)',icon:'fi-br-atom'},
+    {bg:'rgba(34,197,94,0.1)',color:'var(--green)',icon:'fi-br-science'},
+  ];
   try {
-    const snap = await get(child(ref(db), `enrollments/${window._uid}`));
-    const colorSets = [
-      {bg:'rgba(0,240,212,0.1)',color:'var(--cyan)',icon:'fi-br-flask'},
-      {bg:'rgba(124,58,237,0.1)',color:'#a78bfa',icon:'fi-br-calculator'},
-      {bg:'rgba(245,158,11,0.1)',color:'var(--amber)',icon:'fi-br-book-open-cover'},
-      {bg:'rgba(244,63,94,0.1)',color:'var(--rose)',icon:'fi-br-atom'},
-      {bg:'rgba(34,197,94,0.1)',color:'var(--green)',icon:'fi-br-science'},
-    ];
-    const isTeacher = window._userProfile?.role === 'teacher';
+    const _db = window._db, _ref = window._fbRef, _get = window._fbGet, _child = window._fbChild;
+    const snap = await _get(_child(_ref(_db), `enrollments/${window._uid}`));
     if (snap.exists()) {
       const enrollments = snap.val();
       let i = 0;
@@ -3873,7 +3874,6 @@ async function loadClasses() {
         grid.appendChild(div);
       }
     } else {
-      // Empty state
       const empty = document.createElement('div');
       empty.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:.875rem';
       empty.innerHTML = isTeacher
@@ -3881,20 +3881,25 @@ async function loadClasses() {
         : '<i class="fi fi-br-school" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.4"></i>You haven\'t joined any classes yet. Enter a class code above.';
       grid.appendChild(empty);
     }
-    // Add card
-    const isOwnerRole = window._userProfile?.role === 'teacher';
-    const addEl = document.createElement('div');
-    addEl.className = 'class-card class-add-card';
-    addEl.style.cssText = 'border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px';
-    if (isOwnerRole) {
-      addEl.onclick = () => window.openCreateClassModal?.();
-      addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Create new class</span>';
-    } else {
-      addEl.onclick = () => document.getElementById('class-code-input')?.focus();
-      addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>';
-    }
-    grid.appendChild(addEl);
-  } catch(e) { console.error('loadClasses:', e); }
+  } catch(e) {
+    console.error('loadClasses:', e);
+    const errEl = document.createElement('div');
+    errEl.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--rose);font-size:.875rem';
+    errEl.innerHTML = '<i class="fi fi-br-triangle-warning" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.6"></i>Could not load classes — check your connection and try again.';
+    grid.appendChild(errEl);
+  }
+  // Add card always renders regardless of load result
+  const addEl = document.createElement('div');
+  addEl.className = 'class-card class-add-card';
+  addEl.style.cssText = 'border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px';
+  if (isTeacher) {
+    addEl.onclick = () => window.openCreateClassModal?.();
+    addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Create new class</span>';
+  } else {
+    addEl.onclick = () => document.getElementById('class-code-input')?.focus();
+    addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>';
+  }
+  grid.appendChild(addEl);
   _loadClassesInFlight = false;
 }
 window._loadClasses = loadClasses;

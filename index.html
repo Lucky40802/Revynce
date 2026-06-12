@@ -2525,36 +2525,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <button class="btn-ghost" onclick="connectGoogleClassroom()" style="font-size:.82rem;padding:8px 14px"><iconify-icon icon="mdi:google-classroom" style="font-size:1rem"></iconify-icon> &nbsp;Import classes from Google Classroom</button>
       </div>
       <div class="classes-grid" id="classes-grid">
-        <div class="class-card" style="cursor:pointer" onclick="openClassroom('BIO-2024','Biology Year 12')">
-          <div class="class-header">
-            <div class="class-icon" style="background:rgba(0,240,212,0.1);color:var(--cyan)"><i class="fi fi-br-flask"></i></div>
-            <span class="class-code-chip">BIO-2024</span>
-          </div>
-          <div class="class-name">Biology Year 12</div>
-          <div class="class-teacher">Mrs Clarke · 28 students</div>
-          <div class="class-stats">
-            <div class="class-stat"><div class="class-stat-n">4</div><div class="class-stat-l">Assignments</div></div>
-            <div class="class-stat"><div class="class-stat-n">78%</div><div class="class-stat-l">Avg Score</div></div>
-            <div class="class-stat"><div class="class-stat-n">3</div><div class="class-stat-l">Resources</div></div>
-          </div>
-        </div>
-        <div class="class-card" style="cursor:pointer" onclick="openClassroom('MAT-ADV','Advanced Mathematics')">
-          <div class="class-header">
-            <div class="class-icon" style="background:rgba(124,58,237,0.1);color:#a78bfa"><i class="fi fi-br-calculator"></i></div>
-            <span class="class-code-chip">MAT-ADV</span>
-          </div>
-          <div class="class-name">Advanced Mathematics</div>
-          <div class="class-teacher">Mr Peterson · 22 students</div>
-          <div class="class-stats">
-            <div class="class-stat"><div class="class-stat-n">6</div><div class="class-stat-l">Assignments</div></div>
-            <div class="class-stat"><div class="class-stat-n">82%</div><div class="class-stat-l">Avg Score</div></div>
-            <div class="class-stat"><div class="class-stat-n">7</div><div class="class-stat-l">Resources</div></div>
-          </div>
-        </div>
-        <div class="class-card class-add-card" style="border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px" onclick="document.getElementById('class-code-input')?.focus()">
-          <i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i>
-          <span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>
-        </div>
+        <!-- populated by loadClasses() -->
       </div>
     </div>
 
@@ -3647,6 +3618,35 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   </div>
 </div>
 
+<!-- Class Settings Modal -->
+<div class="modal-overlay" id="class-settings-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fi fi-br-settings" style="color:var(--cyan);margin-right:6px"></i>Class Settings</div>
+      <button class="modal-close" onclick="closeModal('class-settings-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <input type="hidden" id="settings-class-code">
+    <div class="form-group"><label class="form-label">Class Name</label><input type="text" class="form-input" id="settings-class-name" placeholder="e.g. Biology Year 12"></div>
+    <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="settings-class-subject" placeholder="e.g. Biology"></div>
+    <div class="form-group"><label class="form-label">Year Level</label><input type="text" class="form-input" id="settings-class-year" placeholder="e.g. Year 12"></div>
+    <div class="form-group">
+      <label class="form-label">Class Code</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="text" class="form-input" id="settings-class-code-display" readonly style="opacity:.6;font-family:monospace;letter-spacing:.1em;flex:1">
+        <button onclick="copyClassCode()" class="btn-ghost" style="padding:8px 12px;font-size:.8rem" title="Copy code"><i class="fi fi-br-copy"></i></button>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">Share this code with students so they can join.</div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn-ghost" style="color:var(--rose);border-color:rgba(244,63,94,.25)" onclick="confirmDeleteClass()"><i class="fi fi-br-trash"></i> Delete Class</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" onclick="closeModal('class-settings-modal')">Cancel</button>
+        <button class="btn-primary" id="save-class-settings-btn" onclick="saveClassSettings()"><i class="fi fi-br-disk"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Create Class Modal -->
 <div class="modal-overlay" id="create-class-modal">
   <div class="modal">
@@ -3821,13 +3821,16 @@ async function loadDashboardStats() {
 window._loadDashboardStats = loadDashboardStats;
 
 // ── Classes ──
+let _loadClassesInFlight = false;
 async function loadClasses() {
   if (!window._uid) return;
+  if (_loadClassesInFlight) return; // prevent concurrent duplicate renders
+  _loadClassesInFlight = true;
+  const grid = document.getElementById('classes-grid');
+  if (!grid) { _loadClassesInFlight = false; return; }
+  grid.innerHTML = ''; // always clear first — removes any stale/hardcoded content
   try {
     const snap = await get(child(ref(db), `enrollments/${window._uid}`));
-    if (!snap.exists()) return;
-    const enrollments = snap.val();
-    const grid = document.getElementById('classes-grid');
     const colorSets = [
       {bg:'rgba(0,240,212,0.1)',color:'var(--cyan)',icon:'fi-br-flask'},
       {bg:'rgba(124,58,237,0.1)',color:'#a78bfa',icon:'fi-br-calculator'},
@@ -3835,35 +3838,62 @@ async function loadClasses() {
       {bg:'rgba(244,63,94,0.1)',color:'var(--rose)',icon:'fi-br-atom'},
       {bg:'rgba(34,197,94,0.1)',color:'var(--green)',icon:'fi-br-science'},
     ];
-    grid.innerHTML = '';
-    let i = 0;
-    for (const [code, cls] of Object.entries(enrollments)) {
-      const c = colorSets[i % colorSets.length]; i++;
-      const div = document.createElement('div');
-      div.className = 'class-card';
-      div.style.cursor = 'pointer';
-      div.onclick = () => openClassroom(code, cls.name||code);
-      div.innerHTML = `
-        <div class="class-header">
-          <div class="class-icon" style="background:${c.bg};color:${c.color}"><i class="fi ${c.icon}"></i></div>
-          <span class="class-code-chip">${code}</span>
-        </div>
-        <div class="class-name">${cls.name||code}</div>
-        <div class="class-teacher">${cls.teacherName||'Your Teacher'}${cls.subject?' · '+cls.subject:''}</div>
-        <div class="class-stats">
-          <div class="class-stat"><div class="class-stat-n">${cls.yearLevel||'—'}</div><div class="class-stat-l">Year Level</div></div>
-          <div class="class-stat"><div class="class-stat-n">${cls.role==='teacher'?'Teacher':'Student'}</div><div class="class-stat-l">Role</div></div>
-        </div>
-        <div style="margin-top:10px;font-size:.75rem;color:var(--cyan)"><i class="fi fi-rr-arrow-right"></i> Open Classroom</div>`;
-      grid.appendChild(div);
+    const isTeacher = window._userProfile?.role === 'teacher';
+    if (snap.exists()) {
+      const enrollments = snap.val();
+      let i = 0;
+      for (const [code, cls] of Object.entries(enrollments)) {
+        const c = colorSets[i % colorSets.length]; i++;
+        const isOwner = cls.role === 'teacher' || cls.teacherUid === window._uid;
+        const div = document.createElement('div');
+        div.className = 'class-card';
+        div.style.cursor = 'pointer';
+        div.innerHTML = `
+          <div class="class-header">
+            <div class="class-icon" style="background:${c.bg};color:${c.color}"><i class="fi ${c.icon}"></i></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="class-code-chip">${code}</span>
+              ${isOwner ? `<button onclick="event.stopPropagation();openClassSettings('${code}')" title="Class settings" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:2px 4px;border-radius:6px;font-size:.85rem" onmouseenter="this.style.color='var(--cyan)'" onmouseleave="this.style.color='var(--text-muted)'"><i class="fi fi-br-settings"></i></button>` : ''}
+            </div>
+          </div>
+          <div class="class-name">${cls.name||code}</div>
+          <div class="class-teacher">${isOwner ? 'Your class' : (cls.teacherName||'Your Teacher')}${cls.subject?' · '+cls.subject:''}</div>
+          <div class="class-stats">
+            <div class="class-stat"><div class="class-stat-n">${cls.yearLevel||'—'}</div><div class="class-stat-l">Year Level</div></div>
+            <div class="class-stat"><div class="class-stat-n">${isOwner?'Teacher':'Student'}</div><div class="class-stat-l">Role</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:.75rem;color:var(--cyan)"><i class="fi fi-rr-arrow-right"></i> Open Classroom</div>`;
+        div.querySelector('.class-name').onclick = () => openClassroom(code, cls.name||code);
+        div.querySelector('.class-teacher').onclick = () => openClassroom(code, cls.name||code);
+        div.querySelector('[style*="arrow-right"]').onclick = () => openClassroom(code, cls.name||code);
+        div.querySelector('.class-icon').onclick = () => openClassroom(code, cls.name||code);
+        div.onclick = (e) => { if (!e.target.closest('button')) openClassroom(code, cls.name||code); };
+        grid.appendChild(div);
+      }
+    } else {
+      // Empty state
+      const empty = document.createElement('div');
+      empty.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:.875rem';
+      empty.innerHTML = isTeacher
+        ? '<i class="fi fi-br-chalkboard-user" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.4"></i>No classes yet. Use the <strong style="color:var(--text)">Create Class</strong> button above to get started.'
+        : '<i class="fi fi-br-school" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.4"></i>You haven\'t joined any classes yet. Enter a class code above.';
+      grid.appendChild(empty);
     }
+    // Add card
+    const isOwnerRole = window._userProfile?.role === 'teacher';
     const addEl = document.createElement('div');
     addEl.className = 'class-card class-add-card';
     addEl.style.cssText = 'border:2px dashed var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px';
-    addEl.onclick = () => document.getElementById('class-code-input')?.focus();
-    addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>';
+    if (isOwnerRole) {
+      addEl.onclick = () => window.openCreateClassModal?.();
+      addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Create new class</span>';
+    } else {
+      addEl.onclick = () => document.getElementById('class-code-input')?.focus();
+      addEl.innerHTML = '<i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i><span style="font-size:.84rem;color:var(--text-muted)">Join another class</span>';
+    }
     grid.appendChild(addEl);
   } catch(e) { console.error('loadClasses:', e); }
+  _loadClassesInFlight = false;
 }
 window._loadClasses = loadClasses;
 
@@ -4450,6 +4480,83 @@ window.joinClass = async function() {
 };
 window.openCreateClassModal = function() { document.getElementById('create-class-modal').classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+
+// ── Class Settings ──
+window.openClassSettings = async function(code) {
+  const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+  document.getElementById('settings-class-code').value = code;
+  document.getElementById('settings-class-code-display').value = code;
+  // Pre-fill from Firebase
+  try {
+    const snap = await _get(_child(_ref(_db), `classes/${code}`));
+    const cls = snap.exists() ? snap.val() : {};
+    document.getElementById('settings-class-name').value = cls.name || '';
+    document.getElementById('settings-class-subject').value = cls.subject || '';
+    document.getElementById('settings-class-year').value = cls.yearLevel || '';
+  } catch(e) {
+    // Fall back to enrollment data
+    const snap2 = await _get(_child(_ref(_db), `enrollments/${window._uid}/${code}`)).catch(()=>null);
+    const cls = snap2?.exists() ? snap2.val() : {};
+    document.getElementById('settings-class-name').value = cls.name || '';
+    document.getElementById('settings-class-subject').value = cls.subject || '';
+    document.getElementById('settings-class-year').value = cls.yearLevel || '';
+  }
+  document.getElementById('class-settings-modal').classList.add('open');
+};
+
+window.saveClassSettings = async function() {
+  const _db=window._db,_ref=window._fbRef,_set=window._fbSet,_get=window._fbGet,_child=window._fbChild;
+  const code = document.getElementById('settings-class-code').value;
+  const name = document.getElementById('settings-class-name').value.trim();
+  const subject = document.getElementById('settings-class-subject').value.trim();
+  const yearLevel = document.getElementById('settings-class-year').value.trim();
+  if (!name) { showToast('Class name is required.', 'error'); return; }
+  const btn = document.getElementById('save-class-settings-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    // Update main class record
+    await _set(_ref(_db, `classes/${code}/name`), name);
+    await _set(_ref(_db, `classes/${code}/subject`), subject);
+    await _set(_ref(_db, `classes/${code}/yearLevel`), yearLevel);
+    // Update teacher's own enrollment record
+    await _set(_ref(_db, `enrollments/${window._uid}/${code}/name`), name);
+    await _set(_ref(_db, `enrollments/${window._uid}/${code}/subject`), subject);
+    await _set(_ref(_db, `enrollments/${window._uid}/${code}/yearLevel`), yearLevel);
+    closeModal('class-settings-modal');
+    showToast('Class updated!', 'success');
+    loadClasses();
+  } catch(e) {
+    showToast('Error saving — check your connection.', 'error');
+  }
+  btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-disk"></i> Save Changes';
+};
+
+window.copyClassCode = function() {
+  const code = document.getElementById('settings-class-code-display').value;
+  navigator.clipboard.writeText(code).then(() => showToast(`Code "${code}" copied!`, 'success')).catch(() => showToast(code, 'info'));
+};
+
+window.confirmDeleteClass = function() {
+  const code = document.getElementById('settings-class-code').value;
+  const name = document.getElementById('settings-class-name').value || code;
+  if (!confirm(`Delete "${name}"?\n\nThis will remove the class and all its assignments and resources. Students will lose access.\n\nThis cannot be undone.`)) return;
+  deleteClass(code);
+};
+
+async function deleteClass(code) {
+  const _db=window._db,_ref=window._fbRef,_remove=window._fbRemove,_get=window._fbGet,_child=window._fbChild;
+  try {
+    // Remove class, assignments, resources, enrollments for teacher
+    await _remove(_ref(_db, `classes/${code}`));
+    await _remove(_ref(_db, `assignments/${code}`));
+    await _remove(_ref(_db, `resources/${code}`));
+    await _remove(_ref(_db, `attendance/${code}`));
+    await _remove(_ref(_db, `enrollments/${window._uid}/${code}`));
+    closeModal('class-settings-modal');
+    showToast('Class deleted.', 'success');
+    loadClasses();
+  } catch(e) { showToast('Error deleting class.', 'error'); }
+}
 window.createClassSubmit = async function() {
   const name = document.getElementById('create-class-name').value.trim();
   const subject = document.getElementById('create-class-subject').value.trim();

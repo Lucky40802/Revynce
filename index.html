@@ -4146,9 +4146,43 @@ Return only the raw JSON object.`;
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
   if (!raw) throw new Error('Empty response from AI — please try again.');
-  const match = raw.match(/\{[\s\S]*\}/);
+
+  // Strip markdown code fences (```json ... ``` or ``` ... ```)
+  const stripped = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+
+  // Extract outermost JSON object
+  const match = stripped.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('AI returned unexpected format — please try again.');
-  return JSON.parse(match[0]);
+
+  // First attempt: direct parse
+  try {
+    return JSON.parse(match[0]);
+  } catch (_) {}
+
+  // Second attempt: escape literal newlines inside string values so JSON.parse accepts them
+  const repaired = match[0]
+    .replace(/"(notes|test|title|front|back)":\s*"([\s\S]*?)(?=",?\s*"(?:notes|test|title|palmCards|front|back)"|"\s*\})/g,
+      (_, key, val) => `"${key}": "${val.replace(/\n/g, '\\n').replace(/\r/g, '').replace(/(?<!\\)"/g, '\\"')}"`);
+  try {
+    return JSON.parse(repaired);
+  } catch (_) {}
+
+  // Third attempt: extract each field individually with targeted regexes
+  function extractStr(src, key) {
+    const m = src.match(new RegExp(`"${key}"\\s*:\\s*"([\\s\\S]*?)(?<!\\\\)"(?=\\s*[,}])`));
+    return m ? m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : '';
+  }
+  function extractArr(src, key) {
+    const m = src.match(new RegExp(`"${key}"\\s*:\\s*(\\[[\\s\\S]*?\\])(?=\\s*[,}])`));
+    if (!m) return [];
+    try { return JSON.parse(m[1]); } catch { return []; }
+  }
+  const title     = extractStr(match[0], 'title');
+  const notes     = extractStr(match[0], 'notes');
+  const test      = extractStr(match[0], 'test');
+  const palmCards = extractArr(match[0], 'palmCards');
+  if (!notes && !test && !palmCards.length) throw new Error('AI response could not be parsed — please try again.');
+  return { title, notes, test, palmCards };
 }
 
 // ── AI Upload ──

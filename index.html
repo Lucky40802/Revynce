@@ -879,6 +879,27 @@ body::before {
 .sched-task { background:var(--cyan-dim); color:var(--cyan); font-size:.65rem; font-weight:700; padding:3px 6px; border-radius:5px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sched-task.violet { background:var(--violet-dim); color:#a78bfa; }
 .sched-task.amber { background:rgba(245,158,11,.1); color:var(--amber); }
+.sched-task.custom { background:rgba(124,58,237,.1); color:#a78bfa; position:relative; padding-right:18px; cursor:default; }
+.sched-task.custom .sched-task-del { position:absolute;right:3px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:inherit;opacity:.5;padding:0;font-size:.6rem;line-height:1; }
+.sched-task.custom .sched-task-del:hover { opacity:1; }
+.sched-add-btn { width:100%;margin-top:6px;background:none;border:1px dashed var(--border);border-radius:5px;color:var(--text-muted);font-size:.65rem;font-weight:600;padding:3px 0;cursor:pointer;font-family:var(--font-b);transition:border-color .15s,color .15s; }
+.sched-add-btn:hover { border-color:var(--cyan);color:var(--cyan); }
+/* Archive action button */
+.ar-upload-row { position:relative; }
+.ar-row-actions { display:flex;gap:6px;flex-shrink:0;margin-left:8px; }
+.ar-action-btn { background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:.72rem;padding:4px 8px;cursor:pointer;font-family:var(--font-b);transition:all .15s;white-space:nowrap; }
+.ar-action-btn:hover { border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim); }
+/* Deck drag-reorder */
+.deck-card[draggable="true"] { cursor:grab; }
+.deck-card.drag-over { border-color:var(--cyan)!important;background:var(--cyan-dim)!important; }
+.deck-card.dragging { opacity:.4; }
+/* Timetable editable cell */
+.tt-cell.tt-has-class.tt-editable { cursor:pointer; }
+.tt-cell.tt-has-class.tt-editable:hover { border-color:var(--cyan); }
+.tt-cell-edit-hint { font-size:.6rem;color:var(--text-muted);margin-top:3px;display:none; }
+.tt-cell.tt-editable:hover .tt-cell-edit-hint { display:block; }
+/* Deck rename input */
+.deck-rename-input { background:var(--bg-card2);border:1px solid var(--border-active);border-radius:6px;padding:4px 8px;font-size:.84rem;font-weight:700;color:var(--text);font-family:var(--font-b);width:100%;margin-bottom:4px; }
 .agenda-list { list-style:none; display:flex; flex-direction:column; gap:10px; max-width:560px; }
 .agenda-item { display:flex; gap:14px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
 .agenda-time { font-size:.8rem; font-weight:700; color:var(--cyan); white-space:nowrap; padding-top:2px; }
@@ -3592,6 +3613,90 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   </div>
 </div>
 
+<!-- Archive Edit Modal (rename / move to folder) -->
+<div class="modal-overlay" id="ar-edit-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Edit Entry</div>
+      <button class="modal-close" onclick="closeModal('ar-edit-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <input type="hidden" id="ar-edit-key">
+    <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="ar-edit-title" placeholder="e.g. Cell Division Notes"></div>
+    <div class="form-group"><label class="form-label">Subject folder</label><input type="text" class="form-input" id="ar-edit-subject" placeholder="e.g. Biology"></div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn-ghost" style="color:var(--rose);border-color:rgba(244,63,94,.3)" onclick="arDeleteEntry(document.getElementById('ar-edit-key').value)"><i class="fi fi-br-trash"></i> Delete</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" onclick="closeModal('ar-edit-modal')">Cancel</button>
+        <button class="btn-primary" onclick="arSaveEdit()"><i class="fi fi-br-check"></i> Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Timetable Period Modal -->
+<div class="modal-overlay" id="edit-period-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Edit Period</div>
+      <button class="modal-close" onclick="closeModal('edit-period-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <input type="hidden" id="ep-key">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group" style="margin:0"><label class="form-label">Day</label>
+        <select class="form-input" id="ep-day">
+          <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0"><label class="form-label">Period</label>
+        <select class="form-input" id="ep-period">
+          <option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="ep-subject"></div>
+    <div class="form-group"><label class="form-label">Room</label><input type="text" class="form-input" id="ep-room"></div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn-ghost" style="color:var(--rose);border-color:rgba(244,63,94,.3)" onclick="deletePeriod(document.getElementById('ep-key').value)"><i class="fi fi-br-trash"></i> Delete</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" onclick="closeModal('edit-period-modal')">Cancel</button>
+        <button class="btn-primary" onclick="saveEditPeriod()"><i class="fi fi-br-check"></i> Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Study Block Modal -->
+<div class="modal-overlay" id="sched-block-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">Add Study Block</div>
+      <button class="modal-close" onclick="closeModal('sched-block-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <input type="hidden" id="sb-day">
+    <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="sb-subject" placeholder="e.g. Maths revision"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('sched-block-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveSchedBlock()"><i class="fi fi-br-check"></i> Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Deck Rename Modal -->
+<div class="modal-overlay" id="deck-rename-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">Rename Deck</div>
+      <button class="modal-close" onclick="closeModal('deck-rename-modal')"><i class="fi fi-rr-cross"></i></button>
+    </div>
+    <input type="hidden" id="dr-key">
+    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="dr-name" placeholder="e.g. Cell Biology Year 12"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('deck-rename-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveDeckRename()"><i class="fi fi-br-check"></i> Rename</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Period Modal (Teacher Timetable) -->
 <div class="modal-overlay" id="add-period-modal">
   <div class="modal" style="max-width:420px">
@@ -4024,7 +4129,11 @@ async function loadFlashcards() {
   try {
     const snap = await window._fbGet(window._fbRef(window._db, `flashcardDecks/${window._uid}`));
     if (snap.exists()) {
-      window._fcDecks = snap.val();
+      const val = snap.val();
+      // Restore saved deck order, exclude the _order meta key from deck data
+      _deckOrder = Array.isArray(val._order) ? val._order : [];
+      delete val._order;
+      window._fcDecks = val;
     } else {
       _restoreSampleDecks();
     }
@@ -5077,6 +5186,48 @@ window._addXP = async function(amount) {
 };
 
 // ── Dynamic schedule ──
+// ── Study schedule custom blocks (stored in schedule/{uid}) ──
+window._schedBlocks = {}; // { dayKey: ['Maths revision', ...] }
+
+async function _loadSchedBlocks() {
+  if (!window._uid || !window._db || !window._fbGet || !window._fbRef) return;
+  try {
+    const snap = await window._fbGet(window._fbRef(window._db, `schedule/${window._uid}`));
+    window._schedBlocks = snap.exists() ? snap.val() : {};
+  } catch(e) {}
+}
+
+async function _saveSchedBlocks() {
+  if (!window._uid || !window._db || !window._fbSet || !window._fbRef) return;
+  await window._fbSet(window._fbRef(window._db, `schedule/${window._uid}`), window._schedBlocks).catch(()=>{});
+}
+
+window.openSchedBlockModal = function(dayKey) {
+  document.getElementById('sb-day').value     = dayKey;
+  document.getElementById('sb-subject').value = '';
+  document.getElementById('sched-block-modal').classList.add('open');
+  setTimeout(() => document.getElementById('sb-subject').focus(), 80);
+};
+
+window.saveSchedBlock = async function() {
+  const day  = document.getElementById('sb-day').value;
+  const subj = document.getElementById('sb-subject').value.trim();
+  if (!subj) { showToast('Enter a subject', 'error'); return; }
+  if (!window._schedBlocks[day]) window._schedBlocks[day] = [];
+  window._schedBlocks[day].push(subj);
+  await _saveSchedBlocks();
+  closeModal('sched-block-modal');
+  renderSchedule();
+};
+
+window.deleteSchedBlock = async function(dayKey, idx) {
+  if (!window._schedBlocks[dayKey]) return;
+  window._schedBlocks[dayKey].splice(idx, 1);
+  if (!window._schedBlocks[dayKey].length) delete window._schedBlocks[dayKey];
+  await _saveSchedBlocks();
+  renderSchedule();
+};
+
 async function renderSchedule() {
   const grid = document.getElementById('schedule-week-grid');
   if (!grid) return;
@@ -5087,12 +5238,11 @@ async function renderSchedule() {
   const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const fullDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
-  // Load from Firebase timetable if logged in
+  // Load timetable subjects from Firebase
   let byDay = {};
   if (window._uid && window._db) {
     try {
-      const _db=window._db, _ref=window._fbRef, _get=window._fbGet, _child=window._fbChild;
-      const snap = await _get(_child(_ref(_db), `timetable/${window._uid}`));
+      const snap = await window._fbGet(window._fbRef(window._db, `timetable/${window._uid}`));
       if (snap.exists()) {
         Object.values(snap.val()).forEach(entry => {
           const d = (entry.day || '').toLowerCase();
@@ -5103,16 +5253,28 @@ async function renderSchedule() {
     } catch(e) {}
   }
 
+  // Load custom study blocks
+  await _loadSchedBlocks();
+
   const accentCycle = ['','amber','violet','','amber'];
   grid.innerHTML = dayNames.map((d, i) => {
     const date = new Date(monday); date.setDate(monday.getDate() + i);
     const isToday = date.toDateString() === now.toDateString();
-    const dayKey = fullDays[i].toLowerCase();
-    const subs = byDay[dayKey] || [];
-    const tasks = subs.length
+    const dayKey  = fullDays[i].toLowerCase();
+    const subs    = byDay[dayKey] || [];
+    const custom  = window._schedBlocks[dayKey] || [];
+    const classTasks = subs.length
       ? subs.map((s, j) => `<div class="sched-task ${accentCycle[j % accentCycle.length]}">${s}</div>`).join('')
       : `<div class="sched-task" style="opacity:.35;font-style:italic">No class</div>`;
-    return `<div class="sched-day${isToday?' today':''}"><div class="sched-day-label">${d}</div><div class="sched-day-num">${date.getDate()}</div>${tasks}</div>`;
+    const customTasks = custom.map((s, j) =>
+      `<div class="sched-task custom">${s}<button class="sched-task-del" onclick="event.stopPropagation();deleteSchedBlock('${dayKey}',${j})" title="Remove">✕</button></div>`
+    ).join('');
+    return `<div class="sched-day${isToday?' today':''}">
+      <div class="sched-day-label">${d}</div>
+      <div class="sched-day-num">${date.getDate()}</div>
+      ${classTasks}${customTasks}
+      <button class="sched-add-btn" onclick="openSchedBlockModal('${dayKey}')">+ Add study block</button>
+    </div>`;
   }).join('');
 }
 
@@ -5415,11 +5577,15 @@ const _deckIcons = {
   English:'fi-br-book', default:'fi-br-layers'
 };
 
+let _deckOrder = []; // persisted order of deck keys
+let _dragSrcId  = null;
+
 window.renderDecks = function() {
   const grid = document.getElementById('deck-grid');
   if (!grid) return;
   const decks = window._fcDecks || {};
-  const keys  = Object.keys(decks);
+  let keys = _deckOrder.filter(k => decks[k]); // ordered first
+  Object.keys(decks).forEach(k => { if (!keys.includes(k)) keys.push(k); }); // append new
 
   if (!keys.length) {
     grid.innerHTML = `
@@ -5440,8 +5606,15 @@ window.renderDecks = function() {
     const date  = d.createdAt
       ? new Date(d.createdAt).toLocaleDateString('en-AU', { day:'numeric', month:'short' })
       : '';
+    const esc = s => (s||'').replace(/'/g,"\\'");
     return `
-      <div class="deck-card" onclick="if(!window._deckEditMode)openDeck('${id}')">
+      <div class="deck-card" draggable="true" data-deck-id="${id}"
+           ondragstart="_deckDragStart(event,'${id}')"
+           ondragover="_deckDragOver(event)"
+           ondragleave="_deckDragLeave(event)"
+           ondrop="_deckDrop(event,'${id}')"
+           ondragend="_deckDragEnd(event)"
+           onclick="if(!window._deckEditMode)openDeck('${id}')">
         <button class="deck-delete-btn" title="Remove set" onclick="event.stopPropagation();deleteDeck('${id}')">
           <i class="fi fi-br-trash"></i>
         </button>
@@ -5450,9 +5623,14 @@ window.renderDecks = function() {
         <div class="deck-count">${count} card${count !== 1 ? 's' : ''}</div>
         <div class="deck-footer">
           <span class="deck-date">${date}</span>
-          <button class="deck-study-btn" onclick="event.stopPropagation();if(!window._deckEditMode)openDeck('${id}')">
-            <i class="fi fi-rr-play"></i> Study
-          </button>
+          <div style="display:flex;gap:6px">
+            <button class="deck-study-btn" style="background:var(--bg-card2);color:var(--text-muted);border:1px solid var(--border)" onclick="event.stopPropagation();openDeckRenameModal('${id}','${esc(d.subject||'')}')">
+              <i class="fi fi-br-pencil"></i>
+            </button>
+            <button class="deck-study-btn" onclick="event.stopPropagation();if(!window._deckEditMode)openDeck('${id}')">
+              <i class="fi fi-rr-play"></i> Study
+            </button>
+          </div>
         </div>
       </div>`;
   }).join('') + `
@@ -5460,6 +5638,60 @@ window.renderDecks = function() {
       <i class="fi fi-br-plus" style="font-size:1.5rem;color:var(--text-muted)"></i>
       <span style="font-size:.84rem;color:var(--text-muted);font-weight:600">New Set</span>
     </div>`;
+};
+
+// ── Deck drag-to-reorder ──
+function _deckDragStart(e, id) {
+  _dragSrcId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+}
+function _deckDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function _deckDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function _deckDragEnd(e)   { e.currentTarget.classList.remove('dragging','drag-over'); }
+function _deckDrop(e, targetId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!_dragSrcId || _dragSrcId === targetId) return;
+  const decks = window._fcDecks || {};
+  let keys = _deckOrder.filter(k => decks[k]);
+  Object.keys(decks).forEach(k => { if (!keys.includes(k)) keys.push(k); });
+  const from = keys.indexOf(_dragSrcId), to = keys.indexOf(targetId);
+  if (from < 0 || to < 0) return;
+  keys.splice(from, 1); keys.splice(to, 0, _dragSrcId);
+  _deckOrder = keys;
+  _dragSrcId = null;
+  window.renderDecks();
+  // Persist order to Firebase
+  if (window._uid && window._fbSet && window._fbRef && window._db) {
+    window._fbSet(window._fbRef(window._db, `flashcardDecks/${window._uid}/_order`), keys).catch(()=>{});
+  }
+}
+
+// ── Deck rename ──
+window.openDeckRenameModal = function(id, currentName) {
+  document.getElementById('dr-key').value  = id;
+  document.getElementById('dr-name').value = currentName;
+  document.getElementById('deck-rename-modal').classList.add('open');
+};
+window.saveDeckRename = async function() {
+  const id   = document.getElementById('dr-key').value;
+  const name = document.getElementById('dr-name').value.trim();
+  if (!name) { showToast('Name cannot be empty','error'); return; }
+  const decks = window._fcDecks || {};
+  if (!decks[id]) return;
+  decks[id].subject = name;
+  window._fcDecks = decks;
+  if (window._uid && window._fbSet && window._fbRef && window._db) {
+    await window._fbSet(window._fbRef(window._db, `flashcardDecks/${window._uid}/${id}/subject`), name).catch(()=>{});
+  }
+  closeModal('deck-rename-modal');
+  window.renderDecks();
+  showToast('Deck renamed','success');
 };
 
 // ═══════════════════════════════════════
@@ -5539,6 +5771,7 @@ window.arOpenFolder = function(subject) {
       ? new Date(item.uploadedAt).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})
       : '';
     const hasNotes = !!item.notes, hasCards = !!(item.palmCards?.length), hasTest = !!item.test;
+    const esc = s => (s||'').replace(/'/g,"\\'");
     return `
       <div class="ar-upload-row" onclick="arOpenSet('${key}')">
         <div class="ar-upload-ic"><i class="fi fi-br-document-signed"></i></div>
@@ -5549,6 +5782,9 @@ window.arOpenFolder = function(subject) {
           ${hasTest  ? '<span class="ar-chip ar-chip-t">Test</span>'  : ''}
         </div>
         <div class="ar-upload-date">${date}</div>
+        <div class="ar-row-actions">
+          <button class="ar-action-btn" title="Rename or move" onclick="event.stopPropagation();arOpenEditModal('${key}','${esc(item.deckTitle||item.fileName||'')}','${esc(item.subject||'')}')"><i class="fi fi-br-pencil"></i></button>
+        </div>
       </div>`;
   }).join('');
 
@@ -5632,6 +5868,60 @@ window.arGoHome = function() {
   _arCurrentSubject = null; _arCurrentKey = null;
   arSetBreadcrumb([{ label:'Archive' }]);
   arShowView('ar-home');
+};
+
+// ── Archive: open edit modal ──
+window.arOpenEditModal = function(key, title, subject) {
+  document.getElementById('ar-edit-key').value     = key;
+  document.getElementById('ar-edit-title').value   = title;
+  document.getElementById('ar-edit-subject').value = subject;
+  document.getElementById('ar-edit-modal').classList.add('open');
+};
+
+window.arSaveEdit = async function() {
+  const key     = document.getElementById('ar-edit-key').value;
+  const title   = document.getElementById('ar-edit-title').value.trim();
+  const subject = document.getElementById('ar-edit-subject').value.trim();
+  if (!key) return;
+  if (!window._uid || !window._db || !window._fbSet || !window._fbRef) return;
+  try {
+    const updates = {};
+    if (title)   updates.deckTitle = title;
+    if (subject) updates.subject   = subject;
+    // Write each field individually so we don't overwrite notes/cards/test
+    for (const [field, val] of Object.entries(updates)) {
+      await window._fbSet(window._fbRef(window._db, `uploads/${window._uid}/${key}/${field}`), val);
+    }
+    // Update local cache
+    if (window._archiveData?.[key]) {
+      if (title)   window._archiveData[key].deckTitle = title;
+      if (subject) window._archiveData[key].subject   = subject;
+    }
+    closeModal('ar-edit-modal');
+    showToast('Entry updated', 'success');
+    // Refresh the current view
+    const sub = _arCurrentSubject;
+    window.renderArchiveFolders?.();
+    if (sub) window.arOpenFolder?.(subject || sub);
+  } catch(e) {
+    showToast('Could not save — ' + e.message, 'error');
+  }
+};
+
+window.arDeleteEntry = async function(key) {
+  if (!key || !confirm('Delete this entry? This cannot be undone.')) return;
+  try {
+    if (window._uid && window._fbRemove && window._fbRef && window._db) {
+      await window._fbRemove(window._fbRef(window._db, `uploads/${window._uid}/${key}`));
+    }
+    if (window._archiveData) delete window._archiveData[key];
+    closeModal('ar-edit-modal');
+    showToast('Deleted', 'success');
+    window.renderArchiveFolders?.();
+    window.arGoHome?.();
+  } catch(e) {
+    showToast('Could not delete — ' + e.message, 'error');
+  }
 };
 
 window.loadArchive = async function() {
@@ -6711,6 +7001,49 @@ window.saveNewPeriod = async function() {
     window.renderTimetable();
   } catch(e) { showToast('Error saving period.', 'error'); }
 };
+// ── Timetable edit/delete (teacher only) ──
+window.openEditPeriodModal = function(key, subject, room, day, period) {
+  document.getElementById('ep-key').value     = key;
+  document.getElementById('ep-subject').value = subject || '';
+  document.getElementById('ep-room').value    = room    || '';
+  const dayEl = document.getElementById('ep-day');
+  const perEl = document.getElementById('ep-period');
+  if (dayEl) { Array.from(dayEl.options).forEach(o => { o.selected = o.value === day; }); }
+  if (perEl) { Array.from(perEl.options).forEach(o => { o.selected = o.value === String(period); }); }
+  document.getElementById('edit-period-modal').classList.add('open');
+};
+
+window.saveEditPeriod = async function() {
+  const oldKey  = document.getElementById('ep-key').value;
+  const subject = document.getElementById('ep-subject').value.trim();
+  const room    = document.getElementById('ep-room').value.trim();
+  const day     = document.getElementById('ep-day').value;
+  const period  = document.getElementById('ep-period').value;
+  if (!subject) { showToast('Subject required', 'error'); return; }
+  const newKey = `p${period}_${day.toLowerCase()}`;
+  try {
+    if (oldKey !== newKey && window._fbRemove) {
+      await window._fbRemove(window._fbRef(window._db, `timetable/${window._uid}/${oldKey}`));
+    }
+    await window._fbSet(window._fbRef(window._db, `timetable/${window._uid}/${newKey}`), {
+      subject, room, teacher: window._userProfile?.name || 'Teacher', period: Number(period), day
+    });
+    closeModal('edit-period-modal');
+    showToast(`${subject} updated`, 'success');
+    window.renderTimetable();
+  } catch(e) { showToast('Error saving — ' + e.message, 'error'); }
+};
+
+window.deletePeriod = async function(key) {
+  if (!key || !confirm('Remove this period?')) return;
+  try {
+    await window._fbRemove(window._fbRef(window._db, `timetable/${window._uid}/${key}`));
+    closeModal('edit-period-modal');
+    showToast('Period removed', 'success');
+    window.renderTimetable();
+  } catch(e) { showToast('Error removing period', 'error'); }
+};
+
 window.closePricingModal = function() {
   document.getElementById('pricing-modal-overlay')?.classList.remove('open');
 };
@@ -6772,14 +7105,16 @@ window.renderTimetable = async function() {
   const grid = document.getElementById('timetable-grid');
   if (!grid) return;
 
-  // Load classes the user is enrolled in
+  // Load timetable from Firebase
   let classes = {};
-  if (window._uid) {
+  if (window._uid && window._db && window._fbGet && window._fbRef) {
     try {
-      const snap = await get(child(ref(db), `timetable/${window._uid}`));
+      const snap = await window._fbGet(window._fbRef(window._db, `timetable/${window._uid}`));
       if (snap.exists()) classes = snap.val();
     } catch(e) {}
   }
+
+  const isTeacher = window._userProfile?.role === 'teacher';
 
   // Rebuild grid (keep header row)
   grid.innerHTML = `
@@ -6801,17 +7136,30 @@ window.renderTimetable = async function() {
       if (entry) {
         hasAny = true;
         const acc = ACCENT_COLORS[di % ACCENT_COLORS.length];
-        cell.className = 'tt-cell tt-has-class';
+        cell.className = 'tt-cell tt-has-class' + (isTeacher ? ' tt-editable' : '');
         cell.style.background = acc.bg;
         cell.style.borderColor = acc.color.replace('var(--','').replace(')','');
         cell.innerHTML = `
           <div class="tt-cell-subject" style="color:${acc.color}">${entry.subject||'—'}</div>
           <div class="tt-cell-room">${entry.room||''}</div>
-          <div class="tt-cell-teacher">${entry.teacher||''}</div>`;
+          <div class="tt-cell-teacher">${entry.teacher||''}</div>
+          ${isTeacher ? '<div class="tt-cell-edit-hint"><i class="fi fi-br-pencil"></i> Click to edit</div>' : ''}`;
+        if (isTeacher) {
+          cell.onclick = () => openEditPeriodModal(key, entry.subject, entry.room, day, p.num);
+        }
       } else {
         cell.className = 'tt-cell';
         cell.style.background = 'transparent';
         cell.style.borderStyle = 'dashed';
+        if (isTeacher) {
+          cell.style.cursor = 'pointer';
+          cell.title = 'Add period';
+          cell.onclick = () => {
+            document.getElementById('ap-day').value    = day;
+            document.getElementById('ap-period').value = String(p.num);
+            openModal('add-period-modal');
+          };
+        }
       }
       grid.appendChild(cell);
     });

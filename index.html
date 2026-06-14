@@ -2221,6 +2221,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <button class="nav-item" onclick="showPanel('classes',this)"><i class="fi fi-br-school"></i> My Classes</button>
     <button class="nav-item" onclick="showPanel('schedule',this)"><i class="fi fi-br-calendar"></i> Study Schedule</button>
     <button class="nav-item" onclick="showPanel('performance',this)"><i class="fi fi-br-chart-histogram"></i> Performance</button>
+    <button class="nav-item" onclick="showPanel('flashcards',this)"><i class="fi fi-br-layers"></i> Flashcards</button>
+    <button class="nav-item" onclick="showPanel('quiz',this)"><i class="fi fi-br-quiz-alt"></i> Quiz</button>
     <div class="sb-section">Study Tools</div>
     <button class="nav-item" onclick="showPanel('pomodoro',this)"><i class="fi fi-br-time-forward"></i> Pomodoro</button>
     <button class="nav-item" onclick="showPanel('voice',this)"><i class="fi fi-br-microphone"></i> Voice Rooms</button>
@@ -3549,6 +3551,47 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   </div>
 </div>
 
+<!-- ── FLASHCARDS PANEL ── -->
+<div class="app-panel" id="panel-flashcards">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+      <h2 class="section-head">Flashcard Decks</h2>
+      <p class="section-sub">Your AI-generated palm card sets. Upload a file to create more.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" id="deck-edit-btn" onclick="toggleDeckEditMode(this)" style="font-size:.8rem;padding:7px 14px"><i class="fi fi-br-trash"></i> Manage</button>
+      <button class="btn-primary" onclick="showPanel('upload',null)" style="font-size:.8rem;padding:7px 14px"><i class="fi fi-br-magic-wand"></i> New Set</button>
+    </div>
+  </div>
+  <div class="deck-grid" id="deck-grid"></div>
+</div>
+
+<!-- ── QUIZ PANEL ── -->
+<div class="app-panel" id="panel-quiz">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+    <div>
+      <h2 class="section-head">Quiz Mode</h2>
+      <p class="section-sub">Test your knowledge. AI questions are used when available.</p>
+    </div>
+    <div id="quiz-score-header" style="font-size:.85rem;font-weight:700;color:var(--cyan);font-family:var(--font-d)">Score: 0/0</div>
+  </div>
+  <div class="quiz-wrap">
+    <div class="quiz-header">
+      <span id="quiz-prog" style="font-size:.8rem;color:var(--text-muted)">1 / 5</span>
+      <button class="btn-ghost" onclick="initQuiz()" style="font-size:.78rem;padding:5px 12px"><i class="fi fi-br-rotate-right"></i> Restart</button>
+    </div>
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+    <div class="quiz-card">
+      <div class="quiz-q" id="quiz-q">Loading question…</div>
+      <div class="quiz-opts" id="quiz-opts"></div>
+      <div class="quiz-fb" id="quiz-fb"></div>
+    </div>
+    <div class="quiz-nav">
+      <button class="btn-primary" id="quiz-next" onclick="nextQ()" style="display:none"><i class="fi fi-br-angle-right"></i> Next</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Period Modal (Teacher Timetable) -->
 <div class="modal-overlay" id="add-period-modal">
   <div class="modal" style="max-width:420px">
@@ -3977,9 +4020,9 @@ window._createClass = async function(name, subject, yearLevel) {
 
 // ── Flashcards (deck-based) ──
 async function loadFlashcards() {
-  if (!window._uid) return;
+  if (!window._uid || !window._db || !window._fbRef || !window._fbGet) return;
   try {
-    const snap = await get(child(ref(db), `flashcardDecks/${window._uid}`));
+    const snap = await window._fbGet(window._fbRef(window._db, `flashcardDecks/${window._uid}`));
     if (snap.exists()) {
       window._fcDecks = snap.val();
     } else {
@@ -5216,10 +5259,16 @@ window.sendMsg = async function() {
   } catch(e) { removeTyping(); appendChatError('⚠ Could not reach AI: ' + e.message); }
   sendBtn.disabled = false; input.focus();
 };
-window.useSuggestion = function(chip) { document.getElementById('chatInput').value = chip.textContent; sendMsg(); };
+window.useSuggestion = function(chip) {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  input.value = chip.textContent;
+  sendMsg();
+};
 
 function appendChat(text, type) {
   const box = document.getElementById('chatMessages');
+  if (!box) return;
   const wrap = document.createElement('div'); wrap.className = 'msg ' + type;
   const ava = document.createElement('div'); ava.className = 'msg-ava';
   ava.innerHTML = type === 'ai' ? '<i class="fi fi-br-robot" style="font-size:.75rem"></i>' : 'ME';
@@ -8150,6 +8199,8 @@ window.showPanel = function(name, navEl) {
   if (name === 'attendance-marking') window.initMarkRollPanel();
   if (name === 'attendance') window.loadStudentAttendance();
   if (name === 'classes') { _loadClassesInFlight = false; loadClasses(); }
+  if (name === 'flashcards') { window._loadFlashcards?.(); window.renderDecks?.(); }
+  if (name === 'quiz') { initQuiz(); }
 };
 
 // ── Student attendance panel: load real data from Firebase ──

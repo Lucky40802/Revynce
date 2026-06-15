@@ -1463,6 +1463,36 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 </style>
 </head>
 <body>
+<!-- ══════════════════════════════════════════════════════════════
+     STATIC GOOGLE PERMISSIONS DISCLOSURE — always visible to crawlers
+     This section is intentionally placed before all JavaScript so that
+     Google's OAuth branding checker can read it without executing JS.
+══════════════════════════════════════════════════════════════ -->
+<div id="static-google-disclosure" style="font-family:sans-serif;max-width:900px;margin:0 auto;padding:40px 24px;line-height:1.7;color:#1a1a2e">
+  <h1 style="font-size:2rem;font-weight:800;margin-bottom:8px">Revynce — AI-Powered Study Platform</h1>
+  <p style="font-size:1rem;margin-bottom:24px">Revynce is an all-in-one AI education platform for students and teachers. Students can upload PDFs, documents, and images to instantly generate AI study notes, palm cards (flashcards), practice tests, and quizzes. Teachers can manage classes, mark rolls, post notices, build AI test papers, and track student performance — all in one place.</p>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:12px">Google Services Used by Revynce</h2>
+  <p style="margin-bottom:16px">Revynce optionally integrates with the following Google services. Each integration is opt-in and only activated when you explicitly connect it. We never access any Google data without your permission, and we do not sell or share your data with any third parties.</p>
+
+  <h3 style="font-size:1rem;font-weight:700;margin:0 0 4px">1. Google Sign-In</h3>
+  <p style="margin:0 0 16px"><strong>Data accessed:</strong> Your name, email address, and Google profile photo.<br><strong>Purpose:</strong> To create and authenticate your Revynce account so you can log in securely without a separate password.</p>
+
+  <h3 style="font-size:1rem;font-weight:700;margin:0 0 4px">2. Google Classroom</h3>
+  <p style="margin:0 0 16px"><strong>Data accessed:</strong> Your enrolled courses and class rosters from Google Classroom.<br><strong>Purpose:</strong> To import your classes into Revynce so you can access teacher materials, assignments, and classmates without re-entering your school details manually. Revynce uses the <code>https://www.googleapis.com/auth/classroom.courses.readonly</code> and <code>https://www.googleapis.com/auth/classroom.rosters.readonly</code> scopes.</p>
+
+  <h3 style="font-size:1rem;font-weight:700;margin:0 0 4px">3. Google Drive</h3>
+  <p style="margin:0 0 16px"><strong>Data accessed:</strong> Only the specific files you explicitly select via the Google Drive file picker.<br><strong>Purpose:</strong> To feed your chosen document into Revynce's AI engine to generate study notes, flashcards, and practice tests from your own materials. Revynce uses the <code>https://www.googleapis.com/auth/drive.readonly</code> scope and only reads the file you select — it does not access any other Drive files.</p>
+
+  <h3 style="font-size:1rem;font-weight:700;margin:0 0 4px">4. Google Calendar</h3>
+  <p style="margin:0 0 16px"><strong>Data accessed:</strong> Write access to create events in your Google Calendar.<br><strong>Purpose:</strong> To sync your personalised study schedule and exam dates directly to Google Calendar so you never miss a study session. Revynce uses the <code>https://www.googleapis.com/auth/calendar.events</code> scope to create events only — it does not read your existing calendar events.</p>
+
+  <p style="margin-top:24px;font-size:.9rem">
+    <a href="privacy.html" style="color:#4285f4">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="mailto:support@revynce.com.au" style="color:#4285f4">Contact Us</a>
+  </p>
+</div>
+<!-- ══════════════════════════════════════════════════════════════ -->
 <noscript>
   <div style="font-family:sans-serif;text-align:center;padding:60px 20px;background:#05070f;color:#e8eaf0;min-height:100vh">
     <h1 style="color:#00f0d4;font-size:2rem;margin-bottom:12px">Revynce</h1>

@@ -1794,14 +1794,9 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
   <section class="hero-section">
     <div class="hero-eyebrow"><i class="fi fi-sr-star" style="font-size:.75rem"></i> AI-Powered Learning Platform</div>
     <h1 class="hero-h1">Study smarter.<br><span class="accent">Not harder.</span></h1>
-    <p class="hero-p">The all-in-one AI education platform for students and teachers — generate AI notes, flashcards, quizzes and test papers from any document in seconds.</p>
-    <p style="font-size:.88rem;color:var(--text-muted);max-width:600px;margin:0 auto 32px;line-height:1.7">
-      Revynce is an AI-powered study platform that helps students generate notes, palm cards, practice tests, and quizzes from uploaded PDFs, documents, and images. Teachers can manage classes, mark rolls, post notices, build AI test papers, and track student performance — all in one place.<br><br>
-      Revynce integrates with Google services to enhance your experience: <strong>Google Classroom</strong> is used to import your enrolled courses and class rosters; <strong>Google Drive</strong> is used to access files you select for AI-powered note generation; <strong>Google Calendar</strong> is used to sync your personalised study schedule. Revynce does not store, sell, or share your Google data with any third parties.
-    </p>
     <div class="hero-ctas">
-      <button class="btn-primary btn-lg" onclick="showAuth('signup','student')"><i class="fi fi-br-graduation-cap"></i> &nbsp;Student — Sign Up Free</button>
-      <button class="btn-ghost btn-lg" onclick="showAuth('signup','teacher')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Teacher — Get Started</button>
+      <button class="btn-primary btn-lg" onclick="showAuth('signup','student')"><i class="fi fi-br-graduation-cap"></i> &nbsp;Student - Sign Up Free</button>
+      <button class="btn-ghost btn-lg" onclick="showAuth('signup','teacher')"><i class="fi fi-br-chalkboard-user"></i> &nbsp;Teacher - Get Started</button>
     </div>
 
     <div class="acct-picker fade-up">
@@ -1852,42 +1847,61 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <div class="stat-item"><div class="stat-n">HSC</div><div class="stat-l">Major project</div></div>
   </div>
 
-  <!-- ── GOOGLE DATA USAGE ── -->
-  <section id="google-data-usage" style="padding:60px 20px;max-width:860px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:36px">
-      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(66,133,244,.08);border:1px solid rgba(66,133,244,.2);border-radius:100px;padding:6px 18px;font-size:.78rem;font-weight:700;color:#60a5fa;margin-bottom:16px">
-        <iconify-icon icon="mdi:google" style="font-size:1rem"></iconify-icon> Google Integration
+  <!-- ── ABOUT & GOOGLE DATA USAGE ── -->
+  <section id="google-data-usage" style="padding:72px 20px;background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div style="max-width:900px;margin:0 auto">
+      <!-- App description -->
+      <div style="text-align:center;margin-bottom:52px">
+        <div class="hero-eyebrow" style="margin-bottom:16px"><i class="fi fi-sr-info" style="font-size:.75rem"></i> About Revynce</div>
+        <h2 class="section-head">What is Revynce?</h2>
+        <p class="section-sub" style="max-width:680px;margin:0 auto">Revynce is an AI-powered study platform for students and teachers. Students upload PDFs, documents, and images to generate AI notes, palm cards, practice tests, and quizzes. Teachers manage classes, mark rolls, post notices, build AI test papers, and track student performance - all in one place.</p>
       </div>
-      <h2 style="font-family:var(--font-d);font-size:1.6rem;font-weight:800;margin-bottom:12px">How Revynce uses your Google data</h2>
-      <p style="color:var(--text-muted);max-width:600px;margin:0 auto;line-height:1.7;font-size:.92rem">Revynce optionally connects to Google services to make your study experience seamless. We only request access to data that is strictly necessary for each feature, and your data is never sold or shared with third parties.</p>
+
+      <!-- Google integrations -->
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(66,133,244,.08);border:1px solid rgba(66,133,244,.2);border-radius:100px;padding:6px 18px;font-size:.78rem;font-weight:700;color:#60a5fa;margin-bottom:16px">
+          <iconify-icon icon="mdi:google" style="font-size:1rem"></iconify-icon> Google Integrations
+        </div>
+        <h2 class="section-head" style="font-size:1.5rem">How Revynce uses your Google data</h2>
+        <p class="section-sub" style="max-width:620px;margin:0 auto">We only request access to data strictly necessary for each feature. Your data is never sold or shared with third parties. All Google integrations are optional.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+          <div style="width:40px;height:40px;background:rgba(66,133,244,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <iconify-icon icon="mdi:google" style="font-size:1.4rem;color:#4285f4"></iconify-icon>
+          </div>
+          <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Sign-In</div>
+          <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Your name, email address, and profile photo.<br><br><strong style="color:var(--text)">Why:</strong> To create and authenticate your Revynce account securely without requiring a separate password.</p>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+          <div style="width:40px;height:40px;background:rgba(66,133,244,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <iconify-icon icon="mdi:google-classroom" style="font-size:1.4rem;color:#4285f4"></iconify-icon>
+          </div>
+          <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Classroom</div>
+          <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Your enrolled courses and class rosters.<br><br><strong style="color:var(--text)">Why:</strong> To import your classes into Revynce so you can access teacher materials and classmates without re-entering your school details manually.</p>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+          <div style="width:40px;height:40px;background:rgba(52,168,83,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <iconify-icon icon="mdi:google-drive" style="font-size:1.4rem;color:#34a853"></iconify-icon>
+          </div>
+          <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Drive</div>
+          <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Only the specific files you choose to select.<br><br><strong style="color:var(--text)">Why:</strong> To feed your selected document into Revynce's AI engine to generate study notes, palm cards, and practice tests from your own materials.</p>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+          <div style="width:40px;height:40px;background:rgba(251,188,4,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <iconify-icon icon="mdi:google-calendar" style="font-size:1.4rem;color:#fbbc04"></iconify-icon>
+          </div>
+          <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Calendar</div>
+          <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Ability to create events in your calendar.<br><br><strong style="color:var(--text)">Why:</strong> To sync your personalised study schedule and exam dates to Google Calendar so you never miss a study session.</p>
+        </div>
+      </div>
+
+      <p style="text-align:center;margin-top:32px;font-size:.82rem;color:var(--text-muted)">
+        You can use Revynce fully without connecting any Google service. &nbsp;·&nbsp;
+        <a href="privacy.html" style="color:var(--cyan);text-decoration:none">Read our full Privacy Policy</a>
+      </p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
-      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
-        <div style="width:40px;height:40px;background:rgba(66,133,244,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
-          <iconify-icon icon="mdi:google-classroom" style="font-size:1.4rem;color:#4285f4"></iconify-icon>
-        </div>
-        <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Classroom</div>
-        <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Your enrolled courses and class rosters.<br><br><strong style="color:var(--text)">Why:</strong> To import your classes into Revynce so you can access teacher materials, assignments, and classmates without re-entering your school details manually.</p>
-      </div>
-      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
-        <div style="width:40px;height:40px;background:rgba(52,168,83,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
-          <iconify-icon icon="mdi:google-drive" style="font-size:1.4rem;color:#34a853"></iconify-icon>
-        </div>
-        <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Drive</div>
-        <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Only the specific files you choose to select.<br><br><strong style="color:var(--text)">Why:</strong> To feed your selected document into Revynce's AI engine so it can generate study notes, palm cards, and practice tests from your own materials.</p>
-      </div>
-      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
-        <div style="width:40px;height:40px;background:rgba(251,188,4,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
-          <iconify-icon icon="mdi:google-calendar" style="font-size:1.4rem;color:#fbbc04"></iconify-icon>
-        </div>
-        <div style="font-weight:700;font-size:.92rem;margin-bottom:8px">Google Calendar</div>
-        <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65"><strong style="color:var(--text)">What we access:</strong> Ability to create events in your calendar.<br><br><strong style="color:var(--text)">Why:</strong> To sync your personalised study schedule and exam dates directly to Google Calendar so you never miss a study session.</p>
-      </div>
-    </div>
-    <p style="text-align:center;margin-top:28px;font-size:.8rem;color:var(--text-muted)">
-      All Google integrations are optional. You can use Revynce fully without connecting any Google service. &nbsp;·&nbsp;
-      <a href="privacy.html" style="color:var(--cyan);text-decoration:none">Read our full Privacy Policy →</a>
-    </p>
   </section>
 
   <!-- ── PRICING ── -->

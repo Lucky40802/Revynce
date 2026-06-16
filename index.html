@@ -2394,9 +2394,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           </div>
           <div class="card card-pad" id="dash-alerts-card">
             <div class="card-title"><i class="fi fi-br-bell" style="color:var(--amber)"></i> &nbsp;Alerts</div>
-            <ul class="alerts-list">
-              <li class="alert-li"><div class="alert-ic warn"><i class="fi fi-br-exclamation"></i></div><div><div class="alert-title">Quiz due tomorrow</div><div class="alert-sub">Physics Chapter 3 test · 9:00 AM</div></div></li>
-              <li class="alert-li"><div class="alert-ic info"><i class="fi fi-br-megaphone"></i></div><div><div class="alert-title">New material uploaded</div><div class="alert-sub">Mrs Clarke added Chemistry notes</div></div></li>
+            <ul class="alerts-list" id="dash-alerts-list">
+              <li style="text-align:center;padding:20px;color:var(--text-muted);font-size:.82rem"><i class="fi fi-br-bell-slash" style="display:block;font-size:1.4rem;margin-bottom:8px;opacity:.3"></i>No alerts right now</li>
             </ul>
           </div>
         </div>
@@ -2404,24 +2403,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <div class="two-col">
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-chart-histogram" style="color:var(--cyan)"></i> &nbsp;Topic Strength</div>
-          <div class="prog-row"><span class="prog-label">Biology</span><div class="prog-track"><div class="prog-fill" style="width:82%"></div></div><span class="prog-val">82%</span></div>
-          <div class="prog-row"><span class="prog-label">Maths</span><div class="prog-track"><div class="prog-fill" style="width:74%"></div></div><span class="prog-val">74%</span></div>
-          <div class="prog-row"><span class="prog-label">Physics</span><div class="prog-track"><div class="prog-fill" style="width:51%;background:var(--amber)"></div></div><span class="prog-val" style="color:var(--amber)">51%</span></div>
-          <div class="prog-row"><span class="prog-label">History</span><div class="prog-track"><div class="prog-fill" style="width:68%"></div></div><span class="prog-val">68%</span></div>
-          <div class="prog-row"><span class="prog-label">Chemistry</span><div class="prog-track"><div class="prog-fill" style="width:38%;background:var(--rose)"></div></div><span class="prog-val" style="color:var(--rose)">38%</span></div>
+          <div id="dash-topic-strength">
+            <div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:.82rem"><i class="fi fi-br-chart-histogram" style="display:block;font-size:1.4rem;margin-bottom:8px;opacity:.3"></i>Complete quizzes to see your topic strengths</div>
+          </div>
         </div>
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-calendar" style="color:var(--cyan)"></i> &nbsp;Today's Schedule</div>
-          <ul class="agenda-list">
-            <li class="agenda-item" style="border:none;padding:8px 0;background:none">
-              <div class="agenda-time">09:00</div><div><div class="agenda-subject">Biology Revision</div><div class="agenda-desc">Chapter 5 — Genetics</div><span class="agenda-pill" style="background:var(--cyan-dim);color:var(--cyan)">1h</span></div>
-            </li>
-            <li class="agenda-item" style="border:none;padding:8px 0;background:none">
-              <div class="agenda-time">11:00</div><div><div class="agenda-subject">Maths Practice Quiz</div><div class="agenda-desc">Quadratics &amp; Calculus</div><span class="agenda-pill" style="background:var(--violet-dim);color:#a78bfa">45m</span></div>
-            </li>
-            <li class="agenda-item" style="border:none;padding:8px 0;background:none">
-              <div class="agenda-time">14:00</div><div><div class="agenda-subject">Chemistry Flashcards</div><div class="agenda-desc">Weak area — prioritise!</div><span class="agenda-pill" style="background:rgba(244,63,94,.1);color:var(--rose)">30m</span></div>
-            </li>
+          <ul class="agenda-list" id="dash-today-schedule">
+            <li style="text-align:center;padding:20px;color:var(--text-muted);font-size:.82rem"><i class="fi fi-br-calendar" style="display:block;font-size:1.4rem;margin-bottom:8px;opacity:.3"></i>No study blocks for today - add one in Study Schedule</li>
           </ul>
         </div>
       </div>
@@ -3291,33 +3280,6 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             </div>
           </div>
         </div>
-        <div class="card card-pad notice-item" data-category="class">
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="background:rgba(124,58,237,0.12);color:#a78bfa;border-radius:10px;padding:10px;flex-shrink:0"><i class="fi fi-br-flask"></i></div>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <span style="font-weight:700;font-size:.9rem">Biology — Chapter 5 Test Rescheduled</span>
-                <span class="pill" style="background:rgba(124,58,237,0.12);color:#a78bfa;font-size:.68rem">BIO-2024</span>
-              </div>
-              <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">The Chapter 5 test has been moved to next Tuesday. Use the extra time to review Cell Division and Genetics. Practice questions have been uploaded to the Archive.</p>
-              <div style="font-size:.75rem;color:var(--text-muted)"><i class="fi fi-rr-clock"></i> Posted 3 hours ago &nbsp;·&nbsp; Mrs Clarke</div>
-            </div>
-          </div>
-        </div>
-        <div class="card card-pad notice-item" data-category="class">
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="background:rgba(245,158,11,0.1);color:var(--amber);border-radius:10px;padding:10px;flex-shrink:0"><i class="fi fi-br-calculator"></i></div>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <span style="font-weight:700;font-size:.9rem">Maths — Calculus Assignment Due Monday</span>
-                <span class="pill" style="background:rgba(245,158,11,0.1);color:var(--amber);font-size:.68rem">MAT-ADV</span>
-                <span class="pill" style="background:rgba(244,63,94,.1);color:var(--rose);font-size:.68rem">Due Soon</span>
-              </div>
-              <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">Reminder: the integration and differentiation assignment is due Monday at 11:59 PM. Submit via Google Classroom. Late submissions will receive a 10% penalty per day.</p>
-              <div style="font-size:.75rem;color:var(--text-muted)"><i class="fi fi-rr-clock"></i> Posted 2 days ago &nbsp;·&nbsp; Mr Peterson</div>
-            </div>
-          </div>
-        </div>
       </div>
       <div id="notices-empty" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
         <i class="fi fi-br-megaphone" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>
@@ -4046,6 +4008,44 @@ async function loadDashboardStats() {
     if (fcSnap.exists()) Object.values(fcSnap.val()).forEach(d => { fcCount += (d.cards?.length||0); });
     document.getElementById('d-flashcards').textContent = fcCount;
     document.getElementById('d-class-count').textContent = classSnap.exists() ? Object.keys(classSnap.val()).length : 0;
+    // Topic Strength from quiz scores
+    const topicEl = document.getElementById('dash-topic-strength');
+    if (topicEl && quizSnap.exists()) {
+      const scores = Object.values(quizSnap.val());
+      const bySubject = {};
+      scores.forEach(s => {
+        const subj = s.subject || s.topic || 'General';
+        if (!bySubject[subj]) bySubject[subj] = [];
+        const pct = s.percent ?? (s.score != null && s.total ? Math.round(s.score/s.total*100) : null);
+        if (pct != null) bySubject[subj].push(pct);
+      });
+      const subjects = Object.entries(bySubject).filter(([,v])=>v.length>0).slice(0,5);
+      if (subjects.length) {
+        topicEl.innerHTML = subjects.map(([subj, vals]) => {
+          const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+          const color = avg >= 70 ? 'var(--cyan)' : avg >= 50 ? 'var(--amber)' : 'var(--rose)';
+          return `<div class="prog-row"><span class="prog-label">${subj}</span><div class="prog-track"><div class="prog-fill" style="width:${avg}%;background:${color}"></div></div><span class="prog-val" style="color:${color}">${avg}%</span></div>`;
+        }).join('');
+      }
+    }
+    // Today's Schedule from Firebase
+    const schedEl = document.getElementById('dash-today-schedule');
+    if (schedEl) {
+      try {
+        const dayKey = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date().getDay()];
+        const schedSnap = await window._fbGet(window._fbRef(window._db, `schedule/${window._uid}`));
+        const blocks = schedSnap.exists() ? Object.values(schedSnap.val()).filter(b => b.day === dayKey) : [];
+        blocks.sort((a,b) => (a.time||'').localeCompare(b.time||''));
+        if (blocks.length) {
+          schedEl.innerHTML = blocks.map(b => `
+            <li class="agenda-item" style="border:none;padding:8px 0;background:none">
+              <div class="agenda-time">${b.time||''}</div>
+              <div><div class="agenda-subject">${b.subject||''}</div>${b.notes?`<div class="agenda-desc">${b.notes}</div>`:''}
+              <span class="agenda-pill" style="background:var(--cyan-dim);color:var(--cyan)">${b.duration||''}</span></div>
+            </li>`).join('');
+        }
+      } catch(e) { /* leave empty state */ }
+    }
     // Recent activity
     if (uploadsSnap.exists()) {
       const uploads = Object.values(uploadsSnap.val())
@@ -5163,10 +5163,6 @@ async function _seedNotifications(uid, role) {
     { title: 'New school notice posted', desc: 'Admin Office posted: "Sports Carnival — Friday". 28 students in your classes were notified.', type:'info', icon:'notice', category:'class', link:'notices', read:true, createdAt: new Date(now - 1000*60*60*24).toISOString() },
   ] : [
     { title: 'Welcome to Revynce!', desc: 'Upload your first notes, generate flashcards, and start earning XP. Good luck!', type:'info', icon:'info', category:'system', read:false, createdAt: new Date(now - 1000*60*5).toISOString() },
-    { title: 'Maths — Calculus Assignment Due Monday', desc: 'Reminder from Mr Peterson: your integration assignment is due Monday at 11:59 PM.', type:'warn', icon:'warn', category:'class', link:'notices', read:false, createdAt: new Date(now - 1000*60*60*3).toISOString() },
-    { title: '🏅 Badge unlocked — First Upload', desc: "You uploaded your first file and earned the First Upload badge. +50 XP!", type:'success', icon:'badge', category:'badge', link:'rewards', read:false, createdAt: new Date(now - 1000*60*60*24).toISOString() },
-    { title: 'Biology — Chapter 5 Test Rescheduled', desc: 'Mrs Clarke moved the Chapter 5 test to next Tuesday. Extra practice questions are in the Archive.', type:'info', icon:'notice', category:'class', link:'notices', read:true, createdAt: new Date(now - 1000*60*60*24*2).toISOString() },
-    { title: 'Leaderboard — You moved up!', desc: "You've climbed to rank 6 on this week's leaderboard. Keep studying to reach the top 3!", type:'success', icon:'trophy', category:'system', link:'leaderboard', read:true, createdAt: new Date(now - 1000*60*60*24*3).toISOString() },
   ];
   for (const n of seeds) {
     await push(ref(db, `notifications/${uid}`), n);
@@ -7225,41 +7221,6 @@ window.renderTimetable = async function() {
   document.getElementById('tt-empty').style.display = hasAny ? 'none' : '';
   grid.style.display = hasAny ? 'grid' : 'none';
 
-  // Demo timetable if nothing saved
-  if (!hasAny) {
-    const demoClasses = {
-      p3_monday:   { subject:'Biology Yr 12', room:'Room 14', teacher:'Mrs Clarke' },
-      p5_monday:   { subject:'Advanced Maths', room:'Room 7', teacher:'Mr Peterson' },
-      p2_tuesday:  { subject:'Physics', room:'Lab 2', teacher:'Mr Smith' },
-      p4_wednesday:{ subject:'Chemistry', room:'Lab 1', teacher:'Ms Nguyen' },
-      p1_thursday: { subject:'Advanced Maths', room:'Room 7', teacher:'Mr Peterson' },
-      p3_thursday: { subject:'Biology Yr 12', room:'Room 14', teacher:'Mrs Clarke' },
-      p5_friday:   { subject:'Physics', room:'Lab 2', teacher:'Mr Smith' },
-    };
-    // Re-render with demo data
-    grid.innerHTML = `<div class="tt-corner"></div>${DAYS.map(d=>`<div class="tt-day">${d}</div>`).join('')}`;
-    grid.style.display = 'grid';
-    document.getElementById('tt-empty').style.display = 'none';
-    TIMETABLE_PERIODS.forEach(p => {
-      const lbl = document.createElement('div');
-      lbl.className = 'tt-period-label';
-      lbl.innerHTML = `<span class="tt-period-num">P${p.num}</span><span class="tt-period-time">${p.time}</span>`;
-      grid.appendChild(lbl);
-      DAYS.forEach((day, di) => {
-        const cell = document.createElement('div');
-        const key = `p${p.num}_${day.toLowerCase()}`;
-        const entry = demoClasses[key];
-        if (entry) {
-          const acc = ACCENT_COLORS[di % ACCENT_COLORS.length];
-          cell.className = 'tt-cell tt-has-class';
-          cell.innerHTML = `<div class="tt-cell-subject" style="color:${acc.color}">${entry.subject}</div><div class="tt-cell-room">${entry.room}</div><div class="tt-cell-teacher">${entry.teacher}</div>`;
-        } else {
-          cell.className = 'tt-cell';
-          cell.style.borderStyle = 'dashed';
-        }
-        grid.appendChild(cell);
-      });
-    });
   }
 };
 

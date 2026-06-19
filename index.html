@@ -4322,14 +4322,15 @@ async function generateContentWithAI(fileText, fileName, subject, instructions, 
     ? `Study material:\n"""\n${fileText}\n"""\n\n`
     : `File: "${fileName}"${subject ? '\nSubject: ' + subject : ''}\n\n`;
   const instr = instructions ? `Instructions: ${instructions}\n\n` : '';
-  const systemPrompt = 'You are Revynce AI, an educational content generator. Respond with raw valid JSON only — no markdown fences, no explanation before or after the JSON object.';
+  const systemPrompt = 'You are Revynce AI, an educational content generator. You MUST base ALL content strictly and exclusively on the provided study material — do not add facts, questions, or concepts from outside the document. Respond with raw valid JSON only — no markdown fences, no explanation before or after the JSON object.';
   const userPrompt = mode === 'teacher'
-    ? `${context}${instr}Generate a complete test paper as JSON: {"test":"<full formatted test paper in markdown with MCQ section, short answer, essay, and answer key>"}`
-    : `${context}${instr}Generate study materials as JSON with these exact keys:
-- "title": concise descriptive title based on the document content (max 7 words, e.g. "Cell Division — Year 12 Biology")
-- "notes": comprehensive markdown study notes with ## headings, bullet points, **bold** key terms, and concise explanations
-- "palmCards": array of exactly 12 objects with keys front (question string) and back (answer string) — cover all key concepts
-- "test": a complete practice test in plain text with three sections: "MULTIPLE CHOICE" (10 questions A/B/C/D), "SHORT ANSWER" (4 questions with 3-5 sentence expected responses), and "ANSWER KEY" listing all correct answers with brief explanations
+    ? `${context}${instr}Generate a complete test paper based ONLY on the study material above. JSON format: {"test":"<full formatted test paper in markdown with MCQ section, short answer, essay, and answer key — all questions must come directly from the document>"}`
+    : `${context}${instr}Generate study materials based ONLY on the study material above. Use these exact JSON keys:
+- "title": concise descriptive title based on the document (max 7 words)
+- "notes": comprehensive markdown study notes with ## headings, bullet points, **bold** key terms — cover every major topic in the document
+- "palmCards": array of exactly 12 objects with keys "front" (question) and "back" (answer) — every question must come directly from the document content
+- "test": practice test in plain text with: "MULTIPLE CHOICE" (10 questions A/B/C/D where all options are plausible based on the document), "SHORT ANSWER" (4 questions), "ANSWER KEY" with correct answers and brief explanations — every question must be answerable from the document
+IMPORTANT: Do not include any question, fact, or concept that is not explicitly covered in the study material above.
 Return only the raw JSON object.`;
 
   let res;
@@ -4340,7 +4341,7 @@ Return only the raw JSON object.`;
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
-        max_tokens: 4096,
+        max_tokens: 8192,
         temperature: 0.25,
         uid: window._uid || null,
         plan: window._userProfile?.plan || 'free'

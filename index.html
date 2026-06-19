@@ -4341,7 +4341,7 @@ Return only the raw JSON object.`;
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
-        max_tokens: 8192,
+        max_tokens: 16384,
         temperature: 0.25,
         uid: window._uid || null,
         plan: window._userProfile?.plan || 'free'

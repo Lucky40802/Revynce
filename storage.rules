@@ -7,6 +7,12 @@ service firebase.storage {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Profile pictures — owner can write, anyone authenticated can read
+    match /profilePics/{uid}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Class resources uploaded by teachers — any authenticated user can read
     match /classResources/{classCode}/{allPaths=**} {
       allow read: if request.auth != null;

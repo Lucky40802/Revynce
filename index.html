@@ -3544,14 +3544,51 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 
 <!-- Edit Profile Modal -->
 <div class="modal-overlay" id="edit-profile-modal">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:460px">
     <div class="modal-header"><div class="modal-title">Edit Profile</div><button class="modal-close" onclick="closeModal('edit-profile-modal')"><i class="fi fi-rr-cross"></i></button></div>
+
+    <!-- Profile picture -->
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
+      <div id="edit-profile-pic-wrap" style="position:relative;cursor:pointer" onclick="document.getElementById('profile-pic-input').click()" title="Click to change photo">
+        <div id="edit-profile-pic-ava" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;font-family:var(--font-d);overflow:hidden">
+          <span id="edit-profile-pic-initials">?</span>
+          <img id="edit-profile-pic-img" style="display:none;width:100%;height:100%;object-fit:cover" src="" alt="Profile">
+        </div>
+        <div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-card)">
+          <i class="fi fi-br-camera" style="font-size:.65rem;color:#05070f"></i>
+        </div>
+      </div>
+      <input type="file" id="profile-pic-input" accept="image/*" style="display:none" onchange="previewProfilePic(this)">
+      <span id="profile-pic-status" style="font-size:.75rem;color:var(--text-muted);margin-top:6px">Click photo to change</span>
+    </div>
+
     <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-input" id="edit-profile-name" placeholder="Your name"></div>
     <div class="form-group"><label class="form-label">Leaderboard Alias <span style="color:var(--text-muted);font-size:.75rem">(shown instead of real name)</span></label><input type="text" class="form-input" id="edit-profile-alias" placeholder="e.g. StarStudent42" maxlength="20"></div>
-    <div class="form-group"><label class="form-label">Email <span style="color:var(--text-muted);font-size:.75rem">(cannot be changed here)</span></label><div id="edit-profile-email" style="font-size:.85rem;color:var(--text-muted);padding:10px 0"></div></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="edit-profile-email" style="font-size:.85rem;color:var(--text-muted);flex:1"></div>
+        <button class="btn-ghost" style="padding:6px 12px;font-size:.78rem;white-space:nowrap" onclick="closeModal('edit-profile-modal');openModal('change-email-modal')"><i class="fi fi-br-pencil"></i> Change</button>
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('edit-profile-modal')">Cancel</button>
       <button class="btn-primary" id="save-profile-btn" onclick="saveProfile()"><i class="fi fi-br-disk"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Email Modal -->
+<div class="modal-overlay" id="change-email-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><div class="modal-title">Change Email</div><button class="modal-close" onclick="closeModal('change-email-modal')"><i class="fi fi-rr-cross"></i></button></div>
+    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px">Enter your current password to verify your identity, then set a new email address.</p>
+    <div class="form-group"><label class="form-label">Current Password</label><div class="pw-wrap"><input type="password" class="form-input" id="cem-password" placeholder="Your current password"><button type="button" class="pw-toggle" onclick="togglePw('cem-password',this)" tabindex="-1"><i class="fi fi-rr-eye"></i></button></div></div>
+    <div class="form-group"><label class="form-label">New Email Address</label><input type="email" class="form-input" id="cem-email" placeholder="new@email.com"></div>
+    <p id="cem-msg" style="font-size:.8rem;min-height:18px;margin-bottom:8px"></p>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('change-email-modal')">Cancel</button>
+      <button class="btn-primary" id="cem-btn" onclick="doChangeEmail()"><i class="fi fi-br-envelope"></i> Update Email</button>
     </div>
   </div>
 </div>
@@ -3950,6 +3987,7 @@ function populateApp(profile) {
   const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
   const init = (profile.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   ['sb-avatar','profile-ava'].forEach(id => setText(id, init));
+  if (profile.photoURL) applyProfilePic(profile.photoURL, init);
   setText('sb-name', profile.name||'User');
   setText('sb-role', profile.role||'student');
   window._updateUpgradeBanner?.(profile.plan || profile.role);
@@ -6582,37 +6620,151 @@ window.openPricingModal = function() {
 
 // ── Edit Profile modal ──
 window.openEditProfileModal = function() {
-  const name = window._userProfile?.name || '';
+  const name  = window._userProfile?.name || '';
   const email = window._auth?.currentUser?.email || '';
-  document.getElementById('edit-profile-name').value = name;
+  const photo = window._userProfile?.photoURL || '';
+  document.getElementById('edit-profile-name').value  = name;
   document.getElementById('edit-profile-alias').value = window._userProfile?.lbAlias || '';
   document.getElementById('edit-profile-email').textContent = email;
+  // show existing photo or initials
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
+  const picInitEl = document.getElementById('edit-profile-pic-initials');
+  const picImgEl  = document.getElementById('edit-profile-pic-img');
+  if (photo) {
+    picImgEl.src = photo; picImgEl.style.display = 'block';
+    if (picInitEl) picInitEl.style.display = 'none';
+  } else {
+    if (picInitEl) { picInitEl.textContent = initials; picInitEl.style.display = ''; }
+    picImgEl.style.display = 'none';
+  }
+  document.getElementById('profile-pic-status').textContent = 'Click photo to change';
+  document.getElementById('profile-pic-status').style.color = '';
+  _pendingProfilePicFile = null;
   openModal('edit-profile-modal');
 };
+
 window.saveProfile = async function() {
   const newName  = document.getElementById('edit-profile-name').value.trim();
   const newAlias = document.getElementById('edit-profile-alias').value.trim().slice(0, 20);
   if (!newName) { showToast('Name cannot be empty.', 'error'); return; }
   if (!window._uid) { showToast('Not logged in.', 'error'); return; }
   const btn = document.getElementById('save-profile-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.innerHTML = '<i class="fi fi-br-spinner"></i> Saving…';
   try {
-    await set(ref(db, `users/${window._uid}/name`), newName);
-    if (newAlias) await set(ref(db, `users/${window._uid}/lbAlias`), newAlias);
-    else await set(ref(db, `users/${window._uid}/lbAlias`), null);
-    window._userProfile = { ...(window._userProfile || {}), name: newName, lbAlias: newAlias };
-    document.getElementById('sb-name').textContent  = newName;
+    // Upload photo if selected
+    let photoURL = window._userProfile?.photoURL || null;
+    if (_pendingProfilePicFile) {
+      document.getElementById('profile-pic-status').textContent = 'Uploading photo…';
+      photoURL = await uploadProfilePic(window._uid);
+    }
+    await window._fbSet(window._fbRef(window._db, `users/${window._uid}/name`), newName);
+    if (newAlias) await window._fbSet(window._fbRef(window._db, `users/${window._uid}/lbAlias`), newAlias);
+    else await window._fbSet(window._fbRef(window._db, `users/${window._uid}/lbAlias`), null);
+    if (photoURL) await window._fbSet(window._fbRef(window._db, `users/${window._uid}/photoURL`), photoURL);
+    window._userProfile = { ...(window._userProfile||{}), name:newName, lbAlias:newAlias, photoURL };
+    document.getElementById('sb-name').textContent   = newName;
     document.getElementById('dash-name').textContent = newName;
     document.getElementById('profile-name').textContent = newName;
     const lbDisplay = newAlias || newName.split(' ')[0];
     document.getElementById('lb-your-name').textContent = lbDisplay;
-    const ava = newName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    document.getElementById('sb-avatar').textContent   = ava;
-    document.getElementById('profile-ava').textContent = ava;
+    const ava = newName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    if (photoURL) {
+      applyProfilePic(photoURL, ava);
+    } else {
+      document.getElementById('sb-avatar').textContent   = ava;
+      document.getElementById('profile-ava').textContent = ava;
+    }
     closeModal('edit-profile-modal');
     showToast('Profile updated!', 'success');
-  } catch(e) { showToast('Error saving profile.', 'error'); }
+  } catch(e) { showToast('Error saving profile: ' + e.message, 'error'); }
   finally { btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-disk"></i> Save'; }
+};
+
+// ── Profile picture preview ──
+let _pendingProfilePicFile = null;
+window.previewProfilePic = function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5 MB', 'error'); return; }
+  _pendingProfilePicFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('edit-profile-pic-img').src = e.target.result;
+    document.getElementById('edit-profile-pic-img').style.display = 'block';
+    document.getElementById('edit-profile-pic-initials').style.display = 'none';
+    document.getElementById('profile-pic-status').textContent = 'New photo selected - save to upload';
+    document.getElementById('profile-pic-status').style.color = 'var(--cyan)';
+  };
+  reader.readAsDataURL(file);
+};
+
+// ── Upload profile picture to Firebase Storage ──
+async function uploadProfilePic(uid) {
+  if (!_pendingProfilePicFile) return null;
+  const { getStorage, ref: sRef, uploadBytes, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js');
+  const storage = getStorage();
+  const fileRef = sRef(storage, `profilePics/${uid}/avatar`);
+  await uploadBytes(fileRef, _pendingProfilePicFile);
+  const url = await getDownloadURL(fileRef);
+  _pendingProfilePicFile = null;
+  return url;
+}
+
+// ── Update profile pic display everywhere ──
+function applyProfilePic(url, initials) {
+  ['profile-ava', 'edit-profile-pic-img'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (url) {
+      if (id === 'profile-ava') {
+        el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      } else {
+        el.src = url;
+        el.style.display = 'block';
+        const initEl = document.getElementById('edit-profile-pic-initials');
+        if (initEl) initEl.style.display = 'none';
+      }
+    }
+  });
+  if (!url && initials) {
+    const avaEl = document.getElementById('profile-ava');
+    if (avaEl) avaEl.textContent = initials;
+    document.getElementById('sb-avatar').textContent = initials;
+  }
+}
+
+// ── Change Email modal ──
+window.doChangeEmail = async function() {
+  const password = document.getElementById('cem-password').value;
+  const newEmail = document.getElementById('cem-email').value.trim();
+  const msg = document.getElementById('cem-msg');
+  const btn = document.getElementById('cem-btn');
+  if (!password || !newEmail) { msg.textContent = 'Please fill in all fields.'; msg.className = 'msg-err'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { msg.textContent = 'Please enter a valid email address.'; msg.className = 'msg-err'; return; }
+  btn.disabled = true; btn.textContent = 'Updating…';
+  try {
+    const { EmailAuthProvider, reauthenticateWithCredential, updateEmail, verifyBeforeUpdateEmail } = await import('https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js');
+    const user = window._auth.currentUser;
+    const cred = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, cred);
+    await verifyBeforeUpdateEmail(user, newEmail);
+    await window._fbSet(window._fbRef(window._db, `users/${window._uid}/email`), newEmail);
+    closeModal('change-email-modal');
+    showToast('Verification email sent to ' + newEmail + '. Check your inbox to confirm.', 'success');
+    document.getElementById('cem-password').value = '';
+    document.getElementById('cem-email').value = '';
+    msg.textContent = '';
+  } catch(e) {
+    const errs = {
+      'auth/wrong-password': 'Current password is incorrect.',
+      'auth/email-already-in-use': 'That email is already in use.',
+      'auth/invalid-email': 'Invalid email address.',
+      'auth/requires-recent-login': 'Please log out and log back in first.',
+      'auth/too-many-requests': 'Too many attempts. Try again later.',
+    };
+    msg.textContent = errs[e.code] || e.message;
+    msg.className = 'msg-err';
+  } finally { btn.disabled = false; btn.textContent = 'Update Email'; }
 };
 
 // ── Change Password modal ──

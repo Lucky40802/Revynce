@@ -2221,6 +2221,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
             <button class="role-pill sel" id="rp-student" onclick="pickRole(this,'student')"><i class="fi fi-br-graduation-cap"></i> Student</button>
             <button class="role-pill" id="rp-org-student" onclick="pickRole(this,'org-student')"><i class="fi fi-br-school"></i> School Student</button>
             <button class="role-pill" id="rp-teacher" onclick="pickRole(this,'teacher')"><i class="fi fi-br-chalkboard-user"></i> Teacher</button>
+            <button class="role-pill" id="rp-admin" onclick="pickRole(this,'admin')"><i class="fi fi-br-megaphone"></i> Admin</button>
           </div>
           <div class="form-group">
             <label class="form-label">Full Name</label>
@@ -2318,6 +2319,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <button class="nav-item" id="marking-nav" onclick="showPanel('marking',this)" style="display:none"><i class="fi fi-br-diploma"></i> AI Marking</button>
     <button class="nav-item" id="mark-roll-nav" onclick="showPanel('attendance-marking',this)" style="display:none"><i class="fi fi-br-clipboard-list-check"></i> Mark Roll</button>
     <button class="nav-item" id="post-notice-nav" onclick="showPanel('manage-notices',this)" style="display:none"><i class="fi fi-br-pen-field"></i> Post Notice</button>
+    <div class="sb-section" id="admin-section" style="display:none">Administration</div>
+    <button class="nav-item" id="admin-notice-nav" onclick="showPanel('manage-notices',this)" style="display:none"><i class="fi fi-br-megaphone"></i> Post Announcement</button>
     <div class="sidebar-bottom sb-bottom">
       <div class="user-chip">
         <div class="user-ava" id="sb-avatar">?</div>
@@ -2410,7 +2413,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-calendar" style="color:var(--cyan)"></i> &nbsp;Today's Schedule</div>
           <ul class="agenda-list" id="dash-today-schedule">
-            <li style="text-align:center;padding:20px;color:var(--text-muted);font-size:.82rem"><i class="fi fi-br-calendar" style="display:block;font-size:1.4rem;margin-bottom:8px;opacity:.3"></i>No study blocks for today - add one in Study Schedule</li>
+            <li style="text-align:center;padding:20px;color:var(--text-muted);font-size:.82rem"><i class="fi fi-br-calendar" style="display:block;font-size:1.4rem;margin-bottom:8px;color:var(--cyan);opacity:.5"></i>No study blocks for today - add one in Study Schedule</li>
           </ul>
         </div>
       </div>
@@ -2859,11 +2862,11 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <h2 class="section-head">Teacher Dashboard</h2>
       <p class="section-sub">Class performance, student risk alerts, assignment analytics.</p>
       <div class="teacher-stats">
-        <div class="teacher-stat"><i class="fi fi-br-users"></i><div class="teacher-stat-n">50</div><div class="teacher-stat-l">Total Students</div></div>
-        <div class="teacher-stat"><i class="fi fi-br-school"></i><div class="teacher-stat-n">3</div><div class="teacher-stat-l">Active Classes</div></div>
-        <div class="teacher-stat"><i class="fi fi-br-diploma"></i><div class="teacher-stat-n">12</div><div class="teacher-stat-l">Assignments Set</div></div>
-        <div class="teacher-stat"><i class="fi fi-br-exclamation-triangle" style="color:var(--rose)"></i><div class="teacher-stat-n" style="color:var(--rose)">4</div><div class="teacher-stat-l">At-Risk Students</div></div>
-        <div class="teacher-stat"><i class="fi fi-br-chart-histogram"></i><div class="teacher-stat-n">76%</div><div class="teacher-stat-l">Class Average</div></div>
+        <div class="teacher-stat"><i class="fi fi-br-users"></i><div class="teacher-stat-n" id="teach-stat-students">—</div><div class="teacher-stat-l">Total Students</div></div>
+        <div class="teacher-stat"><i class="fi fi-br-school"></i><div class="teacher-stat-n" id="teach-stat-classes">—</div><div class="teacher-stat-l">Active Classes</div></div>
+        <div class="teacher-stat"><i class="fi fi-br-diploma"></i><div class="teacher-stat-n" id="teach-stat-assignments">—</div><div class="teacher-stat-l">Assignments Set</div></div>
+        <div class="teacher-stat"><i class="fi fi-br-exclamation-triangle" style="color:var(--rose)"></i><div class="teacher-stat-n" style="color:var(--rose)" id="teach-stat-atrisk">—</div><div class="teacher-stat-l">At-Risk Students</div></div>
+        <div class="teacher-stat"><i class="fi fi-br-chart-histogram"></i><div class="teacher-stat-n" id="teach-stat-avg">—</div><div class="teacher-stat-l">Class Average</div></div>
       </div>
       <!-- Risk alerts -->
       <div class="card card-pad" style="margin-bottom:20px;border-color:rgba(244,63,94,.2)">
@@ -2871,21 +2874,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px">Students who have scored below 50% on 2+ consecutive assessments are flagged automatically.</p>
         <table class="marks-table">
           <thead><tr><th>Student</th><th>Class</th><th>Last 3 Scores</th><th>Trend</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td style="font-weight:600">James Miller</td>
-              <td style="color:var(--text-muted)">Physics</td>
-              <td>48%, 42%, 38%</td>
-              <td><span style="color:var(--rose);font-weight:700">↓ Declining</span></td>
-              <td><button class="btn-ghost" style="padding:6px 12px;font-size:.75rem" onclick="contactStudent(this)"><i class="fi fi-br-envelope"></i> Contact</button></td>
-            </tr>
-            <tr>
-              <td style="font-weight:600">Lucy Park</td>
-              <td style="color:var(--text-muted)">Chemistry</td>
-              <td>44%, 49%, 41%</td>
-              <td><span style="color:var(--rose);font-weight:700">↓ Declining</span></td>
-              <td><button class="btn-ghost" style="padding:6px 12px;font-size:.75rem" onclick="contactStudent(this)"><i class="fi fi-br-envelope"></i> Contact</button></td>
-            </tr>
+          <tbody id="at-risk-tbody">
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:18px;font-size:.82rem"><i class="fi fi-br-check" style="color:var(--green);margin-right:6px"></i>No at-risk students — great work!</td></tr>
           </tbody>
         </table>
       </div>
@@ -2894,11 +2884,8 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <div class="card-title"><i class="fi fi-br-users" style="color:var(--cyan)"></i> &nbsp;Class Overview</div>
         <table class="marks-table">
           <thead><tr><th>Student</th><th>Subject</th><th>Progress</th><th>XP</th><th>Last Active</th><th>Avg Score</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>Alex Johnson</td><td>Mathematics</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:82%;background:var(--green)"></div></div></td><td style="color:var(--cyan);font-weight:700">500</td><td style="color:var(--text-muted)">2h ago</td><td>82%</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> On Track</span></td></tr>
-            <tr><td>Sarah Chen</td><td>Biology</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:74%;background:var(--cyan)"></div></div></td><td style="color:var(--cyan);font-weight:700">450</td><td style="color:var(--text-muted)">1d ago</td><td>74%</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> On Track</span></td></tr>
-            <tr><td>James Miller</td><td>Physics</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:42%;background:var(--rose)"></div></div></td><td style="color:var(--cyan);font-weight:700">200</td><td style="color:var(--text-muted)">3d ago</td><td>43%</td><td><span class="risk-badge risk-danger"><i class="fi fi-br-exclamation-triangle"></i> At Risk</span></td></tr>
-            <tr><td>Priya Lal</td><td>Chemistry</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:55%;background:var(--amber)"></div></div></td><td style="color:var(--cyan);font-weight:700">360</td><td style="color:var(--text-muted)">1h ago</td><td>55%</td><td><span class="risk-badge risk-warn"><i class="fi fi-br-exclamation"></i> Watch</span></td></tr>
+          <tbody id="class-overview-tbody">
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:18px;font-size:.82rem"><i class="fi fi-br-users" style="margin-right:6px;opacity:.4"></i>No students yet — create a class and invite students.</td></tr>
           </tbody>
         </table>
       </div>
@@ -2907,14 +2894,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <div class="card-title"><i class="fi fi-br-trophy" style="color:var(--cyan)"></i> &nbsp;Subject Ranking Settings</div>
         <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px">Choose which classes have a visible subject leaderboard for students. Students can only see rankings if you enable it.</p>
         <div id="teacher-lb-toggles">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-            <div><div style="font-weight:600;font-size:.87rem">Biology Year 12</div><div style="font-size:.75rem;color:var(--text-muted)">BIO-2024 · 28 students</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="lb-toggle-BIO2024" onchange="saveLeaderboardToggle('BIO-2024',this.checked)"><span class="toggle-slider"></span></label>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
-            <div><div style="font-weight:600;font-size:.87rem">Advanced Mathematics</div><div style="font-size:.75rem;color:var(--text-muted)">MAT-ADV · 22 students</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="lb-toggle-MATADV" onchange="saveLeaderboardToggle('MAT-ADV',this.checked)"><span class="toggle-slider"></span></label>
-          </div>
+          <div style="color:var(--text-muted);font-size:.82rem;padding:10px 0"><i class="fi fi-br-school" style="margin-right:6px;opacity:.4"></i>Your classes will appear here once created.</div>
         </div>
         <p style="font-size:.75rem;color:var(--text-muted);margin-top:10px"><i class="fi fi-br-info"></i> Rankings are based on quiz & test scores within that subject, not XP.</p>
       </div>
@@ -2923,18 +2903,11 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <div class="two-col">
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-chart-histogram" style="color:var(--cyan)"></i> &nbsp;Hardest Topics for Class</div>
-          <div class="topic-row"><div class="topic-name">Quantum Mechanics</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:38%;background:var(--rose)"></div></div></div><div class="topic-score" style="color:var(--rose)">38%</div></div>
-          <div class="topic-row"><div class="topic-name">Organic Reactions</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:45%;background:var(--amber)"></div></div></div><div class="topic-score" style="color:var(--amber)">45%</div></div>
-          <div class="topic-row"><div class="topic-name">Integration</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:52%;background:var(--amber)"></div></div></div><div class="topic-score" style="color:var(--amber)">52%</div></div>
-          <div class="topic-row"><div class="topic-name">Genetics</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:71%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">71%</div></div>
-          <div class="topic-row"><div class="topic-name">Cell Biology</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:80%;background:var(--green)"></div></div></div><div class="topic-score" style="color:var(--green)">80%</div></div>
+          <div id="teach-hard-topics" style="color:var(--text-muted);font-size:.82rem;padding:10px 0"><i class="fi fi-br-chart-histogram" style="margin-right:6px;opacity:.4"></i>Quiz data will appear here once students complete assessments.</div>
         </div>
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-clipboard-list" style="color:var(--cyan)"></i> &nbsp;Assignment Completion</div>
-          <div class="topic-row"><div class="topic-name">Biology Test 1</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:96%;background:var(--green)"></div></div></div><div class="topic-score" style="color:var(--green)">96%</div></div>
-          <div class="topic-row"><div class="topic-name">Maths Quiz 3</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:88%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">88%</div></div>
-          <div class="topic-row"><div class="topic-name">Physics HW</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:62%;background:var(--amber)"></div></div></div><div class="topic-score" style="color:var(--amber)">62%</div></div>
-          <div class="topic-row"><div class="topic-name">Chem Lab Report</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:74%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">74%</div></div>
+          <div id="teach-assign-completion" style="color:var(--text-muted);font-size:.82rem;padding:10px 0"><i class="fi fi-br-clipboard-list" style="margin-right:6px;opacity:.4"></i>Assignment data will appear here once tests are assigned.</div>
         </div>
       </div>
     </div>
@@ -3017,13 +2990,10 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="card-title"><i class="fi fi-br-diploma" style="color:var(--cyan)"></i> &nbsp;Marked Submissions</div>
           <table class="marks-table">
             <thead><tr><th>Student</th><th>Score</th><th>Grade</th><th>Feedback</th></tr></thead>
-            <tbody>
-              <tr><td>Alex Johnson</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:88%;background:var(--green)"></div></div> 88%</td><td><span class="pill pill-green">A</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem" onclick="viewMarkedFeedback('Alex Johnson',88,'A','Strong understanding of key concepts. Minor errors in section 2 — review worked examples.')"><i class="fi fi-br-eye"></i> View</button></td></tr>
-              <tr><td>Sarah Chen</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:74%;background:var(--cyan)"></div></div> 74%</td><td><span class="pill pill-green">B</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem" onclick="viewMarkedFeedback('Sarah Chen',74,'B','Good attempt. Questions 3 and 7 were partially correct — review definitions and apply to examples.')"><i class="fi fi-br-eye"></i> View</button></td></tr>
-              <tr><td>James Miller</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:42%;background:var(--rose)"></div></div> 42%</td><td><span class="pill pill-rose">F</span></td><td><button class="btn-ghost" style="padding:5px 10px;font-size:.72rem" onclick="viewMarkedFeedback('James Miller',42,'F','Significant gaps in core concepts. Recommend revision of chapters 1–3 and a one-on-one catch-up session.')"><i class="fi fi-br-eye"></i> View</button></td></tr>
+            <tbody id="marked-submissions-tbody">
+              <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:18px;font-size:.82rem"><i class="fi fi-br-diploma" style="margin-right:6px;opacity:.4"></i>No submissions marked yet — upload student work and start AI marking.</td></tr>
             </tbody>
           </table>
-          <p style="font-size:.75rem;color:var(--text-muted);margin-top:14px"><i class="fi fi-br-info"></i> James Miller flagged — below 50% threshold. Alert sent.</p>
         </div>
       </div>
     </div>
@@ -3302,21 +3272,14 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
         <table class="marks-table" id="att-table">
           <thead><tr><th>Date</th><th>Class</th><th>Period</th><th>Status</th><th>Note</th></tr></thead>
           <tbody id="att-tbody">
-            <tr><td style="color:var(--text-muted)">02 Jun 2026</td><td>Biology Yr 12</td><td>Period 3</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span></td><td style="color:var(--text-muted)">—</td></tr>
-            <tr><td style="color:var(--text-muted)">02 Jun 2026</td><td>Advanced Maths</td><td>Period 5</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span></td><td style="color:var(--text-muted)">—</td></tr>
-            <tr><td style="color:var(--text-muted)">01 Jun 2026</td><td>Physics</td><td>Period 2</td><td><span class="risk-badge risk-warn"><i class="fi fi-br-clock"></i> Late</span></td><td style="color:var(--text-muted)">5 min late</td></tr>
-            <tr><td style="color:var(--text-muted)">30 May 2026</td><td>Chemistry</td><td>Period 4</td><td><span class="risk-badge risk-danger"><i class="fi fi-br-cross"></i> Absent</span></td><td style="color:var(--text-muted)">Parent notified</td></tr>
-            <tr><td style="color:var(--text-muted)">29 May 2026</td><td>Biology Yr 12</td><td>Period 3</td><td><span class="risk-badge risk-ok"><i class="fi fi-br-check"></i> Present</span></td><td style="color:var(--text-muted)">—</td></tr>
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:18px;font-size:.82rem"><i class="fi fi-br-calendar-lines" style="margin-right:6px;opacity:.4"></i>No attendance records yet — records appear after roll is marked.</td></tr>
           </tbody>
         </table>
       </div>
       <div class="card card-pad">
         <div class="card-title"><i class="fi fi-br-info" style="color:var(--cyan)"></i> &nbsp;Attendance by Subject</div>
         <div id="att-by-subject" style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
-          <div class="topic-row"><div class="topic-name">Biology Yr 12</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:95%;background:var(--green)"></div></div></div><div class="topic-score" style="color:var(--green)">95%</div></div>
-          <div class="topic-row"><div class="topic-name">Advanced Maths</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:92%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">92%</div></div>
-          <div class="topic-row"><div class="topic-name">Physics</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:78%;background:var(--amber)"></div></div></div><div class="topic-score" style="color:var(--amber)">78%</div></div>
-          <div class="topic-row"><div class="topic-name">Chemistry</div><div class="topic-bar-wrap"><div class="prog-bar"><div class="prog-bar-fill" style="width:85%;background:var(--cyan)"></div></div></div><div class="topic-score" style="color:var(--cyan)">85%</div></div>
+          <div style="color:var(--text-muted);font-size:.82rem;padding:10px 0"><i class="fi fi-br-info" style="margin-right:6px;opacity:.4"></i>Attendance by subject will appear after rolls are marked.</div>
         </div>
       </div>
     </div>
@@ -4012,6 +3975,11 @@ function populateApp(profile) {
     setText('profile-role-badge', 'Teacher');
     setStyle('teacher-upload-mode', 'display', '');
   }
+  if (role==='admin') {
+    ['admin-section','admin-notice-nav','post-notice-nav'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
+    setText('profile-role-badge', 'Admin');
+    setStyle('join-class-form', 'display', 'none');
+  }
 }
 
 // ── XP helper ──
@@ -4692,7 +4660,7 @@ window.doGoogleAuth = async function() {
     const { ref: _ref, set: _set, get: _get } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js");
     const snap = await _get(_ref(window._db, `users/${user.uid}/profile`));
     if (!snap.exists()) {
-      const role = document.getElementById('rp-teacher')?.classList.contains('sel') ? 'teacher' : 'student';
+      const role = ['teacher','admin'].find(r => document.getElementById('rp-'+r)?.classList.contains('sel')) || 'student';
       await _set(_ref(window._db, `users/${user.uid}/profile`), {
         name: user.displayName || user.email.split('@')[0],
         email: user.email,
@@ -5119,7 +5087,7 @@ function _updateNotifBadges() {
   const unreadEl = document.getElementById('unread-count');
   const dotEl   = document.getElementById('notif-dot');
   const tabBadge = document.getElementById('notif-tab-unread-badge');
-  if (countEl)  countEl.textContent = unread || '0';
+  if (countEl) { countEl.textContent = unread; countEl.style.display = unread > 0 ? '' : 'none'; }
   if (unreadEl) unreadEl.textContent = unread;
   if (tabBadge) tabBadge.textContent = unread;
   if (dotEl)    dotEl.style.display  = unread > 0 ? '' : 'none';

@@ -1252,6 +1252,26 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 .ar-chip-c { background:var(--cyan-dim);color:var(--cyan);border:1px solid var(--border-active); }
 .ar-chip-t { background:rgba(124,58,237,.1);color:#a78bfa;border:1px solid rgba(124,58,237,.2); }
 
+/* Archive edit mode */
+.ar-edit-bar { display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);border-radius:var(--radius);margin-bottom:12px;font-size:.84rem; }
+.ar-edit-bar.visible { display:flex; }
+.ar-upload-list.edit-mode .ar-upload-row { cursor:default;padding-left:10px; }
+.ar-upload-list.edit-mode .ar-upload-row:hover { border-color:var(--border);background:var(--bg-card); }
+.ar-upload-list.edit-mode .ar-upload-row.selected { border-color:var(--rose);background:rgba(244,63,94,.06); }
+.ar-select-cb { display:none;accent-color:var(--rose);width:16px;height:16px;cursor:pointer;flex-shrink:0;margin-right:4px; }
+.ar-upload-list.edit-mode .ar-select-cb { display:block; }
+.ar-edit-toggle { padding:7px 14px;font-size:.8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-card2);color:var(--text-muted);cursor:pointer;font-family:var(--font-b);transition:all .18s; }
+.ar-edit-toggle:hover { border-color:var(--rose);color:var(--rose); }
+.ar-edit-toggle.active { border-color:var(--rose);color:var(--rose);background:rgba(244,63,94,.08); }
+
+/* Confirm popup */
+.confirm-overlay { position:fixed;inset:0;background:rgba(5,7,15,.75);backdrop-filter:blur(6px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px; }
+.confirm-overlay.open { display:flex; }
+.confirm-box { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 28px 22px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:fadeUp .18s ease; }
+.confirm-title { font-family:var(--font-d);font-weight:700;font-size:1rem;margin-bottom:8px; }
+.confirm-msg { font-size:.84rem;color:var(--text-muted);line-height:1.6;margin-bottom:22px; }
+.confirm-actions { display:flex;gap:10px;justify-content:flex-end; }
+
 /* File cards (3 per set) */
 .ar-file-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;margin-bottom:24px; }
 .ar-file-card {
@@ -3874,6 +3894,18 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
 <!-- ═══════════════════════════════════════
      FIREBASE + LOGIC
 ═══════════════════════════════════════ -->
+<!-- Confirm popup (replaces browser confirm()) -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">Are you sure?</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-actions">
+      <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-primary" id="confirm-ok" style="background:var(--rose);border-color:var(--rose)"><i class="fi fi-br-trash"></i> <span id="confirm-ok-label">Delete</span></button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
@@ -4901,6 +4933,89 @@ window.joinClass = async function() {
 };
 window.openCreateClassModal = function() { document.getElementById('create-class-modal').classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+window.openModal  = function(id) { document.getElementById(id).classList.add('open'); };
+
+// ── Custom confirm popup ──
+let _confirmCallback = null;
+window.showConfirm = function(msg, onConfirm, { title = 'Are you sure?', label = 'Delete' } = {}) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-ok-label').textContent = label;
+  _confirmCallback = onConfirm;
+  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); onConfirm?.(); };
+  document.getElementById('confirm-overlay').classList.add('open');
+};
+window.closeConfirm = function() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _confirmCallback = null;
+};
+// Close on backdrop click
+document.getElementById('confirm-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeConfirm();
+});
+
+// ── Archive edit mode ──
+let _arEditMode = false;
+const _arSelected = new Set();
+
+window.arToggleEditMode = function() {
+  _arEditMode = !_arEditMode;
+  _arSelected.clear();
+  const list = document.getElementById('ar-upload-list');
+  const bar  = document.getElementById('ar-edit-bar');
+  const btn  = document.getElementById('ar-edit-toggle-btn');
+  if (!list) return;
+  list.classList.toggle('edit-mode', _arEditMode);
+  if (bar) { bar.classList.toggle('visible', _arEditMode); _arUpdateEditBar(); }
+  if (btn) { btn.classList.toggle('active', _arEditMode); btn.textContent = _arEditMode ? 'Done' : 'Edit'; }
+  // In edit mode rows should not navigate on click
+  list.querySelectorAll('.ar-upload-row').forEach(row => {
+    row.style.pointerEvents = _arEditMode ? 'none' : '';
+  });
+  list.querySelectorAll('.ar-select-cb').forEach(cb => { cb.checked = false; cb.style.pointerEvents = _arEditMode ? 'auto' : ''; });
+};
+
+window.arToggleSelect = function(key, cb) {
+  cb.stopPropagation?.();
+  if (_arSelected.has(key)) _arSelected.delete(key);
+  else _arSelected.add(key);
+  const row = document.querySelector(`.ar-upload-row[data-key="${key}"]`);
+  if (row) row.classList.toggle('selected', _arSelected.has(key));
+  _arUpdateEditBar();
+};
+
+function _arUpdateEditBar() {
+  const bar = document.getElementById('ar-edit-bar');
+  if (!bar) return;
+  const n = _arSelected.size;
+  bar.querySelector('#ar-edit-bar-count').textContent = n > 0 ? `${n} selected` : 'Select items to delete';
+  bar.querySelector('#ar-delete-sel-btn').disabled = n === 0;
+}
+
+window.arDeleteSelected = function() {
+  const n = _arSelected.size;
+  if (!n) return;
+  showConfirm(
+    `Delete ${n} item${n > 1 ? 's' : ''}? This cannot be undone.`,
+    async () => {
+      const keys = [..._arSelected];
+      for (const key of keys) {
+        try {
+          if (window._uid && window._fbRemove && window._fbRef && window._db) {
+            await window._fbRemove(window._fbRef(window._db, `uploads/${window._uid}/${key}`));
+          }
+          if (window._archiveData) delete window._archiveData[key];
+        } catch(e) { console.error('delete', key, e); }
+      }
+      _arSelected.clear();
+      _arEditMode = false;
+      showToast(`Deleted ${keys.length} item${keys.length > 1 ? 's' : ''}`, 'success');
+      window.renderArchiveFolders?.();
+      window.arOpenFolder?.(_arCurrentSubject);
+    },
+    { title: `Delete ${n} item${n > 1 ? 's' : ''}?`, label: 'Delete' }
+  );
+};
 
 // ── Class Settings ──
 window.openClassSettings = async function(code) {
@@ -4960,8 +5075,11 @@ window.copyClassCode = function() {
 window.confirmDeleteClass = function() {
   const code = document.getElementById('settings-class-code').value;
   const name = document.getElementById('settings-class-name').value || code;
-  if (!confirm(`Delete "${name}"?\n\nThis will remove the class and all its assignments and resources. Students will lose access.\n\nThis cannot be undone.`)) return;
-  deleteClass(code);
+  showConfirm(
+    `This will remove the class and all its assignments and resources. Students will lose access. This cannot be undone.`,
+    () => deleteClass(code),
+    { title: `Delete "${name}"?`, label: 'Delete' }
+  );
 };
 
 async function deleteClass(code) {
@@ -5825,15 +5943,32 @@ window.arOpenFolder = function(subject) {
     .filter(([, item]) => (item.subject?.trim() || 'Uncategorised') === subject)
     .sort(([,a],[,b]) => new Date(b.uploadedAt||0) - new Date(a.uploadedAt||0));
 
+  // Reset edit mode when opening a new folder
+  _arEditMode = false;
+  _arSelected.clear();
+
   const list = document.getElementById('ar-upload-list');
-  list.innerHTML = uploads.map(([key, item]) => {
+
+  // Build header with Edit toggle button and delete bar
+  const header = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:.82rem;color:var(--text-muted)">${uploads.length} set${uploads.length !== 1 ? 's' : ''}</div>
+      <button class="ar-edit-toggle" id="ar-edit-toggle-btn" onclick="arToggleEditMode()">Edit</button>
+    </div>
+    <div class="ar-edit-bar" id="ar-edit-bar">
+      <span id="ar-edit-bar-count" style="flex:1;color:var(--text-muted)">Select items to delete</span>
+      <button class="btn-ghost" id="ar-delete-sel-btn" style="padding:6px 14px;font-size:.8rem;color:var(--rose);border-color:rgba(244,63,94,.35)" disabled onclick="arDeleteSelected()"><i class="fi fi-br-trash"></i> Delete selected</button>
+    </div>`;
+
+  list.innerHTML = header + uploads.map(([key, item]) => {
     const date = item.uploadedAt
       ? new Date(item.uploadedAt).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})
       : '';
     const hasNotes = !!item.notes, hasCards = !!(item.palmCards?.length), hasTest = !!item.test;
     const esc = s => (s||'').replace(/'/g,"\\'");
     return `
-      <div class="ar-upload-row" onclick="arOpenSet('${key}')">
+      <div class="ar-upload-row" data-key="${key}" onclick="if(!_arEditMode)arOpenSet('${key}')">
+        <input type="checkbox" class="ar-select-cb" onclick="event.stopPropagation();arToggleSelect('${key}',event)" title="Select">
         <div class="ar-upload-ic"><i class="fi fi-br-document-signed"></i></div>
         <div class="ar-upload-title">${item.deckTitle || item.fileName || 'Untitled'}</div>
         <div class="ar-chips">
@@ -5968,20 +6103,22 @@ window.arSaveEdit = async function() {
   }
 };
 
-window.arDeleteEntry = async function(key) {
-  if (!key || !confirm('Delete this entry? This cannot be undone.')) return;
-  try {
-    if (window._uid && window._fbRemove && window._fbRef && window._db) {
-      await window._fbRemove(window._fbRef(window._db, `uploads/${window._uid}/${key}`));
+window.arDeleteEntry = function(key) {
+  if (!key) return;
+  showConfirm('Delete this entry? This cannot be undone.', async () => {
+    try {
+      if (window._uid && window._fbRemove && window._fbRef && window._db) {
+        await window._fbRemove(window._fbRef(window._db, `uploads/${window._uid}/${key}`));
+      }
+      if (window._archiveData) delete window._archiveData[key];
+      closeModal('ar-edit-modal');
+      showToast('Deleted', 'success');
+      window.renderArchiveFolders?.();
+      window.arGoHome?.();
+    } catch(e) {
+      showToast('Could not delete — ' + e.message, 'error');
     }
-    if (window._archiveData) delete window._archiveData[key];
-    closeModal('ar-edit-modal');
-    showToast('Deleted', 'success');
-    window.renderArchiveFolders?.();
-    window.arGoHome?.();
-  } catch(e) {
-    showToast('Could not delete — ' + e.message, 'error');
-  }
+  }, { title: 'Delete entry?', label: 'Delete' });
 };
 
 window.loadArchive = async function() {
@@ -6042,21 +6179,22 @@ window.toggleDeckEditMode = function() {
   }
 };
 
-window.deleteDeck = async function(deckId) {
-  if (!confirm('Remove this flashcard set? This cannot be undone.')) return;
-  try {
-    if (window._uid && window._fbRemove) {
-      await window._fbRemove(window._fbRef(window._db, `flashcardDecks/${window._uid}/${deckId}`));
+window.deleteDeck = function(deckId) {
+  showConfirm('Remove this flashcard set? This cannot be undone.', async () => {
+    try {
+      if (window._uid && window._fbRemove) {
+        await window._fbRemove(window._fbRef(window._db, `flashcardDecks/${window._uid}/${deckId}`));
+      }
+      const decks = window._fcDecks || {};
+      delete decks[deckId];
+      window._fcDecks = decks;
+      window.renderDecks();
+      showToast('Set removed', 'success');
+    } catch(e) {
+      console.error('deleteDeck:', e);
+      showToast('Could not remove set', 'error');
     }
-    const decks = window._fcDecks || {};
-    delete decks[deckId];
-    window._fcDecks = decks;
-    window.renderDecks();
-    showToast('Set removed', 'success');
-  } catch(e) {
-    console.error('deleteDeck:', e);
-    showToast('Could not remove set', 'error');
-  }
+  }, { title: 'Remove flashcard set?', label: 'Remove' });
 };
 
 // Study mode state
@@ -6819,10 +6957,11 @@ window.editNoticeIntoForm = function(title, body, audience) {
 
 // ── Delete posted notice card ──
 window.deletePostedNotice = function(btn) {
-  if (!confirm('Delete this notice? This cannot be undone.')) return;
-  const card = btn.closest('[style*="padding:10px 0"]');
-  if (card) { card.style.opacity = '0'; card.style.transition = 'opacity .25s'; setTimeout(() => card.remove(), 260); }
-  showToast('Notice deleted.', 'success');
+  showConfirm('Delete this notice? This cannot be undone.', () => {
+    const card = btn.closest('[style*="padding:10px 0"]');
+    if (card) { card.style.opacity = '0'; card.style.transition = 'opacity .25s'; setTimeout(() => card.remove(), 260); }
+    showToast('Notice deleted.', 'success');
+  }, { title: 'Delete notice?', label: 'Delete' });
 };
 
 // ── Generate Schedule (AI-based) ──
@@ -7102,10 +7241,11 @@ window.markAssignmentDone = async function() {
   } catch(e) { showToast('Error saving progress.', 'error'); }
 };
 
-window.deleteAssignment = async function(code, id) {
-  if (!confirm('Delete this assignment? Students will lose access.')) return;
-  try { const _db=window._db,_ref=window._fbRef,_set=window._fbSet; await _set(_ref(_db, `assignments/${code}/${id}`), null); showToast('Assignment deleted.', 'success'); loadAssignments(code); }
-  catch(e) { showToast('Error deleting.', 'error'); }
+window.deleteAssignment = function(code, id) {
+  showConfirm('Delete this assignment? Students will lose access.', async () => {
+    try { const _db=window._db,_ref=window._fbRef,_set=window._fbSet; await _set(_ref(_db, `assignments/${code}/${id}`), null); showToast('Assignment deleted.', 'success'); loadAssignments(code); }
+    catch(e) { showToast('Error deleting.', 'error'); }
+  }, { title: 'Delete assignment?', label: 'Delete' });
 };
 
 window.viewAssignmentSubmissions = async function(code, id, title) {
@@ -7150,10 +7290,11 @@ window.postResource = async function() {
   } catch(e) { showToast('Error posting resource.', 'error'); }
 };
 
-window.deleteResource = async function(code, id) {
-  if (!confirm('Delete this resource?')) return;
-  try { const _db=window._db,_ref=window._fbRef,_set=window._fbSet; await _set(_ref(_db,`resources/${code}/${id}`),null); showToast('Resource deleted.','success'); loadResources(code); }
-  catch(e) { showToast('Error deleting.', 'error'); }
+window.deleteResource = function(code, id) {
+  showConfirm('Delete this resource? This cannot be undone.', async () => {
+    try { const _db=window._db,_ref=window._fbRef,_set=window._fbSet; await _set(_ref(_db,`resources/${code}/${id}`),null); showToast('Resource deleted.','success'); loadResources(code); }
+    catch(e) { showToast('Error deleting.', 'error'); }
+  }, { title: 'Delete resource?', label: 'Delete' });
 };
 
 // ── Add Period modal (teacher timetable) ──
@@ -7208,14 +7349,16 @@ window.saveEditPeriod = async function() {
   } catch(e) { showToast('Error saving — ' + e.message, 'error'); }
 };
 
-window.deletePeriod = async function(key) {
-  if (!key || !confirm('Remove this period?')) return;
-  try {
-    await window._fbRemove(window._fbRef(window._db, `timetable/${window._uid}/${key}`));
-    closeModal('edit-period-modal');
-    showToast('Period removed', 'success');
-    window.renderTimetable();
-  } catch(e) { showToast('Error removing period', 'error'); }
+window.deletePeriod = function(key) {
+  if (!key) return;
+  showConfirm('Remove this period from your timetable?', async () => {
+    try {
+      await window._fbRemove(window._fbRef(window._db, `timetable/${window._uid}/${key}`));
+      closeModal('edit-period-modal');
+      showToast('Period removed', 'success');
+      window.renderTimetable();
+    } catch(e) { showToast('Error removing period', 'error'); }
+  }, { title: 'Remove period?', label: 'Remove' });
 };
 
 window.closePricingModal = function() {

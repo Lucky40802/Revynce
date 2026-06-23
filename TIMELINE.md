@@ -303,6 +303,31 @@ All hardcoded fake data removed from teacher-only views:
 
 ---
 
+---
+
+## Phase 18 - Google OAuth Verification (In Progress)
+
+### Verification submission status
+- App Terms of Service page: `https://revynce.com.au/terms.html` — added and submitted
+- Authorised domains confirmed: `revynce.com.au`, `revynce-740d1.firebaseapp.com`, `revynce-740d1.web.app`
+- Contact email: `lakshan.jagadeishan@gmail.com`
+- Scopes declared:
+  - `../auth/calendar.events` — View and edit events on all calendars
+  - `../auth/classroom.courses.readonly` — View Google Classroom classes
+  - `../auth/classroom.rosters.readonly` — View Google Classroom class rosters
+  - `../auth/drive.readonly` — See and download all Google Drive files
+  - `../auth/userinfo.email` — See primary Google Account email address
+
+### Scope justification written
+> "Revynce is an AI-powered study platform for students and teachers. Google Drive read-only is used to let users select their own study documents for AI note generation — no other Drive files are accessed. Google Classroom Read-Only is used to import the user's enrolled courses and class rosters so they don't need to re-enter school details. Google Calendar events scope is used to sync the user's personalised study schedule to their calendar. No data is stored, sold, or shared with third parties. All integrations are opt-in."
+
+### Remaining blockers before verification can be submitted
+- **Drive scope** — missing: scope justification per-scope field, intended data usage, demo video link
+- **Calendar scope** — missing: scope justification per-scope field, intended data usage, demo video link
+- **Demo video** — not yet recorded or uploaded; must show each sensitive scope being used in the app
+
+---
+
 ## Current Status
 
 | Item | Status |
@@ -329,5 +354,9 @@ All hardcoded fake data removed from teacher-only views:
 | Edit mode with multi-select delete | Done |
 | Custom confirm popup | Done |
 | revynce.com.au DNS | Done |
-| Google Drive / Classroom OAuth origins | Done - needs verify in Cloud Console |
+| Terms of Service page | Done |
+| Google OAuth scope justification written | Done |
+| Google OAuth demo video | **Pending — must record and upload** |
+| Google OAuth intended data usage (per scope) | **Pending — must fill in Cloud Console** |
+| Google OAuth verification submission | Pending (blocked by above) |
 | OneDrive integration | Pending - needs Azure Client ID |

@@ -3257,19 +3257,6 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       </div>
       <div id="notices-list" style="display:flex;flex-direction:column;gap:14px">
         <!-- Populated by loadNotices() -->
-        <div class="card card-pad notice-item" data-category="school">
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="background:var(--cyan-dim);color:var(--cyan);border-radius:10px;padding:10px;flex-shrink:0"><i class="fi fi-br-megaphone"></i></div>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <span style="font-weight:700;font-size:.9rem">School Sports Carnival — Friday</span>
-                <span class="pill" style="background:var(--cyan-dim);color:var(--cyan);font-size:.68rem">School</span>
-              </div>
-              <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">All students are required to attend the annual sports carnival this Friday. Bring a water bottle and wear house colours. Absences must be notified to the office by Thursday.</p>
-              <div style="font-size:.75rem;color:var(--text-muted)"><i class="fi fi-rr-clock"></i> Posted 1 day ago &nbsp;·&nbsp; Admin Office</div>
-            </div>
-          </div>
-        </div>
       </div>
       <div id="notices-empty" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
         <i class="fi fi-br-megaphone" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3"></i>
@@ -5283,9 +5270,6 @@ async function _seedNotifications(uid, role) {
   const now = Date.now();
   const seeds = role === 'teacher' ? [
     { title: 'Welcome to Revynce!', desc: 'Set up your first class and start adding students. Use AI Test Builder to generate assessments.', type:'info', icon:'info', category:'system', read:false, createdAt: new Date(now - 1000*60*10).toISOString() },
-    { title: '🚨 At-Risk Alert — James Miller', desc: 'James has scored below 50% on 3 consecutive Physics assessments. Consider reaching out.', type:'danger', icon:'alert', category:'class', link:'teacher', read:false, createdAt: new Date(now - 1000*60*60*2).toISOString() },
-    { title: 'Roll not yet marked — Biology Yr 12', desc: "You haven't marked today's roll for Biology Year 12 (Period 3). Don't forget!", type:'warn', icon:'roll', category:'class', link:'attendance-marking', read:false, createdAt: new Date(now - 1000*60*60*5).toISOString() },
-    { title: 'New school notice posted', desc: 'Admin Office posted: "Sports Carnival — Friday". 28 students in your classes were notified.', type:'info', icon:'notice', category:'class', link:'notices', read:true, createdAt: new Date(now - 1000*60*60*24).toISOString() },
   ] : [
     { title: 'Welcome to Revynce!', desc: 'Upload your first notes, generate flashcards, and start earning XP. Good luck!', type:'info', icon:'info', category:'system', read:false, createdAt: new Date(now - 1000*60*5).toISOString() },
   ];

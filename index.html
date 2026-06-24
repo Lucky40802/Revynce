@@ -3977,7 +3977,7 @@ function populateApp(profile) {
   if (profile.streak) setText('d-streak', '🔥 ' + profile.streak);
   const role = profile.role||'student';
   if (role==='teacher') {
-    ['teach-section','teach-nav','testbuilder-nav','marking-nav'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
+    ['teach-section','teach-nav','testbuilder-nav','marking-nav','mark-roll-nav','post-notice-nav'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
     setStyle('teacher-class-actions', 'display', '');
     setStyle('join-class-form', 'display', 'none');
     setText('classes-sub', 'Manage your classes and track student progress.');

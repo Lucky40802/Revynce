@@ -2695,36 +2695,27 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       <h2 class="section-head">Performance</h2>
       <p class="section-sub" id="perf-sub">Your grades, quiz history, and recommended revision areas.</p>
       <div class="stat-grid" style="margin-bottom:22px">
-        <div class="stat-card"><div class="stat-card-num">78%</div><div class="stat-card-label">Overall Average</div></div>
-        <div class="stat-card"><div class="stat-card-num">12</div><div class="stat-card-label">Quizzes Completed</div></div>
-        <div class="stat-card"><div class="stat-card-num">3</div><div class="stat-card-label">Tests Submitted</div></div>
-        <div class="stat-card"><div class="stat-card-num" style="color:var(--amber)">2</div><div class="stat-card-label">Weak Topics</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="perf-avg">—</div><div class="stat-card-label">Overall Average</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="perf-quizzes">—</div><div class="stat-card-label">Quizzes Completed</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="perf-tests">—</div><div class="stat-card-label">Tests Submitted</div></div>
+        <div class="stat-card"><div class="stat-card-num" id="perf-weak" style="color:var(--amber)">—</div><div class="stat-card-label">Weak Topics</div></div>
       </div>
       <div class="two-col">
         <div class="card card-pad" style="overflow-x:auto">
           <div class="card-title"><i class="fi fi-br-diploma" style="color:var(--cyan)"></i> &nbsp;Grade History</div>
           <table class="marks-table">
             <thead><tr><th>Assignment</th><th>Class</th><th>Score</th><th>Grade</th><th>Date</th></tr></thead>
-            <tbody>
-              <tr><td>Chapter 4 Test</td><td>Biology</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:82%;background:var(--green)"></div></div> 82%</td><td><span class="pill pill-green">A</span></td><td style="color:var(--text-muted)">2 days ago</td></tr>
-              <tr><td>Calculus Quiz</td><td>Maths</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:74%;background:var(--cyan)"></div></div> 74%</td><td><span class="pill pill-green">B</span></td><td style="color:var(--text-muted)">1 week ago</td></tr>
-              <tr><td>Waves Test</td><td>Physics</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:48%;background:var(--rose)"></div></div> 48%</td><td><span class="pill pill-rose">D</span></td><td style="color:var(--text-muted)">1 week ago</td></tr>
-              <tr><td>Organic Chem</td><td>Chemistry</td><td><div class="prog-bar"><div class="prog-bar-fill" style="width:55%;background:var(--amber)"></div></div> 55%</td><td><span class="pill pill-amber">C</span></td><td style="color:var(--text-muted)">2 weeks ago</td></tr>
+            <tbody id="grade-history-tbody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">No grades recorded yet.</td></tr>
             </tbody>
           </table>
         </div>
         <div class="card card-pad">
           <div class="card-title"><i class="fi fi-br-book-bookmark" style="color:var(--cyan)"></i> &nbsp;AI Recommendations</div>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.15);border-radius:10px;padding:14px">
-              <div style="font-weight:700;font-size:.84rem;color:var(--rose);margin-bottom:4px"><i class="fi fi-br-exclamation-triangle"></i> &nbsp;Priority: Physics Waves</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">You scored 48% — below pass threshold. Revynce recommends 2 hours of revision this week.</div>
-              <button class="btn-primary" style="margin-top:10px;padding:7px 14px;font-size:.78rem" onclick="showPanel('upload',null)"><i class="fi fi-br-magic-wand"></i> Generate Notes</button>
-            </div>
-            <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:10px;padding:14px">
-              <div style="font-weight:700;font-size:.84rem;color:var(--amber);margin-bottom:4px"><i class="fi fi-br-exclamation"></i> &nbsp;Review: Organic Chemistry</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">55% average. Focus on reaction mechanisms and functional groups.</div>
-              <button class="btn-ghost" style="margin-top:10px;padding:7px 14px;font-size:.78rem" onclick="showPanel('archive',null)"><i class="fi fi-br-archive"></i> Open Archive</button>
+          <div id="perf-recommendations" style="display:flex;flex-direction:column;gap:12px">
+            <div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.84rem">
+              <i class="fi fi-br-magic-wand" style="display:block;font-size:1.4rem;margin-bottom:8px;color:var(--cyan);opacity:.5"></i>
+              Complete some quizzes to get AI recommendations.
             </div>
           </div>
         </div>
@@ -8690,15 +8681,11 @@ window.loadClassLeaderboard = async function() {
       .sort((a, b) => b.avg - a.avg);
   }
 
-  // Seed demo data if empty
   if (!entries.length) {
-    entries = [
-      { uid: 'demo1', name: 'Alex Johnson',  avg: 88, tests: 5 },
-      { uid: 'demo2', name: 'Sarah Chen',    avg: 82, tests: 4 },
-      { uid: 'demo3', name: 'Priya Lal',     avg: 76, tests: 5 },
-      { uid: 'demo4', name: 'Tom Wu',        avg: 71, tests: 3 },
-      { uid: 'demo5', name: 'Emma Walsh',    avg: 65, tests: 4 },
-    ];
+    disabledMsg.style.display = '';
+    content.style.display = 'none';
+    disabledMsg.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fi fi-br-trophy" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3;color:var(--cyan)"></i><p>No scores yet. Complete quizzes to appear on the leaderboard.</p></div>';
+    return;
   }
 
   disabledMsg.style.display = 'none';

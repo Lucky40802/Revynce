@@ -3364,22 +3364,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="card card-pad">
             <div class="card-title"><i class="fi fi-br-list" style="color:var(--cyan)"></i> &nbsp;Recent Notices You've Posted</div>
             <div id="teacher-notices-list" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
-              <div style="padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="font-weight:600;font-size:.85rem">Biology — Chapter 5 Test Rescheduled</div>
-                <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px">BIO-2024 &nbsp;·&nbsp; 3 hours ago &nbsp;·&nbsp; 28 students reached</div>
-                <div style="margin-top:8px;display:flex;gap:8px">
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="editNoticeIntoForm('Biology — Chapter 5 Test Rescheduled','The Chapter 5 test has been moved to next Tuesday. Use the extra time to review Cell Division and Genetics.','BIO-2024')"><i class="fi fi-br-pencil"></i> Edit</button>
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="deletePostedNotice(this)"><i class="fi fi-br-trash"></i> Delete</button>
-                </div>
-              </div>
-              <div style="padding:10px 0">
-                <div style="font-weight:600;font-size:.85rem">Maths — Calculus Assignment Due Monday</div>
-                <div style="font-size:.75rem;color:var(--text-muted);margin-top:3px">MAT-ADV &nbsp;·&nbsp; 2 days ago &nbsp;·&nbsp; 22 students reached</div>
-                <div style="margin-top:8px;display:flex;gap:8px">
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem" onclick="editNoticeIntoForm('Maths — Calculus Assignment Due Monday','Reminder: the integration and differentiation assignment is due Monday at 11:59 PM.','MAT-ADV')"><i class="fi fi-br-pencil"></i> Edit</button>
-                  <button class="btn-ghost" style="padding:4px 10px;font-size:.72rem;color:var(--rose);border-color:rgba(244,63,94,.2)" onclick="deletePostedNotice(this)"><i class="fi fi-br-trash"></i> Delete</button>
-                </div>
-              </div>
+              <!-- Populated by loadTeacherNotices() -->
             </div>
           </div>
         </div>

@@ -3847,6 +3847,16 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
     <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="create-class-subject" placeholder="e.g. Biology"></div>
     <div class="form-group"><label class="form-label">Year Level</label><input type="text" class="form-input" id="create-class-year" placeholder="e.g. Year 12"></div>
     <div class="form-group"><label class="form-label">Class Code (auto-generated on creation)</label><input type="text" class="form-input" id="create-class-code-display" value="Will be generated…" style="opacity:.6;font-family:monospace;letter-spacing:.1em" readonly></div>
+    <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card2);border-radius:10px;padding:12px 14px;margin-bottom:4px">
+      <div>
+        <div style="font-weight:600;font-size:.84rem"><i class="fi fi-br-trophy" style="color:var(--amber);margin-right:6px"></i>Class Leaderboard / Ranking</div>
+        <div style="font-size:.74rem;color:var(--text-muted);margin-top:2px">Show a ranked scoreboard for students in this class</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-left:12px">
+        <input type="checkbox" id="create-class-ranking" checked style="opacity:0;width:0;height:0">
+        <span onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--cyan)':'var(--border)'" style="position:absolute;cursor:pointer;inset:0;border-radius:24px;background:var(--cyan);transition:.2s"></span>
+      </label>
+    </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('create-class-modal')">Cancel</button>
       <button class="btn-primary" id="create-class-btn" onclick="createClassSubmit()"><i class="fi fi-br-check"></i> Create Class</button>
@@ -4166,13 +4176,13 @@ window._joinClass = async function(code) {
   } catch(e) { console.error('_joinClass:', e); return 'error'; }
 };
 
-window._createClass = async function(name, subject, yearLevel) {
+window._createClass = async function(name, subject, yearLevel, rankingEnabled=true) {
   if (!window._uid) return null;
   try {
     const prefix = (subject||name).slice(0,3).toUpperCase().replace(/[^A-Z]/g,'') || 'CLS';
     const suffix = Math.random().toString(36).slice(2,6).toUpperCase();
     const code = `${prefix}-${suffix}`;
-    const classData = { name, subject, yearLevel, code, teacherUid: window._uid, teacherName: window._userProfile?.name||'Teacher', createdAt: new Date().toISOString() };
+    const classData = { name, subject, yearLevel, code, rankingEnabled, teacherUid: window._uid, teacherName: window._userProfile?.name||'Teacher', createdAt: new Date().toISOString() };
     await set(ref(db, `classes/${code}`), classData);
     await set(ref(db, `enrollments/${window._uid}/${code}`), { ...classData, role: 'teacher' });
     loadClasses();
@@ -5063,10 +5073,11 @@ window.createClassSubmit = async function() {
   const name = document.getElementById('create-class-name').value.trim();
   const subject = document.getElementById('create-class-subject').value.trim();
   const yearLevel = document.getElementById('create-class-year').value.trim();
+  const rankingEnabled = document.getElementById('create-class-ranking')?.checked !== false;
   if (!name) { showToast('Please enter a class name.', 'error'); return; }
   const btn = document.getElementById('create-class-btn');
   btn.disabled = true; btn.textContent = 'Creating…';
-  const code = window._createClass ? await window._createClass(name, subject, yearLevel) : null;
+  const code = window._createClass ? await window._createClass(name, subject, yearLevel, rankingEnabled) : null;
   btn.disabled = false; btn.innerHTML = '<i class="fi fi-br-check"></i> Create Class';
   if (code) {
     const display = document.getElementById('create-class-code-display');
@@ -7219,8 +7230,72 @@ window.viewAssignmentSubmissions = async function(code, id, title) {
 };
 
 // ── Upload resource ──
+let _resourceTab = 'manual';
+let _selectedArchiveKey = null;
+
+window.switchResourceTab = function(tab, btn) {
+  _resourceTab = tab;
+  document.querySelectorAll('#upload-resource-modal .result-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('res-body-manual').style.display  = tab === 'manual'  ? '' : 'none';
+  document.getElementById('res-body-archive').style.display = tab === 'archive' ? '' : 'none';
+  if (tab === 'archive') renderResourceArchiveList('');
+};
+
+window.renderResourceArchiveList = function(filter) {
+  const list = document.getElementById('res-archive-list');
+  if (!list) return;
+  const data = window._archiveData || {};
+  const entries = Object.entries(data)
+    .filter(([, item]) => {
+      const q = filter.toLowerCase();
+      return !q || (item.fileName||item.deckTitle||'').toLowerCase().includes(q) || (item.subject||'').toLowerCase().includes(q);
+    })
+    .sort(([,a],[,b]) => new Date(b.uploadedAt||0) - new Date(a.uploadedAt||0));
+  if (!entries.length) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:.82rem;padding:20px;text-align:center">No archive files found. Upload a document first.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(([key, item]) => {
+    const name = item.deckTitle || item.fileName || 'Untitled';
+    const sub  = item.subject || 'Uncategorised';
+    const hasTest  = !!item.test;
+    const hasNotes = !!item.notes;
+    const tags = [hasTest && '<span style="background:rgba(139,92,246,.15);color:var(--purple);border-radius:4px;padding:1px 6px;font-size:.7rem">Test</span>', hasNotes && '<span style="background:rgba(6,182,212,.1);color:var(--cyan);border-radius:4px;padding:1px 6px;font-size:.7rem">Notes</span>'].filter(Boolean).join(' ');
+    const sel = _selectedArchiveKey === key;
+    return `<div onclick="selectArchiveResource('${key}')" style="padding:10px 12px;border-radius:8px;border:1px solid ${sel?'var(--cyan)':'var(--border)'};background:${sel?'rgba(6,182,212,.08)':'var(--bg-card2)'};cursor:pointer;display:flex;flex-direction:column;gap:3px" onmouseenter="this.style.borderColor='var(--cyan)'" onmouseleave="this.style.borderColor='${sel?'var(--cyan)':'var(--border)'}'">
+      <div style="font-weight:600;font-size:.83rem">${name}</div>
+      <div style="font-size:.74rem;color:var(--text-muted)">${sub}</div>
+      <div style="margin-top:3px">${tags}</div>
+    </div>`;
+  }).join('');
+};
+
+window.selectArchiveResource = function(key) {
+  _selectedArchiveKey = key;
+  const item = (window._archiveData || {})[key];
+  const selBox  = document.getElementById('res-archive-selected');
+  const selName = document.getElementById('res-archive-selected-name');
+  const selSub  = document.getElementById('res-archive-selected-sub');
+  if (item && selBox) {
+    selBox.style.display = '';
+    selName.textContent = item.deckTitle || item.fileName || 'Untitled';
+    selSub.textContent  = item.subject || 'Uncategorised';
+  }
+  renderResourceArchiveList(document.getElementById('res-archive-search')?.value || '');
+};
+
+window.filterResourceArchive = function(q) { renderResourceArchiveList(q); };
+
 window.openUploadResourceModal = async function() {
   const _db=window._db,_ref=window._fbRef,_get=window._fbGet,_child=window._fbChild;
+  // reset to manual tab
+  _resourceTab = 'manual'; _selectedArchiveKey = null;
+  document.getElementById('res-body-manual').style.display  = '';
+  document.getElementById('res-body-archive').style.display = 'none';
+  document.getElementById('res-tab-manual')?.classList.add('active');
+  document.getElementById('res-tab-archive')?.classList.remove('active');
+  document.getElementById('res-archive-selected') && (document.getElementById('res-archive-selected').style.display = 'none');
   const sel = document.getElementById('resource-class-select');
   sel.innerHTML = '<option value="">— choose a class —</option>';
   try {
@@ -7229,20 +7304,34 @@ window.openUploadResourceModal = async function() {
       sel.innerHTML += `<option value="${code}">${cls.name||code} (${code})</option>`;
   } catch(e) {}
   if (_currentClassCode) sel.value = _currentClassCode;
+  // pre-load archive data in background
+  if (!Object.keys(window._archiveData||{}).length) window.loadArchive?.();
   openModal('upload-resource-modal');
 };
 
 window.postResource = async function() {
-  const title   = document.getElementById('resource-title').value.trim();
-  const code    = document.getElementById('resource-class-select').value;
-  const type    = document.getElementById('resource-type').value;
-  const content = document.getElementById('resource-content').value.trim();
-  if (!title || !code) { showToast('Please fill in title and class.', 'error'); return; }
+  const code = document.getElementById('resource-class-select').value;
+  if (!code) { showToast('Please select a class.', 'error'); return; }
+  let title, type, content;
+  if (_resourceTab === 'archive') {
+    if (!_selectedArchiveKey) { showToast('Please select a file from your archive.', 'error'); return; }
+    const item = (window._archiveData || {})[_selectedArchiveKey];
+    if (!item) { showToast('Archive item not found.', 'error'); return; }
+    title   = item.deckTitle || item.fileName || 'Untitled';
+    type    = item.test ? 'past-test' : 'notes';
+    content = item.test || item.notes || '';
+  } else {
+    title   = document.getElementById('resource-title').value.trim();
+    type    = document.getElementById('resource-type').value;
+    content = document.getElementById('resource-content').value.trim();
+    if (!title) { showToast('Please enter a resource title.', 'error'); return; }
+  }
   try {
     const _db=window._db,_ref=window._fbRef,_set=window._fbSet;
     await _set(_ref(_db, `resources/${code}/${Date.now()}`), {
       title, type, content, teacherName: window._userProfile?.name||'Teacher',
-      teacherUid: window._uid, createdAt: new Date().toISOString()
+      teacherUid: window._uid, createdAt: new Date().toISOString(),
+      fromArchive: _resourceTab === 'archive' ? _selectedArchiveKey : null
     });
     closeModal('upload-resource-modal');
     showToast(`Resource posted to ${code}!`, 'success');
@@ -8986,22 +9075,47 @@ window.submitOrgForm = async function() {
 
 <!-- ── UPLOAD RESOURCE MODAL ── -->
 <div class="modal-overlay" id="upload-resource-modal">
-  <div class="modal" style="max-width:440px">
+  <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <div class="modal-title"><i class="fi fi-br-cloud-upload-alt" style="color:var(--cyan)"></i> &nbsp;Upload Resource</div>
+      <div class="modal-title"><i class="fi fi-br-cloud-upload-alt" style="color:var(--cyan)"></i> &nbsp;Post Resource</div>
       <button class="modal-close" onclick="closeModal('upload-resource-modal')"><i class="fi fi-rr-cross"></i></button>
     </div>
-    <div class="form-group"><label class="form-label">Resource Title</label><input type="text" class="form-input" id="resource-title" placeholder="e.g. Chapter 5 Notes"></div>
-    <div class="form-group"><label class="form-label">Select Class</label><select class="form-input" id="resource-class-select"><option value="">— choose a class —</option></select></div>
-    <div class="form-group"><label class="form-label">Resource Type</label>
-      <select class="form-input" id="resource-type">
-        <option value="notes">Notes</option>
-        <option value="worksheet">Worksheet</option>
-        <option value="link">Link</option>
-        <option value="other">Other</option>
-      </select>
+    <!-- Source tabs -->
+    <div class="result-tabs" style="margin-bottom:18px">
+      <button class="result-tab active" id="res-tab-manual" onclick="switchResourceTab('manual',this)"><i class="fi fi-br-edit"></i> Manual</button>
+      <button class="result-tab" id="res-tab-archive" onclick="switchResourceTab('archive',this)"><i class="fi fi-br-archive"></i> From My Archive</button>
     </div>
-    <div class="form-group"><label class="form-label">Content / Link</label><textarea class="form-input" id="resource-content" rows="3" placeholder="Paste notes, link, or description…" style="resize:vertical"></textarea></div>
+    <!-- Manual entry -->
+    <div id="res-body-manual">
+      <div class="form-group"><label class="form-label">Resource Title</label><input type="text" class="form-input" id="resource-title" placeholder="e.g. Chapter 5 Notes"></div>
+      <div class="form-group"><label class="form-label">Resource Type</label>
+        <select class="form-input" id="resource-type">
+          <option value="notes">Notes</option>
+          <option value="worksheet">Worksheet</option>
+          <option value="past-test">Past Test</option>
+          <option value="link">Link</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Content / Link</label><textarea class="form-input" id="resource-content" rows="3" placeholder="Paste notes, link, or description…" style="resize:vertical"></textarea></div>
+    </div>
+    <!-- From archive picker -->
+    <div id="res-body-archive" style="display:none">
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:10px">Select a file from your personal archive to share with the class.</div>
+      <div class="search-bar" style="margin-bottom:10px">
+        <i class="fi fi-rr-search"></i>
+        <input id="res-archive-search" placeholder="Search your archive…" oninput="filterResourceArchive(this.value)" style="width:100%">
+      </div>
+      <div id="res-archive-list" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px">
+        <div style="color:var(--text-muted);font-size:.82rem;padding:20px;text-align:center">Loading archive…</div>
+      </div>
+      <div id="res-archive-selected" style="display:none;margin-top:10px;padding:10px 12px;background:var(--bg-card2);border-radius:8px;border:1px solid var(--cyan);font-size:.82rem">
+        <div style="font-size:.72rem;color:var(--cyan);margin-bottom:3px">SELECTED</div>
+        <div id="res-archive-selected-name" style="font-weight:600"></div>
+        <div id="res-archive-selected-sub" style="color:var(--text-muted);font-size:.75rem"></div>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:14px"><label class="form-label">Select Class</label><select class="form-input" id="resource-class-select"><option value="">— choose a class —</option></select></div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('upload-resource-modal')">Cancel</button>
       <button class="btn-primary" onclick="postResource()"><i class="fi fi-br-cloud-upload-alt"></i> Post Resource</button>

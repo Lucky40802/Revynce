@@ -3854,7 +3854,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
       </div>
       <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-left:12px">
         <input type="checkbox" id="create-class-ranking" checked style="opacity:0;width:0;height:0">
-        <span onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--cyan)':'var(--border)'" style="position:absolute;cursor:pointer;inset:0;border-radius:24px;background:var(--cyan);transition:.2s"></span>
+        <span onclick="var cb=this.previousElementSibling;cb.checked=!cb.checked;this.style.background=cb.checked?'var(--cyan)':'var(--border)';event.stopPropagation()" style="position:absolute;cursor:pointer;inset:0;border-radius:24px;background:var(--cyan);transition:.2s"></span>
       </label>
     </div>
     <div class="modal-footer">

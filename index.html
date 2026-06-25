@@ -7531,8 +7531,20 @@ window.renderTimetable = async function() {
     });
   });
 
-  document.getElementById('tt-empty').style.display = hasAny ? 'none' : '';
-  grid.style.display = hasAny ? 'grid' : 'none';
+  const addBtn = document.getElementById('add-period-btn');
+  if (addBtn) addBtn.style.display = isTeacher ? '' : 'none';
+
+  if (isTeacher) {
+    // Teachers always see the grid so they can click dashed cells to add periods
+    grid.style.display = 'grid';
+    const emptyEl = document.getElementById('tt-empty');
+    if (emptyEl) emptyEl.style.display = 'none';
+  } else {
+    document.getElementById('tt-empty').style.display = hasAny ? 'none' : '';
+    const sub = document.getElementById('tt-empty-sub');
+    if (sub) sub.textContent = 'Ask your teacher to add your class periods.';
+    grid.style.display = hasAny ? 'grid' : 'none';
+  }
 };
 
 // ── Notices filter ──

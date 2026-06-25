@@ -17,6 +17,10 @@
       ".read": "auth !== null",
       ".write": "auth !== null"
     },
+    "members": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
     "classScores": {
       ".read": "auth !== null",
       "$classCode": {

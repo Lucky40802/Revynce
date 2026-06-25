@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Revynce — Seed Demo Data</title>
+<style>
+  body { font-family: monospace; background: #0d1117; color: #c9d1d9; padding: 30px; max-width: 700px; margin: 0 auto; }
+  h1 { color: #58a6ff; }
+  #log { background: #161b22; border-radius: 8px; padding: 16px; white-space: pre-wrap; font-size: .84rem; line-height: 1.7; max-height: 600px; overflow-y: auto; border: 1px solid #30363d; }
+  .ok   { color: #3fb950; }
+  .err  { color: #f85149; }
+  .head { color: #58a6ff; font-weight: bold; }
+  button { background: #238636; color: #fff; border: none; padding: 10px 22px; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 16px; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<h1>Revynce — Demo Seed Script</h1>
+<p style="color:#8b949e">Seeds realistic data for Teacher, Mia Patel, and Ethan Wu test accounts.</p>
+<button id="runBtn" onclick="runSeed()">▶ Run Seed</button>
+<div id="log" style="margin-top:20px">Waiting…</div>
+
+<script type="module">
+import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut }          from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getDatabase, ref, set }                                 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+const cfg = {
+  apiKey:            "AIzaSyBgjPbnop4gn5ATFMiNthMN6HAbhloXGG8",
+  authDomain:        "revynce-740d1.firebaseapp.com",
+  databaseURL:       "https://revynce-740d1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "revynce-740d1",
+  storageBucket:     "revynce-740d1.firebasestorage.app",
+  messagingSenderId: "624890666308",
+  appId:             "1:624890666308:web:3c9c2e48b2dbd4b1b8b0e4"
+};
+
+const app  = initializeApp(cfg, 'seed');
+const auth = getAuth(app);
+const db   = getDatabase(app);
+
+const logEl = document.getElementById('log');
+function log(msg, cls='') {
+  const line = document.createElement('span');
+  if (cls) line.className = cls;
+  line.textContent = msg + '\n';
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+async function signInAs(email, pw) {
+  try { await signOut(auth); } catch(e) {}
+  const cred = await signInWithEmailAndPassword(auth, email, pw);
+  return cred.user.uid;
+}
+
+window.runSeed = async function() {
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  logEl.innerHTML = '';
+
+  try {
+    const now = Date.now();
+    const DAY = 1000*60*60*24;
+
+    // ─────────────────────────────────────────────────────────────
+    log('═══════════════════════════════════════', 'head');
+    log(' TEACHER  —  Teacher@revynce.demo', 'head');
+    log('═══════════════════════════════════════', 'head');
+    const tUid = await signInAs('Teacher@revynce.demo', 'Teacher123!');
+    log(`✓ Signed in as Teacher (uid: ${tUid})`, 'ok');
+
+    await set(ref(db, `users/${tUid}`), {
+      name: 'Sarah Clarke', email: 'Teacher@revynce.demo',
+      role: 'teacher', xp: 3200, streak: 22, plan: 'free',
+      createdAt: '2026-01-15T09:00:00.000Z'
+    });
+    log('✓ Teacher profile saved', 'ok');
+
+    // Classes
+    const classes = {
+      'BIO-YR12': { name: 'Biology Year 12',     subject: 'Biology',   yearLevel: 'Year 12', code: 'BIO-YR12', rankingEnabled: true,  teacherUid: tUid, teacherName: 'Sarah Clarke', createdAt: '2026-02-01T08:00:00.000Z' },
+      'CHM-ADV':  { name: 'Chemistry Advanced',   subject: 'Chemistry', yearLevel: 'Year 11', code: 'CHM-ADV',  rankingEnabled: false, teacherUid: tUid, teacherName: 'Sarah Clarke', createdAt: '2026-02-01T08:00:00.000Z' },
+    };
+    for (const [code, cls] of Object.entries(classes)) {
+      await set(ref(db, `classes/${code}`), cls);
+      await set(ref(db, `enrollments/${tUid}/${code}`), { ...cls, role: 'teacher' });
+      log(`✓ Class: ${cls.name} (${code})`, 'ok');
+    }
+
+    // Teacher timetable
+    const periods = [
+      ['p1_monday',    'Biology Yr 12',   'B14', 1, 'Monday'],
+      ['p2_monday',    'Chemistry Adv',   'C08', 2, 'Monday'],
+      ['p3_tuesday',   'Biology Yr 12',   'B14', 3, 'Tuesday'],
+      ['p2_wednesday', 'Chemistry Adv',   'C08', 2, 'Wednesday'],
+      ['p4_wednesday', 'Staff Meeting',   'StRm',4, 'Wednesday'],
+      ['p1_thursday',  'Biology Yr 12',   'B14', 1, 'Thursday'],
+      ['p3_thursday',  'Chemistry Adv',   'C08', 3, 'Thursday'],
+      ['p2_friday',    'Biology Yr 12',   'B14', 2, 'Friday'],
+      ['p4_friday',    'Chemistry Adv',   'C08', 4, 'Friday'],
+    ];
+    for (const [key, subject, room, period, day] of periods) {
+      await set(ref(db, `timetable/${tUid}/${key}`), { subject, room, teacher: 'Sarah Clarke', period, day });
+    }
+    log(`✓ Teacher timetable seeded (${periods.length} periods)`, 'ok');
+
+    // Notices
+    await set(ref(db, `notices/BIO-YR12/${now - 1000*60*60*2}`),    { title: 'Biology — Chapter 5 Test Rescheduled',  content: 'The Chapter 5 assessment has been moved to next Tuesday. Review Cell Division and Genetics.',                   classCode: 'BIO-YR12', teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - 1000*60*60*2).toISOString()    });
+    await set(ref(db, `notices/CHM-ADV/${now - DAY*2}`),             { title: 'Chemistry — Titration Prac Reminder',    content: 'Bring your lab coat and safety glasses Wednesday. We\'ll complete the acid-base titration practical.',       classCode: 'CHM-ADV',  teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY*2).toISOString()            });
+    await set(ref(db, `notices/BIO-YR12/${now - DAY*5}`),            { title: 'Half-Yearly Exam Dates Released',         content: 'Half-yearly exams are Week 8. Biology on Tuesday, Chemistry on Thursday. Study guides posted this week.', classCode: 'BIO-YR12', teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY*5).toISOString()            });
+    log('✓ Notices seeded (3)', 'ok');
+
+    // Assignments
+    await set(ref(db, `assignments/BIO-YR12/asg001`), { title: 'Cell Division Quiz',              dueDate: new Date(now + DAY*4).toISOString().slice(0,10),  type: 'test',       instructions: 'Complete all 15 questions. Show your working for short-answer questions.',              teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY*2).toISOString(),  content: 'Q1. Name the 4 phases of mitosis.\nQ2. Distinguish between mitosis and meiosis.\nQ3. What is the role of the spindle fibre?\nQ4. Define cytokinesis.\nQ5. In which type of cell division does crossing over occur?' });
+    await set(ref(db, `assignments/BIO-YR12/asg002`), { title: 'Genetics — Punnett Square Sheet', dueDate: new Date(now + DAY*10).toISOString().slice(0,10), type: 'worksheet',   instructions: 'Complete all 8 problems using Punnett squares. Show full working.',                      teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY).toISOString(),    content: 'Problem 1: Two heterozygous brown-eyed parents (Bb × Bb). Predict the offspring ratio.\nProblem 2: A carrier female (Xx) × colour-blind male (xY). Probability their daughter is colour-blind?' });
+    await set(ref(db, `assignments/CHM-ADV/asg003`),  { title: 'Acid-Base Titration Report',      dueDate: new Date(now + DAY*7).toISOString().slice(0,10),  type: 'assignment', instructions: 'Write a full formal practical report including aim, method, results table, and discussion.', teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - 1000*60*60*3).toISOString(), content: 'Include: Aim, Risk Assessment, Materials, Method, Results (tabulated), Discussion, Conclusion. Minimum 600 words.' });
+    log('✓ Assignments seeded (3)', 'ok');
+
+    // Resources
+    await set(ref(db, `resources/BIO-YR12/${now - DAY*2}`), { title: 'Cell Biology Summary Notes', type: 'notes',     content: 'Key points — Cell Biology:\n• Cell membrane: phospholipid bilayer\n• Mitochondria: site of aerobic respiration, produces ATP\n• Nucleus: contains DNA\n• Endoplasmic reticulum: rough (ribosomes) vs smooth (lipids)\n• Golgi apparatus: packages and secretes proteins', teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY*2).toISOString()  });
+    await set(ref(db, `resources/BIO-YR12/${now - DAY*3}`), { title: '2025 Half-Yearly Past Paper',  type: 'past-test', content: 'Section A — Multiple Choice (20 marks)\nSection B — Short Answer (40 marks)\nSection C — Extended Response (20 marks)\n\nTime allowed: 90 minutes.',             teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY*3).toISOString()  });
+    await set(ref(db, `resources/CHM-ADV/${now - DAY*3}`),  { title: 'Titration Lab Guide',          type: 'worksheet', content: '1. Rinse burette with NaOH solution\n2. Fill to 0.00 mL\n3. Pipette 20.00 mL HCl into flask\n4. Add 3 drops phenolphthalein\n5. Titrate slowly near endpoint\n6. Record concordant titre (within 0.1 mL)', teacherName: 'Sarah Clarke', teacherUid: tUid, createdAt: new Date(now - DAY*3).toISOString() });
+    log('✓ Resources seeded (3)', 'ok');
+
+    // ─────────────────────────────────────────────────────────────
+    log('\n═══════════════════════════════════════', 'head');
+    log(' STUDENT 1  —  Mia Patel  (student2@revynce.demo)', 'head');
+    log('═══════════════════════════════════════', 'head');
+    const s1Uid = await signInAs('student2@revynce.demo', 'Student123!');
+    log(`✓ Signed in as Mia Patel (uid: ${s1Uid})`, 'ok');
+
+    await set(ref(db, `users/${s1Uid}`), { name: 'Mia Patel', email: 'student2@revynce.demo', role: 'student', xp: 520, streak: 12, plan: 'free', createdAt: '2026-02-10T09:00:00.000Z' });
+    log('✓ Profile saved (520 XP, 12-day streak)', 'ok');
+
+    // Mia enrolments
+    for (const [code, cls] of Object.entries(classes)) {
+      await set(ref(db, `enrollments/${s1Uid}/${code}`), { ...cls, role: 'student' });
+    }
+    // Class member records (classMembers path — no auth restriction)
+    await set(ref(db, `classMembers/BIO-YR12/${s1Uid}`), { name: 'Mia Patel', uid: s1Uid, joinedAt: new Date(now - DAY*30).toISOString() });
+    await set(ref(db, `classMembers/CHM-ADV/${s1Uid}`),  { name: 'Mia Patel', uid: s1Uid, joinedAt: new Date(now - DAY*28).toISOString() });
+    log('✓ Mia enrolled in BIO-YR12 and CHM-ADV', 'ok');
+
+    // Mia timetable
+    const miaPerds = [
+      ['p1_monday',    'Biology Yr 12', 'B14', 1, 'Monday',    'Sarah Clarke'],
+      ['p2_monday',    'Chemistry',     'C08', 2, 'Monday',    'Sarah Clarke'],
+      ['p3_monday',    'Mathematics',   'M02', 3, 'Monday',    'Mr Johnson'],
+      ['p1_tuesday',   'English',       'E06', 1, 'Tuesday',   'Ms Williams'],
+      ['p3_tuesday',   'Biology Yr 12', 'B14', 3, 'Tuesday',   'Sarah Clarke'],
+      ['p4_tuesday',   'PDHPE',         'Gym', 4, 'Tuesday',   'Mr Davies'],
+      ['p2_wednesday', 'Chemistry',     'C08', 2, 'Wednesday', 'Sarah Clarke'],
+      ['p1_thursday',  'Biology Yr 12', 'B14', 1, 'Thursday',  'Sarah Clarke'],
+      ['p2_thursday',  'Mathematics',   'M02', 2, 'Thursday',  'Mr Johnson'],
+      ['p2_friday',    'English',       'E06', 2, 'Friday',    'Ms Williams'],
+      ['p4_friday',    'Chemistry',     'C08', 4, 'Friday',    'Sarah Clarke'],
+    ];
+    for (const [key, subject, room, period, day, teacher] of miaPerds) {
+      await set(ref(db, `timetable/${s1Uid}/${key}`), { subject, room, teacher, period, day });
+    }
+    log(`✓ Mia timetable seeded (${miaPerds.length} periods)`, 'ok');
+
+    // Mia quiz scores
+    const miaScores = {
+      'Cell_Division':       { score: 88, total: 100, subject: 'Biology',   date: new Date(now - DAY*5).toISOString()  },
+      'Genetics_Basics':     { score: 74, total: 100, subject: 'Biology',   date: new Date(now - DAY*10).toISOString() },
+      'Acid-Base_Chemistry': { score: 91, total: 100, subject: 'Chemistry', date: new Date(now - DAY*3).toISOString()  },
+      'Periodic_Table':      { score: 65, total: 100, subject: 'Chemistry', date: new Date(now - DAY*8).toISOString()  },
+      'Mole_Calculations':   { score: 58, total: 100, subject: 'Chemistry', date: new Date(now - DAY*12).toISOString() },
+    };
+    for (const [topic, data] of Object.entries(miaScores)) {
+      await set(ref(db, `quizScores/${s1Uid}/${topic}`), data);
+    }
+    log('✓ Mia quiz scores seeded (5 topics, avg 75%)', 'ok');
+
+    // Mia study schedule
+    const miaBlocks = [
+      { day: 'Monday',    subject: 'Biology',   start: '16:00', duration: 60, notes: 'Review Chapter 5 — Cell Division' },
+      { day: 'Wednesday', subject: 'Chemistry', start: '15:30', duration: 45, notes: 'Mole calculations practice' },
+      { day: 'Thursday',  subject: 'Biology',   start: '17:00', duration: 90, notes: 'Past paper practice — half-yearly prep' },
+      { day: 'Friday',    subject: 'Chemistry', start: '15:00', duration: 60, notes: 'Titration report write-up' },
+    ];
+    for (const blk of miaBlocks) {
+      await set(ref(db, `schedule/${s1Uid}/${blk.day}_${blk.start.replace(':','')}`), blk);
+    }
+    log('✓ Mia study schedule seeded (4 blocks)', 'ok');
+
+    // Mia notifications
+    await set(ref(db, `notifications/${s1Uid}/notif001`), { title: 'New assignment posted',         desc: 'Cell Division Quiz due in 4 days — Biology Yr 12',              type: 'info',    icon: 'clipboard', category: 'class',  link: 'classes', read: false, createdAt: new Date(now - 1000*60*60*2).toISOString()  });
+    await set(ref(db, `notifications/${s1Uid}/notif002`), { title: 'Notice from Sarah Clarke',      desc: 'Biology — Chapter 5 Test Rescheduled to next Tuesday',           type: 'warn',    icon: 'notice',    category: 'class',  link: 'notices', read: false, createdAt: new Date(now - 1000*60*60*3).toISOString()  });
+    await set(ref(db, `notifications/${s1Uid}/notif003`), { title: '12-day streak!',                desc: "You're on a 12-day study streak. Keep it up!",                    type: 'success', icon: 'fire',      category: 'system',               read: true,  createdAt: new Date(now - DAY).toISOString()            });
+    log('✓ Mia notifications seeded (3)', 'ok');
+
+    // ─────────────────────────────────────────────────────────────
+    log('\n═══════════════════════════════════════', 'head');
+    log(' STUDENT 2  —  Ethan Wu  (student3@revynce.demo)', 'head');
+    log('═══════════════════════════════════════', 'head');
+    const s2Uid = await signInAs('student3@revynce.demo', 'Student123!');
+    log(`✓ Signed in as Ethan Wu (uid: ${s2Uid})`, 'ok');
+
+    await set(ref(db, `users/${s2Uid}`), { name: 'Ethan Wu', email: 'student3@revynce.demo', role: 'student', xp: 180, streak: 3, plan: 'free', createdAt: '2026-03-05T09:00:00.000Z' });
+    log('✓ Profile saved (180 XP, 3-day streak)', 'ok');
+
+    await set(ref(db, `enrollments/${s2Uid}/BIO-YR12`), { ...classes['BIO-YR12'], role: 'student' });
+    await set(ref(db, `classMembers/BIO-YR12/${s2Uid}`), { name: 'Ethan Wu', uid: s2Uid, joinedAt: new Date(now - DAY*10).toISOString() });
+    log('✓ Ethan enrolled in BIO-YR12', 'ok');
+
+    // Ethan timetable
+    const ethanPerds = [
+      ['p1_monday',   'Biology Yr 12', 'B14', 1, 'Monday',   'Sarah Clarke'],
+      ['p2_monday',   'Mathematics',   'M03', 2, 'Monday',   'Mr Johnson'],
+      ['p3_tuesday',  'Biology Yr 12', 'B14', 3, 'Tuesday',  'Sarah Clarke'],
+      ['p1_thursday', 'Biology Yr 12', 'B14', 1, 'Thursday', 'Sarah Clarke'],
+      ['p3_thursday', 'Mathematics',   'M03', 3, 'Thursday', 'Mr Johnson'],
+      ['p2_friday',   'English',       'E06', 2, 'Friday',   'Ms Williams'],
+    ];
+    for (const [key, subject, room, period, day, teacher] of ethanPerds) {
+      await set(ref(db, `timetable/${s2Uid}/${key}`), { subject, room, teacher, period, day });
+    }
+    log(`✓ Ethan timetable seeded (${ethanPerds.length} periods)`, 'ok');
+
+    // Ethan quiz scores (low performer — at-risk)
+    await set(ref(db, `quizScores/${s2Uid}/Cell_Division`),  { score: 55, total: 100, subject: 'Biology', date: new Date(now - DAY*4).toISOString() });
+    await set(ref(db, `quizScores/${s2Uid}/Genetics_Basics`),{ score: 49, total: 100, subject: 'Biology', date: new Date(now - DAY*9).toISOString() });
+    log('✓ Ethan quiz scores seeded (2 topics, avg 52% — at-risk)', 'ok');
+
+    await set(ref(db, `notifications/${s2Uid}/notif001`), { title: 'Assignment due in 4 days', desc: 'Cell Division Quiz — Biology Yr 12',                                  type: 'warn', icon: 'clipboard', category: 'class',  link: 'classes', read: false, createdAt: new Date(now - 1000*60*60*4).toISOString()    });
+    await set(ref(db, `notifications/${s2Uid}/notif002`), { title: 'Welcome to Revynce!',      desc: "You've joined Biology Year 12 with Sarah Clarke. Check your assignments.", type: 'info', icon: 'info',      category: 'system',               read: true,  createdAt: new Date(now - DAY*10).toISOString()          });
+    log('✓ Ethan notifications seeded (2)', 'ok');
+
+    // ─────────────────────────────────────────────────────────────
+    // Add teacher's own classMembers (signed back in as teacher)
+    await signInAs('Teacher@revynce.demo', 'Teacher123!');
+    await set(ref(db, `classMembers/BIO-YR12/${tUid}`),  { name: 'Sarah Clarke', uid: tUid, role: 'teacher', joinedAt: '2026-02-01T08:00:00.000Z' });
+    await set(ref(db, `classMembers/CHM-ADV/${tUid}`),   { name: 'Sarah Clarke', uid: tUid, role: 'teacher', joinedAt: '2026-02-01T08:00:00.000Z' });
+    log('✓ Teacher member records written', 'ok');
+
+    await signOut(auth);
+    log('\n═══════════════════════════════════════', 'head');
+    log(' ✅  ALL DONE — seed complete!', 'ok');
+    log('═══════════════════════════════════════', 'head');
+    log('\nLog in at revynce.com.au with any of the 3 accounts.', 'ok');
+
+  } catch(e) {
+    log('\n❌ ERROR: ' + e.message, 'err');
+    console.error(e);
+  }
+  btn.disabled = false;
+};
+</script>
+</body>
+</html>

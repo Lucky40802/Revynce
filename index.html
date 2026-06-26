@@ -4182,7 +4182,7 @@ window._createClass = async function(name, subject, yearLevel, rankingEnabled=tr
     const prefix = (subject||name).slice(0,3).toUpperCase().replace(/[^A-Z]/g,'') || 'CLS';
     const suffix = Math.random().toString(36).slice(2,6).toUpperCase();
     const code = `${prefix}-${suffix}`;
-    const classData = { name, subject, yearLevel, code, rankingEnabled, teacherUid: window._uid, teacherName: window._userProfile?.name||'Teacher', createdAt: new Date().toISOString() };
+    const classData = { name, subject, yearLevel, code, rankingEnabled, leaderboardEnabled: rankingEnabled, teacherUid: window._uid, teacherName: window._userProfile?.name||'Teacher', createdAt: new Date().toISOString() };
     await set(ref(db, `classes/${code}`), classData);
     await set(ref(db, `enrollments/${window._uid}/${code}`), { ...classData, role: 'teacher' });
     loadClasses();

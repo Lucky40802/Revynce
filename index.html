@@ -4350,7 +4350,7 @@ Return only the raw JSON object.`;
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'llama-3.3-70b-specdec',
         messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
         max_tokens: 8192,
         temperature: 0.25,

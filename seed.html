@@ -191,6 +191,9 @@ window.runSeed = async function() {
     await set(ref(db, `notifications/${s1Uid}/notif002`), { title: 'Notice from Sarah Clarke',      desc: 'Biology — Chapter 5 Test Rescheduled to next Tuesday',           type: 'warn',    icon: 'notice',    category: 'class',  link: 'notices', read: false, createdAt: new Date(now - 1000*60*60*3).toISOString()  });
     await set(ref(db, `notifications/${s1Uid}/notif003`), { title: '12-day streak!',                desc: "You're on a 12-day study streak. Keep it up!",                    type: 'success', icon: 'fire',      category: 'system',               read: true,  createdAt: new Date(now - DAY).toISOString()            });
     log('✓ Mia notifications seeded (3)', 'ok');
+    // classScores written while signed in as Mia (uid must match)
+    await set(ref(db, `classScores/BIO-YR12/${s1Uid}`), { displayName: 'Mia Patel', avgScore: 81, testCount: 2, showOnLeaderboard: true });
+    log('✓ Mia BIO-YR12 leaderboard score seeded (81%)', 'ok');
 
     // ─────────────────────────────────────────────────────────────
     log('\n═══════════════════════════════════════', 'head');
@@ -228,6 +231,9 @@ window.runSeed = async function() {
     await set(ref(db, `notifications/${s2Uid}/notif001`), { title: 'Assignment due in 4 days', desc: 'Cell Division Quiz — Biology Yr 12',                                  type: 'warn', icon: 'clipboard', category: 'class',  link: 'classes', read: false, createdAt: new Date(now - 1000*60*60*4).toISOString()    });
     await set(ref(db, `notifications/${s2Uid}/notif002`), { title: 'Welcome to Revynce!',      desc: "You've joined Biology Year 12 with Sarah Clarke. Check your assignments.", type: 'info', icon: 'info',      category: 'system',               read: true,  createdAt: new Date(now - DAY*10).toISOString()          });
     log('✓ Ethan notifications seeded (2)', 'ok');
+    // classScores written while signed in as Ethan (uid must match)
+    await set(ref(db, `classScores/BIO-YR12/${s2Uid}`), { displayName: 'Ethan Wu', avgScore: 52, testCount: 2, showOnLeaderboard: true });
+    log('✓ Ethan BIO-YR12 leaderboard score seeded (52%)', 'ok');
 
     // ─────────────────────────────────────────────────────────────
     log('\n═══════════════════════════════════════', 'head');
@@ -267,6 +273,9 @@ window.runSeed = async function() {
     await set(ref(db, `notifications/${s3Uid}/notif001`), { title: 'New assignment posted', desc: 'Cell Division Quiz due in 4 days — Biology Yr 12', type: 'warn', icon: 'clipboard', category: 'class', link: 'classes', read: false, createdAt: new Date(now - 1000*60*60*2).toISOString() });
     await set(ref(db, `notifications/${s3Uid}/notif002`), { title: '7-day streak!', desc: "You're on a 7-day study streak. Keep it up!", type: 'success', icon: 'fire', category: 'system', read: true, createdAt: new Date(now - DAY).toISOString() });
     log('✓ Jordan notifications seeded (2)', 'ok');
+    // classScores written while signed in as Jordan (uid must match)
+    await set(ref(db, `classScores/BIO-YR12/${s3Uid}`), { displayName: 'Jordan Kim', avgScore: 73, testCount: 3, showOnLeaderboard: true });
+    log('✓ Jordan BIO-YR12 leaderboard score seeded (73%)', 'ok');
 
     // ─────────────────────────────────────────────────────────────
     // Add teacher's own classMembers (signed back in as teacher)
@@ -275,14 +284,7 @@ window.runSeed = async function() {
     await set(ref(db, `classMembers/CHM-ADV/${tUid}`),   { name: 'Sarah Clarke', uid: tUid, role: 'teacher', joinedAt: '2026-02-01T08:00:00.000Z' });
     log('✓ Teacher member records written', 'ok');
 
-    // ─────────────────────────────────────────────────────────────
-    // classScores — BIO-YR12 leaderboard (path: classScores/{code}/{uid})
-    // { displayName, avgScore, testCount, showOnLeaderboard }
-    log('\n── Seeding BIO-YR12 leaderboard scores ──', 'head');
-    await set(ref(db, `classScores/BIO-YR12/${s1Uid}`), { displayName: 'Mia Patel',  avgScore: 81, testCount: 2, showOnLeaderboard: true });
-    await set(ref(db, `classScores/BIO-YR12/${s3Uid}`), { displayName: 'Jordan Kim', avgScore: 73, testCount: 3, showOnLeaderboard: true });
-    await set(ref(db, `classScores/BIO-YR12/${s2Uid}`), { displayName: 'Ethan Wu',   avgScore: 52, testCount: 2, showOnLeaderboard: true });
-    log('✓ BIO-YR12 leaderboard: Mia 81% (#1) · Jordan 73% (#2) · Ethan 52% (#3)', 'ok');
+    log('\n── BIO-YR12 leaderboard: Mia 81% (#1) · Jordan 73% (#2) · Ethan 52% (#3) ──', 'ok');
 
     await signOut(auth);
     log('\n═══════════════════════════════════════', 'head');

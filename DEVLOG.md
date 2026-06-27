@@ -2,7 +2,7 @@
 
 **Live site:** https://revynce.com.au  
 **Repository:** https://github.com/Lucky40802/Revynce  
-**Stack:** Single-file HTML app · Firebase Realtime Database · Firebase Auth · Firebase Storage · Firebase Cloud Functions v2 · Groq AI (qwen/qwen3.6-27b) · GitHub Pages
+**Stack:** Single-file HTML app · Firebase Realtime Database · Firebase Auth · Firebase Storage · Firebase Cloud Functions v2 · Groq AI (moonshotai/kimi-k2-instruct) · GitHub Pages
 
 ---
 
@@ -160,7 +160,7 @@ The old `get(child(ref(db), path))` module-scoped pattern is unreliable due to a
 
 ### AI Proxy
 Cloud Function at `https://us-central1-revynce-740d1.cloudfunctions.net/chat`  
-Model: `qwen/qwen3.6-27b` via Groq  
+Model: `moonshotai/kimi-k2-instruct` via Groq  
 Rate limiting enforced server-side per UID
 
 ---

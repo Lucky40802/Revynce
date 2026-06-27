@@ -43,7 +43,9 @@ exports.chat = onRequest(
 
     // ── CORS headers — restrict to your domain in production ──
     const allowedOrigins = [
-      "https://lucky40802.github.io",          // GitHub Pages (primary live URL)
+      "https://revynce.com.au",                 // custom domain (primary)
+      "https://www.revynce.com.au",
+      "https://lucky40802.github.io",           // GitHub Pages fallback
       "https://revynce-740d1.web.app",
       "https://revynce-740d1.firebaseapp.com",
       "http://localhost",
@@ -110,7 +112,7 @@ exports.chat = onRequest(
             "Authorization": `Bearer ${groqKey.value()}`,  // key never sent to browser
           },
           body: JSON.stringify({
-            model:       model       || "llama-3.3-70b-versatile",
+            model:       model       || "moonshotai/kimi-k2-instruct",
             messages:    messages,
             max_tokens:  max_tokens  || 1024,
             temperature: temperature || 0.7,

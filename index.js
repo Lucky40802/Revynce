@@ -2,7 +2,7 @@
  * Revynce — Groq AI Proxy
  * Firebase Cloud Function (2nd gen)
  *
- * Model: llama-3.3-70b-versatile
+ * Model: moonshotai/kimi-k2-instruct
  *
  * HOW TO DEPLOY:
  * 1. firebase login
@@ -56,7 +56,7 @@ exports.chat = onRequest(
           "Authorization": `Bearer ${groqKey.value()}`,
         },
         body: JSON.stringify({
-          model: model || "llama-3.3-70b-versatile",
+          model: model || "moonshotai/kimi-k2-instruct",
           messages,
           max_tokens: max_tokens || 1024,
           temperature: temperature || 0.7,

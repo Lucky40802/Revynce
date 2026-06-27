@@ -2,7 +2,7 @@
  * Revynce — Groq AI Proxy
  * Firebase Cloud Function (2nd gen)
  *
- * Model: meta-llama/llama-4-maverick-17b-128e-instruct
+ * Model: llama-3.3-70b-versatile
  *
  * HOW TO DEPLOY:
  * 1. firebase login
@@ -56,7 +56,7 @@ exports.chat = onRequest(
           "Authorization": `Bearer ${groqKey.value()}`,
         },
         body: JSON.stringify({
-          model: model || "meta-llama/llama-4-maverick-17b-128e-instruct",
+          model: model || "llama-3.3-70b-versatile",
           messages,
           max_tokens: max_tokens || 1024,
           temperature: temperature || 0.7,

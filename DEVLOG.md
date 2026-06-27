@@ -2,7 +2,7 @@
 
 **Live site:** https://revynce.com.au  
 **Repository:** https://github.com/Lucky40802/Revynce  
-**Stack:** Single-file HTML app · Firebase Realtime Database · Firebase Auth · Firebase Storage · Firebase Cloud Functions v2 · Groq AI (meta-llama/llama-4-maverick-17b-128e-instruct) · GitHub Pages
+**Stack:** Single-file HTML app · Firebase Realtime Database · Firebase Auth · Firebase Storage · Firebase Cloud Functions v2 · Groq AI (llama-3.3-70b-versatile) · GitHub Pages
 
 ---
 
@@ -160,7 +160,7 @@ The old `get(child(ref(db), path))` module-scoped pattern is unreliable due to a
 
 ### AI Proxy
 Cloud Function at `https://us-central1-revynce-740d1.cloudfunctions.net/chat`  
-Model: `meta-llama/llama-4-maverick-17b-128e-instruct` via Groq  
+Model: `llama-3.3-70b-versatile` via Groq  
 Rate limiting enforced server-side per UID
 
 ---

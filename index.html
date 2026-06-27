@@ -2513,7 +2513,7 @@ body, .sidebar, .topbar, .card, .app-panel, .land-nav-bar,
           <div class="ai-avatar"><i class="fi fi-br-robot"></i></div>
           <div><div class="ai-name">Revynce AI</div><div class="ai-status"><div class="status-dot"></div> Online &amp; ready</div></div>
           <div style="margin-left:auto;display:flex;gap:6px">
-            <span class="badge">Llama 4 Maverick</span>
+            <span class="badge">Llama 3.3 70B</span>
           </div>
         </div>
         <div class="chat-messages" id="chatMessages">
@@ -4350,7 +4350,7 @@ Return only the raw JSON object.`;
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
+        model: 'llama-3.3-70b-versatile',
         messages: [{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],
         max_tokens: 8192,
         temperature: 0.25,
@@ -4455,7 +4455,7 @@ window.appGenerate = async function() {
       const fileRef = window._sRef(window._storage, `uploads/${window._uid}/${Date.now()}_${appUploadedFile.name}`);
       await window._uploadBytes(fileRef, appUploadedFile);
     }
-    status.textContent = '🤖 Generating AI content with Llama 4 Maverick — ~15 seconds…';
+    status.textContent = '🤖 Generating AI content with Llama 3.3 70B — ~15 seconds…';
     const fileText = await readFileAsText(appUploadedFile);
     const subject = document.getElementById('upload-subject').value.trim();
     const instructions = document.getElementById('upload-instructions').value.trim();
@@ -4768,7 +4768,7 @@ Object.defineProperties(window, {
 });
 
 // ── Groq proxy URL (via Firebase Cloud Function) ──
-// Uses meta-llama/llama-4-maverick-17b-128e-instruct via Groq
+// Uses llama-3.3-70b-versatile via Groq
 // PROXY_URL is defined in REVYNCE_CONFIG above — window._PROXY_URL is already set
 
 // ═══════════════════════════════════════
@@ -5427,7 +5427,7 @@ async function renderSchedule() {
   }).join('');
 }
 
-// ── Chatbot — Groq meta-llama/llama-4-maverick-17b-128e-instruct via Cloud Function ──
+// ── Chatbot — Groq llama-3.3-70b-versatile via Cloud Function ──
 const TUTOR_SYSTEM_BASE = `You are Revynce AI, an expert study tutor for high school and university students. Help with all subjects — maths, science, history, literature, languages, and more. Explain concepts clearly, set practice problems, give essay feedback, and create study strategies. Keep responses concise but thorough. Use bullet points and numbered lists where helpful. Show step-by-step solutions for worked examples. Always be encouraging and positive.`;
 
 let chatHistory = [{ role: 'system', content: TUTOR_SYSTEM_BASE }];
@@ -5557,7 +5557,7 @@ window.sendMsg = async function() {
     const res = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'meta-llama/llama-4-maverick-17b-128e-instruct', messages: chatHistory, max_tokens: 1024, temperature: 0.7, uid: window._uid || null, plan: window._userProfile?.plan || 'free' })
+      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: chatHistory, max_tokens: 1024, temperature: 0.7, uid: window._uid || null, plan: window._userProfile?.plan || 'free' })
     });
     if (!res.ok) { const err = await res.json().catch(()=>{}); throw new Error((err?.error) || 'Server error ' + res.status); }
     const data = await res.json();
@@ -6507,7 +6507,7 @@ const _TUT_STEPS = [
   {
     icon:'fi-br-robot',
     title:'AI Study Tutor',
-    desc:'Chat with Revynce AI — powered by Llama 4 Maverick. Ask it to explain a concept, set you a practice problem, review your essay, or quiz you on any topic.',
+    desc:'Chat with Revynce AI — powered by Llama 3.3 70B. Ask it to explain a concept, set you a practice problem, review your essay, or quiz you on any topic.',
     features:[
       {icon:'fi-br-lightbulb',  label:'Explain Concepts'},
       {icon:'fi-br-pencil',     label:'Practice Problems'},
@@ -6979,7 +6979,7 @@ window.generateTestPaperFromUpload = async function() {
     const prompt  = `${context}Generate a complete ${subject} ${year} test paper with exactly ${mcq} multiple-choice questions (A/B/C/D), ${sa} short-answer questions, and ${essay} essay question(s). Include an answer key at the end. Format clearly with section headings. Return only the plain text test paper.`;
     const res = await fetch(proxyUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'meta-llama/llama-4-maverick-17b-128e-instruct', messages:[{role:'system',content:'You are an expert teacher. Generate a well-structured test paper.'},{role:'user',content:prompt}], max_tokens:4096, temperature:0.3, uid:window._uid||null, plan:window._userProfile?.plan||'free' })
+      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'system',content:'You are an expert teacher. Generate a well-structured test paper.'},{role:'user',content:prompt}], max_tokens:4096, temperature:0.3, uid:window._uid||null, plan:window._userProfile?.plan||'free' })
     });
     if (!res.ok) throw new Error('AI error ' + res.status);
     const data  = await res.json();

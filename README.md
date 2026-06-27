@@ -19,7 +19,7 @@ Revynce is a full-stack AI-powered learning platform for students and teachers. 
 | Database | Firebase Realtime Database + Firestore |
 | Storage | Firebase Storage |
 | AI Proxy | Firebase Cloud Function (Node.js) |
-| AI Model | Kimi K2 (configured in Cloud Function) |
+| AI Model | Llama 4 Maverick (configured in Cloud Function) |
 | Fonts | Syne + DM Sans (Google Fonts) |
 | Icons | Flaticon Uicons |
 

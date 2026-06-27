@@ -112,7 +112,7 @@ exports.chat = onRequest(
             "Authorization": `Bearer ${groqKey.value()}`,  // key never sent to browser
           },
           body: JSON.stringify({
-            model:       model       || "moonshotai/kimi-k2-instruct",
+            model:       model       || "meta-llama/llama-4-maverick-17b-128e-instruct",
             messages:    messages,
             max_tokens:  max_tokens  || 1024,
             temperature: temperature || 0.7,

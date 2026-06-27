@@ -6975,11 +6975,19 @@ window.generateTestPaperFromUpload = async function() {
   try {
     let fileText = '';
     if (file) fileText = await readFileAsText(file);
-    const context = fileText ? `Study material:\n"""\n${fileText.slice(0,8000)}\n"""\n\n` : '';
-    const prompt  = `${context}Generate a complete ${subject} ${year} test paper with exactly ${mcq} multiple-choice questions (A/B/C/D), ${sa} short-answer questions, and ${essay} essay question(s). Include an answer key at the end. Format clearly with section headings. Return only the plain text test paper.`;
+    const context = fileText ? `Study material:\n"""\n${fileText.slice(0,12000)}\n"""\n\n` : '';
+    const prompt  = `${context}Generate a complete ${subject} ${year} test paper with exactly ${mcq} multiple-choice questions (A/B/C/D), ${sa} short-answer questions, and ${essay} essay question(s).
+
+STRICT REQUIREMENTS:
+- Multiple choice: 4 options (A/B/C/D). Each option must be plausible and meaningfully different — no joke/filler answers. Distractors should represent common student misconceptions. Questions must test understanding, not just recall.
+- Short answer: Require 3–6 sentences of explanation. Include "command terms" (describe, explain, analyse, evaluate, justify). Allocate marks per question (e.g. [4 marks]).
+- Essay: Require extended analytical response (300–500 words). Provide a clear scaffold: state your argument, use evidence, evaluate opposing views. Allocate marks (e.g. [10 marks]).
+- Answer key at the end: for MCQ give the letter + one-sentence explanation of WHY it is correct. For short answer and essay provide a model answer / marking criteria with dot-point criteria for full marks.
+- Format with clear section headings (SECTION A — Multiple Choice, SECTION B — Short Answer, SECTION C — Extended Response).
+- Number every question. Do NOT include any preamble — start directly with the test paper.`;
     const res = await fetch(proxyUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'system',content:'You are an expert teacher. Generate a well-structured test paper.'},{role:'user',content:prompt}], max_tokens:4096, temperature:0.3, uid:window._uid||null, plan:window._userProfile?.plan||'free' })
+      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'system',content:`You are a senior ${subject} teacher and experienced exam writer. Your test papers are rigorous, clearly worded, and directly aligned to the study material provided. Never generate vague or trivially easy questions. Every question must have unambiguous wording and a single clearly correct answer (for MCQ) or well-defined marking criteria (for written questions). Do not include any commentary outside the test paper itself.`},{role:'user',content:prompt}], max_tokens:32768, temperature:0.2, uid:window._uid||null, plan:window._userProfile?.plan||'free' })
     });
     if (!res.ok) throw new Error('AI error ' + res.status);
     const data  = await res.json();

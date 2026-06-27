@@ -6979,12 +6979,41 @@ window.generateTestPaperFromUpload = async function() {
     const prompt  = `${context}Generate a complete ${subject} ${year} test paper with exactly ${mcq} multiple-choice questions (A/B/C/D), ${sa} short-answer questions, and ${essay} essay question(s).
 
 STRICT REQUIREMENTS:
-- Multiple choice: 4 options (A/B/C/D). Each option must be plausible and meaningfully different — no joke/filler answers. Distractors should represent common student misconceptions. Questions must test understanding, not just recall.
-- Short answer: Require 3–6 sentences of explanation. Include "command terms" (describe, explain, analyse, evaluate, justify). Allocate marks per question (e.g. [4 marks]).
-- Essay: Require extended analytical response (300–500 words). Provide a clear scaffold: state your argument, use evidence, evaluate opposing views. Allocate marks (e.g. [10 marks]).
-- Answer key at the end: for MCQ give the letter + one-sentence explanation of WHY it is correct. For short answer and essay provide a model answer / marking criteria with dot-point criteria for full marks.
-- Format with clear section headings (SECTION A — Multiple Choice, SECTION B — Short Answer, SECTION C — Extended Response).
-- Number every question. Do NOT include any preamble — start directly with the test paper.`;
+
+SECTION A — MULTIPLE CHOICE (${mcq} questions):
+- 4 options (A/B/C/D). Each option must be plausible and meaningfully different — no joke/filler answers.
+- Distractors must represent specific, common student misconceptions about that exact concept.
+- Questions must test deep understanding and application, NOT simple recall of definitions.
+
+SECTION B — SHORT ANSWER (${sa} questions):
+- Every question must include a command term: describe, explain, analyse, evaluate, or justify.
+- Each question must state the mark value, e.g. [4 marks].
+- Students must write a minimum of 4–6 detailed sentences to earn full marks.
+
+SECTION C — EXTENDED RESPONSE (${essay} question(s)):
+- Each question must demand a structured analytical essay of 350–500 words.
+- Include clear sub-prompts: state a position, support with specific evidence, evaluate a counterargument, and reach a conclusion.
+- State mark value, e.g. [10 marks].
+
+ANSWER KEY (mandatory — formatted EXACTLY as below):
+- Appear under a heading "ANSWER KEY" at the very end, after all questions.
+- List EVERY question individually on its own block, in order, with NO grouping or lumping.
+- Format each MCQ answer entry as:
+    Q[number]: [Correct letter]) [Answer text]
+    Explanation: [3–5 sentences explaining WHY this answer is correct, why each distractor is wrong, and what underlying concept this tests.]
+- Format each short-answer entry as:
+    Q[number]: [Command term restated]
+    Model Answer: [A full, detailed model response of 5–8 sentences that would receive full marks.]
+    Marking Criteria: [Dot-point list of specific facts/concepts that must be present for full marks.]
+- Format each essay entry as:
+    Q[number]: [Question restated]
+    Model Answer Outline: [Full paragraph outline covering each required part of the response.]
+    Marking Criteria: [Dot-point rubric for each mark band — e.g. 9–10, 7–8, 5–6, below 5.]
+
+FORMAT RULES:
+- Clear section headings: SECTION A — MULTIPLE CHOICE, SECTION B — SHORT ANSWER, SECTION C — EXTENDED RESPONSE, ANSWER KEY.
+- Number every question sequentially across all sections (do NOT restart numbering per section).
+- Do NOT include any preamble, introduction, or commentary — start directly with SECTION A.`;
     const res = await fetch(proxyUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'system',content:`You are a senior ${subject} teacher and experienced exam writer. Your test papers are rigorous, clearly worded, and directly aligned to the study material provided. Never generate vague or trivially easy questions. Every question must have unambiguous wording and a single clearly correct answer (for MCQ) or well-defined marking criteria (for written questions). Do not include any commentary outside the test paper itself.`},{role:'user',content:prompt}], max_tokens:32768, temperature:0.2, uid:window._uid||null, plan:window._userProfile?.plan||'free' })
